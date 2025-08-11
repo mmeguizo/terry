@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --breakpoint-xs: 32rem;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+* {
+  /* outline: 1px solid gray; */
+  font-family: var(--font-exo2), sans-serif;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+.container {
+  @apply mx-auto px-6;
+  @apply sm:px-16;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+header {
+  height: 77px !important;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    top: -1px;
+    width: 100%;
+    height: 1px;
+    box-shadow: 0 0 100px 100px black;
+  }
+}
+
+.menu-container {
+  & > svg {
+    top: 0;
+    left: 0;
+    opacity: 1;
+    position: absolute;
+    width: 2500px;
+    height: 97px;
+    z-index: 40;
+  }
+}
+
+/* .logo-container {
+  &::after {
+    content: "";
+    position: absolute;
+    top: -40%;
+    left: 50%;
+    width: 200vw;
+    height: 400%;
+    z-index: 20;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(closest-side, rgba(0, 0, 0, 0.8) 25%, transparent 80%);
+    border-radius: 100%;
+  }
+} */
+
+.button {
+  @apply block uppercase w-fit px-5 py-3;
+  @apply bg-gradient-to-r from-[var(--primary-color)] to-[var(--primary-color)]/60;
+  @apply border-1 border-[var(--primary-color)] rounded-sm;
+  @apply text-white font-medium;
+  outline: 5px solid transparent;
+  outline-offset: -4px;
+  transition: all 500ms;
+}
+
+.button:hover {
+  background-color: var(--primary-color);
+  outline-color: color-mix(in srgb, var(--primary-color) 50%, transparent);
+  outline-offset: 0;
+}
+
+.icon-button {
+  @apply flex items-center justify-start bg-neutral-800/80 rounded-sm overflow-hidden transition-colors duration-300;
+  @apply hover:bg-neutral-900/80;
+
+  & div:first-child {
+    @apply aspect-square h-full rounded-sm grid place-content-center shrink-0 py-6;
+    @apply bg-gradient-to-r from-[var(--primary-color)] to-[var(--primary-color)]/60 shrink-0;
+
+    & svg {
+      @apply size-7 text-white;
+    }
+  }
+
+  & div:last-child {
+    @apply uppercase px-4 text-start;
+  }
+}
+
+.swiper-wrapper {
+  transition-timing-function: linear !important;
+}

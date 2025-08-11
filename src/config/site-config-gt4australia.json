@@ -1,0 +1,58 @@
+{
+  "siteTitle": "Monochrome GT4 Australia",
+  "primaryColor": "#000000",
+  "menuBackground": "#FFFFFF",
+  "textColor": "#000000",
+  "logoImage": "https://gt4australia.com.au/images/sign-up-promo-gt4-aus.jpg",
+  "menu": [
+    { "label": "Home", "url": "/" },
+    { "label": "Calendar", "url": "/calendar" },
+    { "label": "News", "url": "/news" },
+    { "label": "Gallery", "url": "/gallery" }
+  ],
+  "hero": {
+    "background": "https://gt4australia.com.au/timthumb.php?w=1600&src=%2Fimages%2Fevents%2Fimage_2_12.png",
+    "eventDate": "2025-09-05T10:00:00+10:00",
+    "eventInfo": "/event/12/The-Bend",
+    "eventName": "THE BEND",
+    "eventLocation": "Australia",
+    "buttons": [
+      { "label": "Event Info", "url": "/event/12/The-Bend" },
+      { "label": "Race Tickets", "url": "https://www.eventbrite.com.au/e/gt-festival-the-bend-shannons-speedseries-tickets-1235969470959?aff=Website" },
+      { "label": "Timetable", "url": "/event/12/The-Bend#timetable" }
+    ]
+  },
+  "eventDocuments": [
+    { "label": "Event Info", "url": "/event/12/The-Bend" },
+    { "label": "Noticeboard", "url": "/noticeboard?meeting_id=12" }
+  ],
+  "newsItems": [
+    {
+      "title": "Reigning Silver Cup winner receives McLaren test opportunity",
+      "date": "2025-07-29",
+      "image": "https://gt4australia.com.au/images/sign-up-promo-gt4-aus.jpg",
+      "url": "/news/215/reigning-silver-cup-winner-receives-mclaren-test-opportunity"
+    },
+    {
+      "title": "Memorable Race 2 wraps up GT Festival Sandown",
+      "date": "2025-07-27",
+      "image": "https://gt4australia.com.au/timthumb.php?w=1600&src=%2Fimages%2Fevents%2Fimage_2_11.png",
+      "url": "/news/214/memorable-race-2-wraps-up-gt-festival-sandown-for-monocrhome-gt4-australia"
+    }
+  ],
+  "sponsors": [
+    { "name": "Monochrome", "logo": "https://www.monochrome.au/favicon.ico", "url": "https://www.monochrome.au/" },
+    { "name": "Pirelli", "logo": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Pirelli_logo.svg", "url": "https://www.pirelli.com/" },
+    { "name": "Shell Card", "logo": "https://www.shell.com.au/etc.clientlibs/settings/wcm/designs/shell/clientlibs_base/resources/favicon.ico", "url": "https://www.shell.com.au/business-customers/shell-fuel-card.html" }
+  ],
+  "footer": {
+    "backgroundColor": "#000000",
+    "textColor": "#FFFFFF"
+  },
+  "socials": [
+    { "platform": "Facebook", "url": "https://www.facebook.com/gt4australia" },
+    { "platform": "Instagram", "url": "https://www.instagram.com/gt4australia" },
+    { "platform": "X", "url": "https://x.com/" },
+    { "platform": "YouTube", "url": "https://www.youtube.com/@gtworld" }
+  ]
+}
