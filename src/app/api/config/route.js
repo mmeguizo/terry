@@ -59,7 +59,7 @@ export async function GET() {
 
 // Transform Strapi data structure to match your existing JSON structure
 function transformStrapiData(data) {
-  console.log("Transforming Strapi data:", data);
+  // console.log("Transforming Strapi data:", data);
 
   // The data is already in the format we need, no need to access 'attributes'
   const strapiUrl = process.env.STRAPI_URL || "";

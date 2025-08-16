@@ -4,6 +4,7 @@
 // - Sorts by "date" first, then falls back to "publishedAt" if Strapi rejects the sort
 // - Returns a minimal array of news objects
 
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 
 export async function GET() {
@@ -11,80 +12,88 @@ export async function GET() {
   const siteSlug = process.env.SITE_SLUG || "";
   const token = process.env.STRAPI_API_TOKEN || "";
 
-  // Quick env sanity checks for easier debugging
-  if (!base) {
-    console.error("STRAPI_URL is not set");
-    return NextResponse.json({ error: "STRAPI_URL not set" }, { status: 500 });
-  }
-  if (!siteSlug) {
-    console.error("SITE_SLUG is not set");
-    return NextResponse.json({ error: "SITE_SLUG not set" }, { status: 400 });
+  if (!base || !siteSlug) {
+    console.warn("api/news: missing STRAPI_URL or SITE_SLUG");
+    return NextResponse.json([]);
   }
 
-  // Helper to build the URL (with optional sort)
-  const buildUrl = (sort) =>
-    `${base}/api/news-items?filters[sites][slug][$eq]=${encodeURIComponent(siteSlug)}${
-      sort ? `&sort[0]=${encodeURIComponent(sort)}` : ""
-    }`;
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  const RELS = ["sites", "site"]; // support M2M or M2O
+  const SORTS = ["date:desc", "publishedAt:desc", "createdAt:desc"];
 
-  // Try a small set of safe sort keys in order
-  const sorts = ["date:desc", "publishedAt:desc"];
-  let lastResponse = null;
-  let json = null;
+  const toAbs = (v) =>
+    !v ? null : /^https?:\/\//i.test(v) ? v : `${base}/${String(v).replace(/^\/+/, "")}`;
 
-  for (const s of sorts) {
-    const url = buildUrl(s);
-    console.log("Fetching news:", url);
-    lastResponse = await fetch(url, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      cache: "no-store",
+  // Try combinations of relation + sort
+  for (const rel of RELS) {
+    for (const sort of SORTS) {
+      const url =
+        `${base}/api/news-items?filters[${rel}][slug][$eq]=${encodeURIComponent(siteSlug)}` +
+        `&sort[0]=${encodeURIComponent(sort)}&pagination[limit]=8`;
+
+      try {
+        const res = await fetch(url, { headers, cache: "no-store" });
+        if (!res.ok) {
+          const body = await res.text().catch(() => "");
+          // Only keep looping on "Invalid key ..." 400s
+          if (!(res.status === 400 && /Invalid key/i.test(body))) {
+            console.warn("api/news fetch failed:", res.status, body);
+            break;
+          }
+          continue;
+        }
+
+        const json = await res.json();
+        const items = Array.isArray(json?.data) ? json.data : [];
+        if (!items.length) continue;
+
+        const out = items.map((row) => {
+          const a = row?.attributes || row || {};
+          const img =
+            a.image?.data?.attributes?.url ||
+            a.cover?.data?.attributes?.url ||
+            a.thumbnail?.data?.attributes?.url ||
+            a.image || a.imageUrl || null;
+
+          return {
+            id: row?.id,
+            title: a.title || "Untitled",
+            slug: a.slug || null,
+            date: a.date || a.publishedAt || a.createdAt || null,
+            image: toAbs(img),
+            url: a.url || (a.slug ? `/news/${a.slug}` : "#"),
+          };
+        });
+
+        return NextResponse.json(out);
+      } catch (e) {
+        console.warn("api/news network error:", e.message || e);
+      }
+    }
+  }
+
+  // Final fallback: no sort
+  try {
+    const url =
+      `${base}/api/news-items?filters[sites][slug][$eq]=${encodeURIComponent(siteSlug)}` +
+      `&pagination[limit]=8`;
+    const res = await fetch(url, { headers, cache: "no-store" });
+    if (!res.ok) return NextResponse.json([]);
+    const json = await res.json();
+    const items = Array.isArray(json?.data) ? json.data : [];
+    const out = items.map((row) => {
+      const a = row?.attributes || row || {};
+      return {
+        id: row?.id,
+        title: a.title || "Untitled",
+        slug: a.slug || null,
+        date: a.date || a.publishedAt || a.createdAt || null,
+        image: toAbs(a.image),
+        url: a.url || (a.slug ? `/news/${a.slug}` : "#"),
+      };
     });
-
-    if (lastResponse.ok) {
-      json = await lastResponse.json();
-      break;
-    }
-
-    // Log the response body for visibility
-    const body = await lastResponse.text().catch(() => "");
-    console.warn("News fetch failed:", { status: lastResponse.status, body });
-
-    // Only try next sort if this is a typical "Invalid key ..." 400
-    if (!(lastResponse.status === 400 && /Invalid key/i.test(body))) {
-      break;
-    }
+    return NextResponse.json(out);
+  } catch {
+    return NextResponse.json([]);
   }
-
-  // Final fallback: no sort at all
-  if (!json && lastResponse && !lastResponse.ok) {
-    const url = buildUrl("");
-    console.log("Retrying news without sort:", url);
-    const res = await fetch(url, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-      cache: "no-store",
-    });
-    if (!res.ok) {
-      const body = await res.text().catch(() => "");
-      console.error("News fetch (no sort) failed:", { status: res.status, body });
-      return NextResponse.json({ error: "Failed to fetch news" }, { status: 502 });
-    }
-    json = await res.json();
-  }
-
-  // Normalize and return a minimal shape for the UI
-  const items = Array.isArray(json?.data) ? json.data : [];
-  const out = items.map((row) => {
-    const a = row?.attributes || row || {};
-    return {
-      id: row?.id,
-      title: a.title || "Untitled",
-      slug: a.slug || null,
-      // Prefer your "date" field; fall back to Strapi timestamps
-      date: a.date || a.publishedAt || a.createdAt || null,
-      image: a.image || null, // your model uses Text for image
-      url: a.url || (a.slug ? `/news/${a.slug}` : "#"),
-    };
-  });
-
-  return NextResponse.json(out);
 }
