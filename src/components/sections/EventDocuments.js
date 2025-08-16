@@ -9,7 +9,7 @@ export default function EventDocuments() {
   const docs = Array.isArray(config?.eventDocuments) ? config.eventDocuments : [];
 
   return (
-    <section className="bg-neutral-500 py-18">
+    <section className="bg-[#171717] py-18">
       <div className="container">
         <h1 className="xs:text-4xl text-3xl font-semibold text-white text-start mb-8 uppercase">
           Event Documents

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import configData from "@/config/site-config.json";
 import fs from "fs";
 import path from "path";
+import Image from "next/image";
 
 // Keep generateStaticParams but guard when configData.newsItems is missing
 export async function generateStaticParams() {
@@ -136,9 +137,11 @@ export default async function NewsPage({ params }) {
         {/* Hero Section */}
         <div className="mb-8">
           <div className="relative w-full aspect-video max-h-[600px] overflow-hidden mb-6">
-            <img
+            <Image
               src={newsItem.image}
               alt={newsItem.title}
+              fill
+              sizes="(max-width: 768px) 100vw, 1200px"
               className="w-full h-full object-cover"
             />
           </div>
