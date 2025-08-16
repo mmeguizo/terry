@@ -7,6 +7,16 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 
+// Slug helper
+function slugify(input) {
+  return String(input || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
 export async function GET() {
   const base = (process.env.STRAPI_URL || "").replace(/\/+$/, "");
   const siteSlug = process.env.SITE_SLUG || "";
@@ -22,7 +32,7 @@ export async function GET() {
   const SORTS = ["date:desc", "publishedAt:desc", "createdAt:desc"];
 
   const toAbs = (v) =>
-    !v ? null : /^https?:\/\//i.test(v) ? v : `${base}/${String(v).replace(/^\/+/, "")}`;
+    !v ? null : /^https?:\/\//i.test(String(v)) ? String(v) : `${base}/${String(v).replace(/^\/+/, "")}`;
 
   // Try combinations of relation + sort
   for (const rel of RELS) {
@@ -49,19 +59,25 @@ export async function GET() {
 
         const out = items.map((row) => {
           const a = row?.attributes || row || {};
-          const img =
+          const image =
             a.image?.data?.attributes?.url ||
             a.cover?.data?.attributes?.url ||
             a.thumbnail?.data?.attributes?.url ||
-            a.image || a.imageUrl || null;
+            a.image ||
+            a.imageUrl ||
+            null;
+
+          const slug = a.slug || slugify(a.title) || String(row?.id || "");
+          const path = slug ? `/news/${slug}` : "#";
 
           return {
             id: row?.id,
             title: a.title || "Untitled",
-            slug: a.slug || null,
+            slug,
             date: a.date || a.publishedAt || a.createdAt || null,
-            image: toAbs(img),
-            url: a.url || (a.slug ? `/news/${a.slug}` : "#"),
+            image: toAbs(image),
+            url: a.url || path,
+            path,
           };
         });
 
@@ -83,13 +99,23 @@ export async function GET() {
     const items = Array.isArray(json?.data) ? json.data : [];
     const out = items.map((row) => {
       const a = row?.attributes || row || {};
+      const slug = a.slug || slugify(a.title) || String(row?.id || "");
+      const path = slug ? `/news/${slug}` : "#";
       return {
         id: row?.id,
         title: a.title || "Untitled",
-        slug: a.slug || null,
+        slug,
         date: a.date || a.publishedAt || a.createdAt || null,
-        image: toAbs(a.image),
-        url: a.url || (a.slug ? `/news/${a.slug}` : "#"),
+        image: toAbs(
+          a.image?.data?.attributes?.url ||
+            a.cover?.data?.attributes?.url ||
+            a.thumbnail?.data?.attributes?.url ||
+            a.image ||
+            a.imageUrl ||
+            null
+        ),
+        url: a.url || path,
+        path,
       };
     });
     return NextResponse.json(out);
