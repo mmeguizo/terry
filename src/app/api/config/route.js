@@ -64,6 +64,11 @@ function transformStrapiData(data) {
   // The data is already in the format we need, no need to access 'attributes'
   const strapiUrl = process.env.STRAPI_URL || "";
 
+  // Use this pattern before mapping
+  const sponsors = Array.isArray(data?.sponsors) ? data.sponsors : [];
+  const docs = Array.isArray(data?.eventDocuments) ? data.eventDocuments : [];
+  const buttons = Array.isArray(data?.hero?.buttons) ? data.hero.buttons : [];
+
   return {
     siteTitle: data.siteTitle,
     primaryColor: data.primaryColor,
@@ -79,10 +84,10 @@ function transformStrapiData(data) {
       eventInfo: data.hero?.[0]?.eventInfo,
       eventName: data.hero?.[0]?.eventName,
       eventLocation: data.hero?.[0]?.eventLocation,
-      buttons: data.hero?.[0]?.button || [],
+      buttons: buttons,
     },
 
-    eventDocuments: data.eventDocuments || [],
+    eventDocuments: docs,
     websites: data.websites || [],
     newsItems: (data.newsItems || []).map((item) => ({
       ...item,
@@ -90,7 +95,7 @@ function transformStrapiData(data) {
         ? `${strapiUrl}${item.image.data.attributes.url}`
         : item.image,
     })),
-    sponsors: (data.sponsors || []).map((sponsor) => ({
+    sponsors: sponsors.map((sponsor) => ({
       ...sponsor,
       logo: sponsor.logo?.data?.attributes?.url
         ? `${strapiUrl}${sponsor.logo.data.attributes.url}`
