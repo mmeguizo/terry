@@ -65,8 +65,24 @@ async function getEventBySlug(slug) {
   }
 }
 
+function eventToJsonLd(event, path) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SportsEvent",
+    name: event.name,
+    startDate: event.startDate || undefined,
+    endDate: event.endDate || undefined,
+    location: event.venue
+      ? { "@type": "Place", name: event.venue }
+      : undefined,
+    image: event.heroImage ? [event.heroImage] : undefined,
+    description: event.description || undefined,
+    url: path,
+  };
+}
+
 export default async function EventPage({ params }) {
-  const { id: handle } = await params; // supports numeric id or slug
+  const { id: handle } = await params;
   const event = isNumeric(handle) ? await getEventById(handle) : await getEventBySlug(handle);
 
   if (!event) {
@@ -78,10 +94,20 @@ export default async function EventPage({ params }) {
     );
   }
 
+  const isNumHandle = isNumeric(handle);
+  const canonicalPath = `/events/${isNumHandle ? (event.slug || handle) : handle}`;
+  const jsonLd = eventToJsonLd(event, canonicalPath);
+
   const dateRange = fmtRange(event.startDate, event.endDate);
 
   return (
     <main>
+      {/* JSON-LD for rich results */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <section className="bg-[#0f1216] text-white">
         <div className="container py-10">
           <div className="grid md:grid-cols-[2fr_1fr] items-center gap-8">
@@ -203,23 +229,28 @@ export async function generateMetadata({ params }) {
   const title = event.name || "Event";
   const description =
     event.description ||
-    (Array.isArray(event.categories) && event.categories.length ? `Categories: ${event.categories.join(", ")}` : undefined) ||
-    undefined;
+    (Array.isArray(event.categories) && event.categories.length
+      ? `Categories: ${event.categories.join(", ")}`
+      : undefined);
+
+  const images = event.heroImage ? [event.heroImage] : undefined;
+  const canonical = `/events/${isNum ? handle : (event.slug || handle)}`;
 
   return {
-    title: `${title} | Wakefield 300`,
+    title: `${title} | ${process.env.SITE_SLUG || "Site"}`,
     description,
+    alternates: { canonical },
     openGraph: {
       title,
       description,
       type: "article",
-      images: event.heroImage ? [event.heroImage] : undefined,
+      images,
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: event.heroImage ? [event.heroImage] : undefined,
+      images,
     },
   };
 }
