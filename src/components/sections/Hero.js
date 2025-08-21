@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useConfig } from "@/context/ConfigContext";
 import { HiChevronRight } from "react-icons/hi2";
 import { LinkButton, IconLinkButton } from "@/components/ui/Links";
+import Link from "next/link";
 
 const Hero = () => {
   const config = useConfig();
@@ -56,6 +57,25 @@ const Hero = () => {
     month: "long",
     day: "numeric",
   });
+
+  // safe buttons array (do not mutate original config)
+  const heroButtons = Array.isArray(config?.hero?.buttons) ? [...config.hero.buttons] : [];
+
+  // Minimal injection: add "Event info" linking to /events/1389 if not present
+  const eventPath = "/events/1389";
+  const hasEventButton = heroButtons.some(
+    (b) =>
+      (b?.url && String(b.url).replace(/\/+$/, "") === eventPath) ||
+      (String(b?.label || "").toLowerCase() === "event info" || String(b?.label || "").toLowerCase() === "event")
+  );
+
+  if (!hasEventButton) {
+    heroButtons.push({
+      id: "event-info",
+      label: "Event info",
+      url: eventPath,
+    });
+  }
 
   return (
     <section
@@ -117,7 +137,7 @@ const Hero = () => {
             <LinkButton href={config.hero.eventInfo}>Event Info</LinkButton>
           </div>
           <div className="shrink-0 flex flex-col justify-end grow gap-3">
-            {config.hero.buttons.map((button, index) => (
+            {heroButtons.map((button, index) => (
               <IconLinkButton key={index} href={button.url}>
                 <HiChevronRight />
                 {button.label}

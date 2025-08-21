@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 const Card = ({ href, children, className = "" }) => {
   return (
@@ -23,7 +24,7 @@ const CardImage = ({ src, alt = "", className = "" }) => {
 
   return (
     <div className={`border-4 border-b-0 rounded-lg border-white relative w-full aspect-video overflow-hidden ${className}`}>
-      <img src={src} alt={alt} className="w-full h-full object-cover group-hover:scale-102 transition-all duration-500" />
+      <Image src={src} alt={alt} className="w-full h-full object-cover group-hover:scale-102 transition-all duration-500" />
     </div>
   );
 };
