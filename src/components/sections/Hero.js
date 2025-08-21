@@ -52,21 +52,29 @@ const Hero = () => {
   }, [config.hero.eventDate]);
 
   const formatTime = (value) => value.toString().padStart(2, "0");
-  const formattedEventDate = new Date(config.hero.eventDate).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  const formattedEventDate = new Date(config.hero.eventDate).toLocaleDateString(
+    "en-US",
+    {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }
+  );
 
-  // safe buttons array (do not mutate original config)
-  const heroButtons = Array.isArray(config?.hero?.buttons) ? [...config.hero.buttons] : [];
+  // Clone existing buttons safely
+  const heroButtons = Array.isArray(config?.hero?.buttons)
+    ? [...config.hero.buttons]
+    : [];
 
-  // Minimal injection: add "Event info" linking to /events/1389 if not present
-  const eventPath = "/events/1389";
+  // Prefer Strapi setting if present, then env, then default
+  const eventId = (config?.eventId && String(config.eventId)) || process.env.NEXT_PUBLIC_EVENT_ID || "1389";
+  const eventPath = `/events/${eventId}`;
+
+  // Only add if not already present (by exact URL or label)
   const hasEventButton = heroButtons.some(
     (b) =>
       (b?.url && String(b.url).replace(/\/+$/, "") === eventPath) ||
-      (String(b?.label || "").toLowerCase() === "event info" || String(b?.label || "").toLowerCase() === "event")
+      /^event(\s+)?info$/i.test(String(b?.label || ""))
   );
 
   if (!hasEventButton) {
@@ -93,7 +101,10 @@ const Hero = () => {
                 <span>{formatTime(timeLeft.days)}</span>
                 <span
                   className="font-medium relative flex items-center gap-1.5 text-start text-sm uppercase after:content-[''] after:relative after:bg-[var(--primary-color)] after:h-[2px] after:w-[100%]"
-                  style={{ color: config.primaryColor, "--primary-color": config.primaryColor }}
+                  style={{
+                    color: config.primaryColor,
+                    "--primary-color": config.primaryColor,
+                  }}
                 >
                   Days
                 </span>
@@ -103,7 +114,10 @@ const Hero = () => {
                 <span>{formatTime(timeLeft.hours)}</span>
                 <span
                   className="font-medium relative flex items-center gap-1.5 text-start text-sm uppercase after:content-[''] after:relative after:bg-[var(--primary-color)] after:h-[2px] after:w-[100%]"
-                  style={{ color: config.primaryColor, "--primary-color": config.primaryColor }}
+                  style={{
+                    color: config.primaryColor,
+                    "--primary-color": config.primaryColor,
+                  }}
                 >
                   Hrs
                 </span>
@@ -113,7 +127,10 @@ const Hero = () => {
                 <span>{formatTime(timeLeft.minutes)}</span>
                 <span
                   className="font-medium relative flex items-center gap-1.5 text-start text-sm uppercase after:content-[''] after:relative after:bg-[var(--primary-color)] after:h-[2px] after:w-[100%]"
-                  style={{ color: config.primaryColor, "--primary-color": config.primaryColor }}
+                  style={{
+                    color: config.primaryColor,
+                    "--primary-color": config.primaryColor,
+                  }}
                 >
                   Mins
                 </span>
@@ -123,26 +140,37 @@ const Hero = () => {
                 <span>{formatTime(timeLeft.seconds)}</span>
                 <span
                   className="font-medium relative flex items-center gap-1.5 text-start text-sm uppercase after:content-[''] after:relative after:bg-[var(--primary-color)] after:h-[2px] after:w-[100%]"
-                  style={{ color: config.primaryColor, "--primary-color": config.primaryColor }}
+                  style={{
+                    color: config.primaryColor,
+                    "--primary-color": config.primaryColor,
+                  }}
                 >
                   Secs
                 </span>
               </span>
             </h1>
-            <h1 className="xs:text-5xl text-4xl font-semibold text-start uppercase">{config.hero.eventName}</h1>
+            <h1 className="xs:text-5xl text-4xl font-semibold text-start uppercase">
+              {config.hero.eventName}
+            </h1>
 
-            <h1 className="xs:text-4xl text-3xl font-medium text-start uppercase">{config.hero.eventLocation}</h1>
+            <h1 className="xs:text-4xl text-3xl font-medium text-start uppercase">
+              {config.hero.eventLocation}
+            </h1>
 
-            <p className="font-medium text-start uppercase">{formattedEventDate}</p>
+            <p className="font-medium text-start uppercase">
+              {formattedEventDate}
+            </p>
             <LinkButton href={config.hero.eventInfo}>Event Info</LinkButton>
           </div>
           <div className="shrink-0 flex flex-col justify-end grow gap-3">
-            {heroButtons.map((button, index) => (
-              <IconLinkButton key={index} href={button.url}>
-                <HiChevronRight />
-                {button.label}
-              </IconLinkButton>
-            ))}
+            <div className="hero-ctas">
+              {heroButtons.map((button, index) => (
+                <IconLinkButton key={button.id ?? index} href={button.url}>
+                  <HiChevronRight />
+                  {button.label}
+                </IconLinkButton>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -151,3 +179,11 @@ const Hero = () => {
 };
 
 export default Hero;
+
+/*
+<IconLinkButton key={index} href={button.url}>
+                <HiChevronRight />
+                {button.label}
+              </IconLinkButton>
+
+*/

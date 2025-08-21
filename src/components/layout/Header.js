@@ -38,6 +38,19 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isWebsitesMenuOpen, setIsWebsitesMenuOpen] = useState(false);
 
+  console.log(config);
+
+  // Inject "Events" link safely (do not mutate config.menu)
+  const menuItems = Array.isArray(config?.menu) ? [...config.menu] : [];
+  const hasEvents = menuItems.some(
+    (it) =>
+      (it?.url && String(it.url).replace(/\/+$/, "") === "/events") ||
+      String(it?.label || "").toLowerCase() === "events"
+  );
+  if (!hasEvents) {
+    menuItems.push({ label: "Events", url: "/events" });
+  }
+
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const toggleWebsitesMenu = () => setIsWebsitesMenuOpen(!isWebsitesMenuOpen);
   const closeMobileMenu = () => setIsMobileMenuOpen(false);
@@ -63,7 +76,7 @@ const Header = () => {
         <div className="relative h-full menu-container flex gap-4 flex-grow justify-end items-center pt-[5px] xs:ps-30 z-50">
           {/* Desktop menu */}
           <div className="hidden lg:flex gap-4 items-center">
-            {config.menu.map((item, index) => (
+            {menuItems.map((item, index) => (
               <NavLink
                 key={index}
                 href={item.url}
@@ -140,7 +153,7 @@ const Header = () => {
 
           <nav className="flex-1 px-4 py-6">
             <ul className="space-y-2">
-              {config.menu.map((item, index) => (
+              {menuItems.map((item, index) => (
                 <li key={index}>
                   <NavLink
                     href={item.url}
