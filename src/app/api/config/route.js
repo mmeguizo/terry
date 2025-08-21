@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import Image from "next/image";
 export const dynamic = "force-dynamic";
 
 function fmtRange(start, end) {
@@ -246,7 +245,8 @@ export async function GET() {
 
     // Transform Strapi data to match your existing structure
     const transformedConfig = transformStrapiData(strapiData.data[0]);
-    return NextResponse.json(transformedConfig);
+    // return NextResponse.json(transformedConfig);
+     return NextResponse.json(await enrichConfig(transformedConfig));
   } catch (error) {
     console.warn("Falling back to local JSON config:", error);
     const configModule = await import("@/config/site-config.json");
@@ -256,15 +256,25 @@ export async function GET() {
 
 // Transform Strapi data structure to match your existing JSON structure
 function transformStrapiData(data) {
-  // console.log("Transforming Strapi data:", data);
-
-  // The data is already in the format we need, no need to access 'attributes'
   const strapiUrl = process.env.STRAPI_URL || "";
 
-  // Use this pattern before mapping
+  // hero can be an array (repeatable/dynamic zone with 1 item) or a single object
+  const heroObj = Array.isArray(data?.hero) ? data.hero[0] : data?.hero;
+  const rawButtons = Array.isArray(heroObj?.button)
+    ? heroObj.button
+    : Array.isArray(heroObj?.buttons)
+    ? heroObj.buttons
+    : [];
+
+  const buttons = rawButtons.map((b, i) => ({
+    id: b?.id ?? i,
+    label: b?.label ?? b?.text ?? "Learn more",
+    url: b?.url ?? b?.href ?? "#",
+    target: b?.target || "_self",
+  }));
+
   const sponsors = Array.isArray(data?.sponsors) ? data.sponsors : [];
   const docs = Array.isArray(data?.eventDocuments) ? data.eventDocuments : [];
-  const buttons = Array.isArray(data?.hero?.buttons) ? data.hero.buttons : [];
 
   return {
     siteTitle: data.siteTitle,
@@ -274,16 +284,15 @@ function transformStrapiData(data) {
     logoImage: data.logoImage,
     menu: data.menu || [],
     hero: {
-      background: data.hero?.[0]?.background?.data?.attributes?.url
-        ? `${strapiUrl}${data.hero[0].background.data.attributes.url}`
-        : data.hero?.[0]?.background,
-      eventDate: data.hero?.[0]?.eventDate,
-      eventInfo: data.hero?.[0]?.eventInfo,
-      eventName: data.hero?.[0]?.eventName,
-      eventLocation: data.hero?.[0]?.eventLocation,
-      buttons: buttons,
+      background: heroObj?.background?.data?.attributes?.url
+        ? `${strapiUrl}${heroObj.background.data.attributes.url}`
+        : heroObj?.background,
+      eventDate: heroObj?.eventDate,
+      eventInfo: heroObj?.eventInfo,
+      eventName: heroObj?.eventName,
+      eventLocation: heroObj?.eventLocation,
+      buttons, // normalized buttons
     },
-
     eventDocuments: docs,
     websites: data.websites || [],
     newsItems: (data.newsItems || []).map((item) => ({
@@ -298,11 +307,56 @@ function transformStrapiData(data) {
         ? `${strapiUrl}${sponsor.logo.data.attributes.url}`
         : sponsor.logo,
     })),
-    // footer: data.footer ||[],
     footer: {
       backgroundColor: data.footer?.[0]?.backgroundColor || "#000000",
       textColor: data.footer?.[0]?.textColor || "#FFFFFF",
     },
     socials: data.socials || [],
+    // eventId: data.eventId || null, // uncomment if you add this field in Strapi
+  };
+}
+
+const isDev = process.env.NODE_ENV !== "production";
+function getOrigin() {
+  const local = `http://localhost:${process.env.PORT || 3000}`;
+  return isDev ? local : (process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || local);
+}
+
+async function fetchEvents() {
+  try {
+    const res = await fetch(new URL("/api/events", getOrigin()).toString(), { cache: "no-store" });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+function normalizeHeroButtons(hero) {
+  const src = Array.isArray(hero?.buttons)
+    ? hero.buttons
+    : Array.isArray(hero?.button)
+    ? hero.button
+    : [];
+  return src
+    .filter(Boolean)
+    .map((b, i) => ({
+      id: b?.id ?? i,
+      label: String(b?.label ?? b?.text ?? "Learn more"),
+      url: String(b?.url ?? b?.href ?? "#"),
+      target: b?.target || "_self",
+    }));
+}
+
+async function enrichConfig(cfg = {}) {
+  const events = await fetchEvents();
+  return {
+    ...cfg,
+    hero: {
+      ...(cfg.hero || {}),
+      buttons: normalizeHeroButtons(cfg?.hero || {}),
+    },
+    events,
   };
 }
