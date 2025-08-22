@@ -1,4 +1,5 @@
 import { Exo_2 } from "next/font/google";
+import { headers as nextHeaders } from "next/headers";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -11,11 +12,28 @@ const exo2 = Exo_2({
 
 async function getConfig() {
   try {
-    // Use SITE_DOMAIN from env or fallback to localhost
-    const baseUrl = process.env.SITE_DOMAIN || 'http://localhost:3000';
-      
+  // Build absolute URL from incoming request headers
+  const h = await nextHeaders();
+  const proto = h.get("x-forwarded-proto") || "http";
+  const host = h.get("host") || "localhost:3000";
+    const baseUrl = `${proto}://${host}`;
+    // Forward middleware-set headers (site host and query hints) so the config API can be multi-site aware
+    const forwardHeaders = {};
+    const siteHost = h.get("x-site-host") || h.get("host");
+    const siteHostName = h.get("x-site-hostname");
+    if (siteHost) forwardHeaders["x-site-host"] = siteHost;
+    if (siteHostName) forwardHeaders["x-site-hostname"] = siteHostName;
+    // forward any x-q-... query hint headers
+    for (const key of h.keys()) {
+      if (key && key.startsWith && key.startsWith("x-q-")) {
+        const val = h.get(key);
+        if (val) forwardHeaders[key] = val;
+      }
+    }
+
     const res = await fetch(`${baseUrl}/api/config`, {
       cache: "no-store",
+      headers: forwardHeaders,
     });
 
     if (!res.ok) throw new Error("API returned non-200");
@@ -70,11 +88,25 @@ async function getSiteBranding() {
 
 export async function generateMetadata() {
   try {
-    // Use SITE_DOMAIN from env or fallback to localhost
-    const baseUrl = process.env.SITE_DOMAIN || 'http://localhost:3000';
-    
-    const res = await fetch(`${baseUrl}/api/config`, {
+  const h = await nextHeaders();
+  const proto = h.get("x-forwarded-proto") || "http";
+  const host = h.get("host") || "localhost:3000";
+  const baseUrl = `${proto}://${host}`;
+  const forwardHeaders = {};
+  const siteHost = h.get("x-site-host") || h.get("host");
+  const siteHostName = h.get("x-site-hostname");
+  if (siteHost) forwardHeaders["x-site-host"] = siteHost;
+  if (siteHostName) forwardHeaders["x-site-hostname"] = siteHostName;
+  for (const key of h.keys()) {
+    if (key && key.startsWith && key.startsWith("x-q-")) {
+      const val = h.get(key);
+      if (val) forwardHeaders[key] = val;
+    }
+  }
+
+  const res = await fetch(`${baseUrl}/api/config`, {
       cache: "no-store",
+      headers: forwardHeaders,
     });
     if (!res.ok) throw new Error("API failed");
     const config = await res.json();
