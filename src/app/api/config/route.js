@@ -1,331 +1,136 @@
-import Image from "next/image";
 import { NextResponse } from "next/server";
 export const dynamic = "force-dynamic";
 
-function fmtRange(start, end) {
-  if (!start && !end) return null;
-  try {
-    const s = start ? new Date(start) : null;
-    const e = end ? new Date(end) : null;
-    if (s && e) {
-      const sameMonth =
-        s.getMonth() === e.getMonth() && s.getFullYear() === e.getFullYear();
-      const sStr = s.toLocaleDateString("en-AU", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
-      const eStr = e.toLocaleDateString("en-AU", {
-        day: "numeric",
-        month: sameMonth ? undefined : "long",
-        year: sameMonth ? undefined : "numeric",
-      });
-      return `${sStr} – ${eStr}`;
-    }
-    const one = (s || e).toLocaleDateString("en-AU", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
-    return one;
-  } catch {
-    return start || end;
-  }
-}
+const STRAPI_URL = process.env.STRAPI_URL || "";
+const STRAPI_TOKEN = process.env.STRAPI_TOKEN || "";
 
-async function getEventFromEnvId() {
-  const id = process.env.NEXT_PUBLIC_EVENT_ID || "1389";
-  const isDev = process.env.NODE_ENV !== "production";
-  const localOrigin = `http://localhost:${process.env.PORT || 3000}`;
-  const origin =
-    isDev
-      ? localOrigin
-      : process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || localOrigin;
-  const url = new URL(`/api/raceready/event/${id}`, origin).toString();
-
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) return null;
-  return res.json();
-}
-
-export default async function EventSlugPage({ params }) {
-  const { slug } = await params; // Next.js 15: params is a promise
-  const event = await getEventFromEnvId();
-
-  if (
-    !event ||
-    String(event.slug || "").toLowerCase() !== String(slug || "").toLowerCase()
-  ) {
-    return (
-      <main className="container py-14">
-        <h1 className="text-3xl font-semibold mb-2">Event Not Found</h1>
-        <p className="text-neutral-500">
-          The event you’re looking for doesn’t exist or failed to load.
-        </p>
-      </main>
-    );
-  }
-
-  const dateRange = fmtRange(event.startDate, event.endDate);
-
+function getSiteFromRequest(request) {
   return (
-    <main>
-      {/* Hero */}
-      <section className="bg-[#0f1216] text-white">
-        <div className="container py-10">
-          <div className="grid md:grid-cols-[2fr_1fr] items-center gap-8">
-            <div>
-              <h1 className="text-4xl font-bold mb-3">{event.name}</h1>
-              <div className="text-white/80 space-x-3">
-                {dateRange && <span>{dateRange}</span>}
-                {event.venue && (
-                  <>
-                    <span className="opacity-50">•</span>
-                    <span>{event.venue}</span>
-                  </>
-                )}
-              </div>
-              {event.description && (
-                <p className="mt-6 text-white/80 max-w-3xl">
-                  {event.description}
-                </p>
-              )}
-            </div>
-              <div className="relative w-full aspect-video rounded overflow-hidden ring-1 ring-white/10">
-                <Image
-                  src={event.heroImage}
-                  alt={event.name}
-                  className="object-cover"
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  priority
-                />
-              </div>
-              </div>
-        </div>
-      </section>
-
-      {/* Documents */}
-      <section className="bg-[#171717]">
-        <div className="container py-10">
-          <h2 className="text-xl font-semibold text-white mb-4">
-            Event Documents
-          </h2>
-          {Array.isArray(event.documents) && event.documents.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {event.documents.map((d) => (
-                <a
-                  key={d.id}
-                  href={d.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-3 rounded bg-white/5 text-white hover:bg-white/10 transition"
-                >
-                  {d.label}
-                </a>
-              ))}
-            </div>
-          ) : (
-            <p className="text-white/70">No documents yet.</p>
-          )}
-        </div>
-      </section>
-
-      {/* Categories and Entries */}
-      <section className="bg-white">
-        <div className="container py-10">
-          <div className="grid lg:grid-cols-3 gap-10">
-            <div className="lg:col-span-1">
-              <h2 className="text-xl font-semibold mb-3">Categories</h2>
-              {Array.isArray(event.categories) && event.categories.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {event.categories.map((c, i) => (
-                    <span
-                      key={i}
-                      className="px-3 py-1 bg-neutral-100 rounded-full text-neutral-700 text-sm"
-                    >
-                      {c}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-neutral-500">No categories yet.</p>
-              )}
-            </div>
-
-            <div className="lg:col-span-2">
-              <h2 className="text-xl font-semibold mb-3">Entry List</h2>
-              {Array.isArray(event.entries) && event.entries.length > 0 ? (
-                <div className="overflow-x-auto ring-1 ring-neutral-200 rounded">
-                  <table className="min-w-[680px] w-full text-sm">
-                    <thead className="bg-neutral-50">
-                      <tr>
-                        <th className="text-left font-medium p-3">#</th>
-                        <th className="text-left font-medium p-3">Team</th>
-                        <th className="text-left font-medium p-3">Drivers</th>
-                        <th className="text-left font-medium p-3">Car</th>
-                        <th className="text-left font-medium p-3">Class</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {event.entries.map((e) => (
-                        <tr key={e.id} className="border-t">
-                          <td className="p-3">{e.number ?? "-"}</td>
-                          <td className="p-3">{e.team ?? "-"}</td>
-                          <td className="p-3">
-                            {Array.isArray(e.drivers)
-                              ? e.drivers.join(", ")
-                              : "-"}
-                          </td>
-                          <td className="p-3">{e.car ?? "-"}</td>
-                          <td className="p-3">{e.class ?? "-"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-neutral-500">No entries yet.</p>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
+    request?.headers?.get?.("x-site-host") ||
+    request?.headers?.get?.("x-site-hostname") ||
+    null
   );
 }
 
-
-
-export async function GET() {
-  try {
-    const siteSlug = process.env.SITE_SLUG;
-
-    if (!siteSlug) {
-      throw new Error("SITE_SLUG environment variable is not defined");
-    }
-
-    const queryUrl =
-      `${process.env.STRAPI_URL}/api/sites?filters[slug][$eq]=${siteSlug}` +
-      `&populate[footer]=*` +
-      `&populate[socials]=*` +
-      `&populate[sponsors]=*` +
-      `&populate[eventDocuments]=*` +
-      `&populate[menu]=*` +
-      `&populate[websites]=*` +
-      `&populate[hero][populate][button]=*`;
-
-    // Fetch site configuration from Strapi based on slug
-    const strapiResponse = await fetch(
-      // `${process.env.STRAPI_URL}/api/sites?filters[slug][$eq]=${siteSlug}&populate=*`,
-      queryUrl,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        cache: "no-store", // Disable caching for dynamic content
-      }
-    );
-
-    if (!strapiResponse.ok) {
-      console.error(`Strapi API failed with status: ${strapiResponse.status}`);
-      console.error(`Request URL: ${queryUrl}`);
-      console.error(`Response: ${await strapiResponse.text()}`);
-      throw new Error(
-        `Strapi API failed with status: ${strapiResponse.status}`
-      );
-    }
-
-    const strapiData = await strapiResponse.json();
-
-    // Check if we got a site with the requested slug
-    if (!strapiData.data || strapiData.data.length === 0) {
-      throw new Error(`No site found with slug: ${siteSlug}`);
-    }
-
-    // Transform Strapi data to match your existing structure
-    const transformedConfig = transformStrapiData(strapiData.data[0]);
-    // return NextResponse.json(transformedConfig);
-     return NextResponse.json(await enrichConfig(transformedConfig));
-  } catch (error) {
-    console.warn("Falling back to local JSON config:", error);
-    const configModule = await import("@/config/site-config.json");
-    return NextResponse.json(configModule.default);
-  }
+function absoluteUrl(maybeUrl) {
+  if (!maybeUrl) return null;
+  if (typeof maybeUrl !== "string") return null;
+  if (maybeUrl.startsWith("http")) return maybeUrl;
+  if (!STRAPI_URL) return maybeUrl;
+  return STRAPI_URL.replace(/\/$/, "") + (maybeUrl.startsWith("/") ? maybeUrl : `/${maybeUrl}`);
 }
 
-// Transform Strapi data structure to match your existing JSON structure
-function transformStrapiData(data) {
-  const strapiUrl = process.env.STRAPI_URL || "";
+function slugify(input = "") {
+  return String(input || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
 
-  // hero can be an array (repeatable/dynamic zone with 1 item) or a single object
-  const heroObj = Array.isArray(data?.hero) ? data.hero[0] : data?.hero;
-  const rawButtons = Array.isArray(heroObj?.button)
-    ? heroObj.button
-    : Array.isArray(heroObj?.buttons)
-    ? heroObj.buttons
-    : [];
+function normalizeHeroButtons(heroObj) {
+  // accept multiple possible container names
+  let raw =
+    Array.isArray(heroObj?.button) ? heroObj.button :
+    Array.isArray(heroObj?.buttons) ? heroObj.buttons :
+    Array.isArray(heroObj?.Button) ? heroObj.Button :
+    [];
 
-  const buttons = rawButtons.map((b, i) => ({
-    id: b?.id ?? i,
-    label: b?.label ?? b?.text ?? "Learn more",
-    url: b?.url ?? b?.href ?? "#",
-    target: b?.target || "_self",
-  }));
+  // unwrap common Strapi shapes and normalize fields
+  const unwrap = (item) => {
+    if (!item) return null;
+    // media/component wrapped in { data: { attributes: { ... } } }
+    if (item.data && item.data.attributes) return item.data.attributes;
+    // direct attributes
+    if (item.attributes) return item.attributes;
+    // some nested component fields may be under an inner key (e.g. { button: { label, url } })
+    const innerKeys = Object.keys(item).filter(k => typeof item[k] === "object" && item[k] !== null);
+    if (innerKeys.length === 1 && (item[innerKeys[0]]?.label || item[innerKeys[0]]?.url)) {
+      return item[innerKeys[0]];
+    }
+    return item;
+  };
 
-  const sponsors = Array.isArray(data?.sponsors) ? data.sponsors : [];
-  const docs = Array.isArray(data?.eventDocuments) ? data.eventDocuments : [];
+  return raw
+    .map(unwrap)
+    .filter(Boolean)
+    .map((b, i) => {
+      const label =
+        (typeof b === "string" ? b : null) ??
+        b?.label ??
+        b?.text ??
+        b?.title ??
+        b?.buttonLabel ??
+        b?.name ??
+        null;
 
+      const url =
+        b?.url ??
+        b?.href ??
+        b?.link ??
+        b?.targetUrl ??
+        b?.linkUrl ??
+        b?.path ??
+        null;
+
+      return {
+        id: b?.id ?? i,
+        label: label ?? "Learn more",
+        url: url ?? "#",
+        target: b?.target || "_self",
+      };
+    });
+}
+
+function transformSiteAttributes(attrs = {}) {
+  const heroObj = Array.isArray(attrs?.hero) ? attrs.hero[0] : attrs?.hero || {};
   return {
-    siteTitle: data.siteTitle,
-    primaryColor: data.primaryColor,
-    menuBackground: data.menuBackground,
-    textColor: data.textColor,
-    logoImage: data.logoImage,
-    menu: data.menu || [],
+    siteTitle: attrs.siteTitle || attrs.title || "",
+    primaryColor: attrs.primaryColor || "#000000",
+    menuBackground: attrs.menuBackground || "#FFFFFF",
+    textColor: attrs.textColor || "#000000",
+    logoImage: absoluteUrl(attrs.logoImage?.data?.attributes?.url || attrs.logoImage) || null,
+    menu: Array.isArray(attrs.menu) ? attrs.menu.map((m, i) => ({ id: m.id ?? i, label: m.label, url: m.url })) : [],
     hero: {
-      background: heroObj?.background?.data?.attributes?.url
-        ? `${strapiUrl}${heroObj.background.data.attributes.url}`
-        : heroObj?.background,
-      eventDate: heroObj?.eventDate,
-      eventInfo: heroObj?.eventInfo,
-      eventName: heroObj?.eventName,
-      eventLocation: heroObj?.eventLocation,
-      buttons, // normalized buttons
+      background: absoluteUrl(heroObj?.background?.data?.attributes?.url || heroObj?.background) || null,
+      eventDate: heroObj?.eventDate || heroObj?.date || null,
+      eventInfo: heroObj?.eventInfo || heroObj?.eventInfoText || null,
+      eventName: heroObj?.eventName || heroObj?.title || null,
+      eventLocation: heroObj?.eventLocation || null,
+      buttons: normalizeHeroButtons(heroObj),
     },
-    eventDocuments: docs,
-    websites: data.websites || [],
-    newsItems: (data.newsItems || []).map((item) => ({
-      ...item,
-      image: item.image?.data?.attributes?.url
-        ? `${strapiUrl}${item.image.data.attributes.url}`
-        : item.image,
-    })),
-    sponsors: sponsors.map((sponsor) => ({
-      ...sponsor,
-      logo: sponsor.logo?.data?.attributes?.url
-        ? `${strapiUrl}${sponsor.logo.data.attributes.url}`
-        : sponsor.logo,
-    })),
+    eventDocuments: Array.isArray(attrs.eventDocuments) ? attrs.eventDocuments : [],
+    websites: Array.isArray(attrs.websites)
+      ? attrs.websites.map(w => ({ id: w.id, url: w.url, logo: absoluteUrl(w.logo?.data?.attributes?.url || w.logo), label: w.label }))
+      : [],
+    newsItems: Array.isArray(attrs.newsItems) ? attrs.newsItems : [],
+    sponsors: Array.isArray(attrs.sponsors) ? attrs.sponsors.map(s => ({ ...s, logo: absoluteUrl(s.logo?.data?.attributes?.url || s.logo) })) : [],
     footer: {
-      backgroundColor: data.footer?.[0]?.backgroundColor || "#000000",
-      textColor: data.footer?.[0]?.textColor || "#FFFFFF",
+      backgroundColor: (Array.isArray(attrs.footer) ? attrs.footer[0]?.backgroundColor : attrs.footer?.backgroundColor) || "#000000",
+      textColor: (Array.isArray(attrs.footer) ? attrs.footer[0]?.textColor : attrs.footer?.textColor) || "#FFFFFF",
     },
-    socials: data.socials || [],
-    // eventId: data.eventId || null, // uncomment if you add this field in Strapi
+    socials: Array.isArray(attrs.socials) ? attrs.socials : [],
   };
 }
 
-const isDev = process.env.NODE_ENV !== "production";
-function getOrigin() {
-  const local = `http://localhost:${process.env.PORT || 3000}`;
-  return isDev ? local : (process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || local);
+function hasHeroButtons(attrs) {
+  const heroArr = Array.isArray(attrs?.hero) ? attrs.hero : attrs?.hero ? [attrs.hero] : [];
+  const h = heroArr[0] || {};
+  return (Array.isArray(h.button) && h.button.length > 0) || (Array.isArray(h.buttons) && h.buttons.length > 0);
 }
 
-async function fetchEvents() {
+async function fetchEventsInternal(request) {
   try {
-    const res = await fetch(new URL("/api/events", getOrigin()).toString(), { cache: "no-store" });
+    const headers = {};
+    const siteHost = getSiteFromRequest(request);
+    if (siteHost) headers["x-site-host"] = siteHost;
+
+    const origin = (process.env.NODE_ENV !== "production")
+      ? `http://localhost:${process.env.PORT || 3000}`
+      : (process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || `http://localhost:${process.env.PORT || 3000}`);
+
+    const res = await fetch(new URL("/api/events", origin).toString(), { cache: "no-store", headers });
     if (!res.ok) return [];
     const data = await res.json();
     return Array.isArray(data) ? data : [];
@@ -334,30 +139,131 @@ async function fetchEvents() {
   }
 }
 
-function normalizeHeroButtons(hero) {
-  const src = Array.isArray(hero?.buttons)
-    ? hero.buttons
-    : Array.isArray(hero?.button)
-    ? hero.button
-    : [];
-  return src
-    .filter(Boolean)
-    .map((b, i) => ({
-      id: b?.id ?? i,
-      label: String(b?.label ?? b?.text ?? "Learn more"),
-      url: String(b?.url ?? b?.href ?? "#"),
-      target: b?.target || "_self",
-    }));
+async function fetchStrapiSite(request) {
+  const debug = { STRAPI_URL: STRAPI_URL || null, tried: [], tokenUsed: !!STRAPI_TOKEN };
+  if (!STRAPI_URL) return { attrs: null, debug: { error: "STRAPI_URL not set" } };
+
+  const base = STRAPI_URL.replace(/\/$/, "");
+  // Try most explicit nested populates first, then fallbacks
+  const candidates = [
+    "/api/sites?populate[hero][populate][button][populate]=*",
+    "/api/sites?populate[hero][populate]=button",
+    "/api/sites?populate=hero.button,hero,menu,websites,eventDocuments,news_item,footer,sponsors,socials",
+    "/api/sites?populate[hero][populate]=*",
+    "/api/sites?populate=*",
+    "/api/site?populate[hero][populate][button][populate]=*",
+    "/api/site?populate[hero][populate]=button",
+    "/api/site?populate=hero.button,hero,menu,websites,eventDocuments,news_item,footer,sponsors,socials",
+    "/api/site?populate[hero][populate]=*",
+    "/api/site?populate=*",
+    "/api/sites",
+    "/api/site",
+  ];
+
+  const siteHost = getSiteFromRequest(request);
+  const headers = {};
+  if (siteHost) headers["x-site-host"] = siteHost;
+  if (STRAPI_TOKEN) headers["Authorization"] = `Bearer ${STRAPI_TOKEN}`;
+
+  let lastOk = null; // remember the best ok response even if buttons not present
+
+  for (const path of candidates) {
+    const url = `${base}${path}`;
+    debug.tried.push(url);
+    try {
+      const res = await fetch(url, { cache: "no-store", headers });
+      const text = await res.text().catch(() => "");
+      debug[url] = { status: res.status, ok: res.ok, snippet: text ? (text.length > 300 ? text.slice(0, 300) + "…" : text) : null };
+      console.log(`[config] tried ${url} -> status=${res.status} ok=${res.ok}`);
+      if (!res.ok) continue;
+
+      let json = {};
+      try { json = text ? JSON.parse(text) : {}; } catch (e) { debug.parseError = String(e.message || e); continue; }
+
+      // Collection response
+      if (Array.isArray(json?.data)) {
+        const items = json.data;
+        const match = siteHost ? items.find((it) => {
+          const a = it.attributes || {};
+          const hostCandidates = [a.host, a.hostname, a.domain, a.slug, a.siteSlug, a.siteId].filter(Boolean).map(String);
+          return hostCandidates.some(h => siteHost.includes(h) || siteHost === h);
+        }) : null;
+        const chosen = match ?? items[0];
+        if (!chosen) continue;
+
+        const attrs = chosen.attributes || chosen;
+        if (hasHeroButtons(attrs)) {
+          console.log("[config] found hero.button via:", path);
+          return { attrs, debug };
+        }
+        // remember and keep trying more explicit populates
+        lastOk = { attrs, debug };
+        continue;
+      }
+
+      // Single-type response
+      const attrs = json?.data?.attributes ?? null;
+      if (attrs) {
+        if (hasHeroButtons(attrs)) {
+          console.log("[config] found hero.button via:", path);
+          return { attrs, debug };
+        }
+        lastOk = { attrs, debug };
+        continue;
+      }
+
+      // Raw attrs (no data wrapper)
+      if (json && Object.keys(json).length && !("data" in json)) {
+        if (hasHeroButtons(json)) {
+          console.log("[config] found hero.button via raw:", path);
+          return { attrs: json, debug };
+        }
+        lastOk = { attrs: json, debug };
+      }
+    } catch (err) {
+      debug.error = String(err?.message || err);
+    }
+  }
+
+  if (lastOk) return lastOk; // fallback to the best ok result even if no buttons populated
+  console.log("[config] no matching site endpoint found. debug:", JSON.stringify(debug, null, 2));
+  return { attrs: null, debug };
 }
 
-async function enrichConfig(cfg = {}) {
-  const events = await fetchEvents();
-  return {
-    ...cfg,
-    hero: {
-      ...(cfg.hero || {}),
-      buttons: normalizeHeroButtons(cfg?.hero || {}),
-    },
-    events,
-  };
+export async function GET(request) {
+  try {
+    const { attrs, debug } = await fetchStrapiSite(request);
+    let cfg;
+    if (attrs) {
+      cfg = transformSiteAttributes(attrs);
+    } else {
+      cfg = {
+        siteTitle: process.env.SITE_TITLE || "Site",
+        primaryColor: process.env.PRIMARY_COLOR || "#000000",
+        menuBackground: "#FFFFFF",
+        textColor: "#000000",
+        logoImage: null,
+        menu: [],
+        hero: { buttons: [] },
+        eventDocuments: [],
+        websites: [],
+        newsItems: [],
+        sponsors: [],
+        footer: { backgroundColor: "#000000", textColor: "#FFFFFF" },
+        socials: [],
+      };
+    }
+
+    const events = await fetchEventsInternal(request);
+    const enriched = { ...cfg, events };
+
+    // Return debug when STRAPI_URL present but no attrs (helps troubleshooting)
+    if (STRAPI_URL && !attrs) {
+      return NextResponse.json({ ok: false, message: "no site found", debug, result: enriched }, { status: 200 });
+    }
+
+    return NextResponse.json(enriched);
+  } catch (e) {
+    return NextResponse.json({ error: e?.message || "failed" }, { status: 500 });
+  }
 }

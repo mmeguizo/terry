@@ -63,14 +63,19 @@ const Header = () => {
           className="logo-container relative z-50 h-full flex after:text-[var(--logoContainerBG)]"
           style={{ "--logoContainerBG": config.primaryColor }}
         >
-          <Image
-            src={config.logoImage}
-            alt="Logo"
-            width={360}
-            height={120}
-            priority
-            className="w-auto h-full object-contain z-50 relative xs:mt-4 mt-[5px]"
-          />
+          {/* render Image only when src is truthy to avoid empty-string src warnings */}
+          {config?.logoImage ? (
+            <Image
+              src={config.logoImage}
+              alt={config.siteTitle || "Logo"}
+              width={360}
+              height={120}
+              priority
+              className="w-auto h-full object-contain z-50 relative xs:mt-4 mt-[5px]"
+            />
+          ) : (
+            <div className="w-[180px] h-8 bg-neutral-200/10 rounded" aria-hidden="true" />
+          )}
         </div>
 
         <div className="relative h-full menu-container flex gap-4 flex-grow justify-end items-center pt-[5px] xs:ps-30 z-50">
