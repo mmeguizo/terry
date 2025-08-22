@@ -54,12 +54,25 @@ function slugify(input = "") {
 }
 
 function normalizeHeroButtons(heroObj) {
-  // accept multiple possible container names
-  let raw =
-    Array.isArray(heroObj?.button) ? heroObj.button :
-    Array.isArray(heroObj?.buttons) ? heroObj.buttons :
-    Array.isArray(heroObj?.Button) ? heroObj.Button :
-    [];
+  // accept multiple possible container names and nested Strapi shapes
+  let raw = [];
+  const tryArr = (v) => (Array.isArray(v) ? v : null);
+  const candidates = [
+    heroObj?.button,
+    heroObj?.buttons,
+    heroObj?.Button,
+    heroObj?.attributes?.button,
+    heroObj?.attributes?.buttons,
+    heroObj?.data?.attributes?.button,
+    heroObj?.data?.attributes?.buttons,
+  ];
+  for (const c of candidates) {
+    const a = tryArr(c);
+    if (a) {
+      raw = a;
+      break;
+    }
+  }
 
   // unwrap common Strapi shapes and normalize fields
   const unwrap = (item) => {
@@ -153,6 +166,11 @@ function hasHeroButtons(attrs) {
   // some Strapi shapes put components under nested keys e.g. { hero: { data: { attributes: { buttons: [...] }}}}
   const nested = h.data?.attributes || h.attributes || {};
   if (maybe(nested, ["button", "buttons"])) return true;
+
+  // also check top-level attrs for nested placements
+  if (maybe(attrs, ["button", "buttons"])) return true;
+  if (maybe(attrs?.attributes || {}, ["button", "buttons"])) return true;
+  if (maybe(attrs?.data?.attributes || {}, ["button", "buttons"])) return true;
 
   // fallback: check raw attrs for any top-level buttons array
   if (Array.isArray(attrs?.buttons) && attrs.buttons.length > 0) return true;
@@ -250,10 +268,48 @@ async function fetchStrapiSite(request) {
           return { attrs, debug };
         }
 
-        if (hasHeroButtons(attrs)) {
-          console.log("[config] found hero.button via (keeping looking):", path);
-          lastOk = { attrs, debug };
-          continue;
+        // If collection response lacks nested hero buttons, try fetching the single item with deeper populate
+        if (!hasHeroButtons(attrs)) {
+          try {
+            const itemId = chosen.id ?? (chosen.attributes && chosen.attributes.id);
+            if (itemId) {
+              const followPaths = [
+                `/api/sites/${itemId}?populate[hero][populate][button][populate]=*`,
+                `/api/sites/${itemId}?populate=*`
+              ];
+              for (const fp of followPaths) {
+                const followUrl = `${base}${fp}`;
+                debug.tried.push(followUrl);
+                const fres = await fetch(followUrl, { cache: "no-store", headers });
+                const ftext = await fres.text().catch(() => "");
+                debug[followUrl] = { status: fres.status, ok: fres.ok, snippet: ftext ? (ftext.length > 300 ? ftext.slice(0, 300) + "…" : ftext) : null };
+                if (!fres.ok) continue;
+                let fjson = {};
+                try { fjson = ftext ? JSON.parse(ftext) : {}; } catch (e) { debug.parseError = String(e.message || e); continue; }
+                const fattrs = fjson?.data?.attributes ?? fjson;
+                if (fattrs) {
+                  const fHasUseful =
+                    (Array.isArray(fattrs.menu) && fattrs.menu.length > 0) ||
+                    (Array.isArray(fattrs.websites) && fattrs.websites.length > 0) ||
+                    (Array.isArray(fattrs.newsItems) && fattrs.newsItems.length > 0) ||
+                    (Array.isArray(fattrs.news_item) && fattrs.news_item.length > 0) ||
+                    (Array.isArray(fattrs.sponsors) && fattrs.sponsors.length > 0) ||
+                    (Array.isArray(fattrs.socials) && fattrs.socials.length > 0) ||
+                    (fattrs.footer && Object.keys(fattrs.footer).length > 0);
+                  if (fHasUseful) {
+                    console.log("[config] found useful site content via follow-up:", fp);
+                    return { attrs: fattrs, debug };
+                  }
+                  if (hasHeroButtons(fattrs)) {
+                    console.log("[config] found hero.button via follow-up:", fp);
+                    return { attrs: fattrs, debug };
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            debug.followError = String(e?.message || e);
+          }
         }
 
         // remember and keep trying more explicit populates
@@ -330,15 +386,15 @@ export async function GET(request) {
     let cfg;
     if (attrs) {
       cfg = transformSiteAttributes(attrs);
-      // Merge missing sections from the default local config only
-      const fallbackCfg = (await loadDefaultSiteConfig()) || {};
-      if (!Array.isArray(cfg.menu) || cfg.menu.length === 0) cfg.menu = fallbackCfg.menu || [];
-      if (!Array.isArray(cfg.websites) || cfg.websites.length === 0) cfg.websites = fallbackCfg.websites || [];
-      if (!Array.isArray(cfg.newsItems) || cfg.newsItems.length === 0) cfg.newsItems = fallbackCfg.newsItems || [];
-      if (!Array.isArray(cfg.sponsors) || cfg.sponsors.length === 0) cfg.sponsors = fallbackCfg.sponsors || [];
-      if (!cfg.hero || !Array.isArray(cfg.hero.buttons) || cfg.hero.buttons.length === 0) {
-        cfg.hero = { ...(cfg.hero || {}), buttons: fallbackCfg?.hero?.buttons || [] };
-      }
+      // IMPORTANT: If Strapi provided a site record, prefer Strapi data even if partial.
+      // Do NOT merge local fallback pieces into partial Strapi results.
+      // Instead, ensure missing list sections are empty arrays and hero.buttons is at least an empty array.
+      if (!Array.isArray(cfg.menu)) cfg.menu = [];
+      if (!Array.isArray(cfg.websites)) cfg.websites = [];
+      if (!Array.isArray(cfg.newsItems)) cfg.newsItems = [];
+      if (!Array.isArray(cfg.sponsors)) cfg.sponsors = [];
+      if (!cfg.hero) cfg.hero = { buttons: [] };
+      if (!Array.isArray(cfg.hero.buttons)) cfg.hero.buttons = [];
     } else {
       // Local fallback: try the default site-config.json, else return a minimal object
       const cfgFromFile = await loadDefaultSiteConfig();
