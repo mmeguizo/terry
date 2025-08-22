@@ -1,4 +1,5 @@
 export const dynamic = "force-dynamic";
+import Image from "next/image";
 
 function fmtRange(start, end) {
   if (!start && !end) return null;
@@ -22,22 +23,68 @@ function fmtRange(start, end) {
   }
 }
 
-async function getEvent(id) {
-  // Ensure an absolute URL is used on the server
-  const base =
-    process.env.NEXT_PUBLIC_BASE_URL ||
-    process.env.NEXTAUTH_URL ||
-    `http://localhost:${process.env.PORT || 3000}`;
-  const url = new URL(`/api/raceready/event/${id}`, base).toString();
+const isNumeric = (v) => /^\d+$/.test(String(v));
 
+function getOrigin() {
+  const isDev = process.env.NODE_ENV !== "production";
+  const local = `http://localhost:${process.env.PORT || 3000}`;
+  return isDev ? local : (process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || local);
+}
+
+async function getEventById(id) {
+  const url = new URL(`/api/raceready/event/${id}`, getOrigin()).toString();
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) return null;
   return res.json();
 }
 
+async function getEventBySlug(slug) {
+  // 1) Try env-driven single event
+  const envId = process.env.NEXT_PUBLIC_EVENT_ID;
+  if (envId) {
+    const ev = await getEventById(envId);
+    if (ev && String(ev.slug || "").toLowerCase() === String(slug).toLowerCase()) return ev;
+  }
+
+  // 2) Fallback: try /api/events to map slug -> id/data
+  try {
+    const listRes = await fetch(new URL("/api/events", getOrigin()).toString(), { cache: "no-store" });
+    if (!listRes.ok) return null;
+    const list = await listRes.json();
+    const found = Array.isArray(list)
+      ? list.find((it) => String(it.slug || "").toLowerCase() === String(slug).toLowerCase())
+      : null;
+    if (!found) return null;
+
+    if (found.id && isNumeric(found.id)) {
+      return await getEventById(found.id);
+    }
+    return found;
+  } catch {
+    return null;
+  }
+}
+
+function eventToJsonLd(event, path) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "SportsEvent",
+    name: event.name,
+    startDate: event.startDate || undefined,
+    endDate: event.endDate || undefined,
+    location: event.venue
+      ? { "@type": "Place", name: event.venue }
+      : undefined,
+    image: event.heroImage ? [event.heroImage] : undefined,
+    description: event.description || undefined,
+    url: path,
+  };
+}
+
 export default async function EventPage({ params }) {
-  const { id } = await params;
-  const event = await getEvent(id);
+  const { id: handle } = await params;
+  const event = isNumeric(handle) ? await getEventById(handle) : await getEventBySlug(handle);
+
   if (!event) {
     return (
       <main className="container py-14">
@@ -47,11 +94,20 @@ export default async function EventPage({ params }) {
     );
   }
 
+  const isNumHandle = isNumeric(handle);
+  const canonicalPath = `/events/${isNumHandle ? (event.slug || handle) : handle}`;
+  const jsonLd = eventToJsonLd(event, canonicalPath);
+
   const dateRange = fmtRange(event.startDate, event.endDate);
 
   return (
     <main>
-      {/* Hero */}
+      {/* JSON-LD for rich results */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <section className="bg-[#0f1216] text-white">
         <div className="container py-10">
           <div className="grid md:grid-cols-[2fr_1fr] items-center gap-8">
@@ -66,20 +122,24 @@ export default async function EventPage({ params }) {
                   </>
                 )}
               </div>
-              {event.description && (
-                <p className="mt-6 text-white/80 max-w-3xl">{event.description}</p>
-              )}
+              {event.description && <p className="mt-6 text-white/80 max-w-3xl">{event.description}</p>}
             </div>
             {event.heroImage ? (
               <div className="relative w-full aspect-video rounded overflow-hidden ring-1 ring-white/10">
-                <img src={event.heroImage} alt={event.name} className="w-full h-full object-cover" />
+                <Image
+                  src={event.heroImage}
+                  alt={event.name}
+                  className="object-cover"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  priority
+                />
               </div>
             ) : null}
           </div>
         </div>
       </section>
 
-      {/* Quick Links (Documents) */}
       <section className="bg-[#171717]">
         <div className="container py-10">
           <h2 className="text-xl font-semibold text-white mb-4">Event Documents</h2>
@@ -103,7 +163,6 @@ export default async function EventPage({ params }) {
         </div>
       </section>
 
-      {/* Categories and Entries */}
       <section className="bg-white">
         <div className="container py-10">
           <div className="grid lg:grid-cols-3 gap-10">
@@ -158,4 +217,40 @@ export default async function EventPage({ params }) {
       </section>
     </main>
   );
+}
+
+export async function generateMetadata({ params }) {
+  const { id: handle } = await params;
+  const isNum = /^\d+$/.test(String(handle));
+  const event = isNum ? await getEventById(handle) : await getEventBySlug(handle);
+
+  if (!event) return { title: "Event Not Found" };
+
+  const title = event.name || "Event";
+  const description =
+    event.description ||
+    (Array.isArray(event.categories) && event.categories.length
+      ? `Categories: ${event.categories.join(", ")}`
+      : undefined);
+
+  const images = event.heroImage ? [event.heroImage] : undefined;
+  const canonical = `/events/${isNum ? handle : (event.slug || handle)}`;
+
+  return {
+    title: `${title} | ${process.env.SITE_SLUG || "Site"}`,
+    description,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      images,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images,
+    },
+  };
 }
