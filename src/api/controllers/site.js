@@ -38,4 +38,17 @@ function createPopulatedController(uid, schema) {
   });
 }
 
-module.exports = createPopulatedController('api::site.site', strapi.contentTypes['api::site.site'].schema);
+module.exports = createCoreController('api::site.site', ({ strapi }) => ({
+  async find(ctx) {
+    ctx.query = ctx.query || {};
+    ctx.query.populate = ctx.query.populate || {};
+    ctx.query.populate.hero = ctx.query.populate.hero || { populate: { button: { populate: '*' } } };
+    return await super.find(ctx);
+  },
+  async findOne(ctx) {
+    ctx.query = ctx.query || {};
+    ctx.query.populate = ctx.query.populate || {};
+    ctx.query.populate.hero = ctx.query.populate.hero || { populate: { button: { populate: '*' } } };
+    return await super.findOne(ctx);
+  },
+}));
