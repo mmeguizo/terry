@@ -13,8 +13,8 @@ function slugify(input) {
     .replace(/-+/g, "-");
 }
 
-export async function GET(_request, { params }) {
-  const id = params?.id; // <- use destructured params
+export async function GET(_request, ctx) {
+  const { id } = await ctx.params;
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
   try {

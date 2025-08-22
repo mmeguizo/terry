@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useConfig } from "@/context/ConfigContext";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -42,6 +43,7 @@ function CardBody({ children }) {
 
 export default function LatestNews() {
   const [newsItems, setNewsItems] = useState([]);
+  const config = useConfig();
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -49,14 +51,36 @@ export default function LatestNews() {
         const res = await fetch("/api/news", { cache: "no-store" });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        setNewsItems(Array.isArray(data) ? data : []);
+        let items = Array.isArray(data) ? data : [];
+        // Fallback to config.newsItems if API is empty
+        if (!items.length && Array.isArray(config?.newsItems)) {
+          items = config.newsItems.map((n) => ({
+            title: n.title,
+            date: n.date,
+            image: n.image,
+            url: n.url,
+          }));
+        }
+        setNewsItems(items);
       } catch (error) {
         console.error("Failed to load news items:", error);
-        setNewsItems([]);
+        // Last resort: use config.newsItems if present
+        if (Array.isArray(config?.newsItems)) {
+          setNewsItems(
+            config.newsItems.map((n) => ({
+              title: n.title,
+              date: n.date,
+              image: n.image,
+              url: n.url,
+            }))
+          );
+        } else {
+          setNewsItems([]);
+        }
       }
     };
     fetchNews();
-  }, []);
+  }, [config]);
 
   return (
     <section className="bg-neutral-500 py-18">

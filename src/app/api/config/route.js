@@ -4,12 +4,36 @@ export const dynamic = "force-dynamic";
 const STRAPI_URL = process.env.STRAPI_URL || "";
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN || "";
 
+// Lazy-load local default site config safely. If the file doesn't exist, return null.
+async function loadDefaultSiteConfig() {
+  try {
+    const mod = await import("@/config/site-config.json");
+    return mod?.default || mod;
+  } catch {
+    return null;
+  }
+}
+
 function getSiteFromRequest(request) {
-  return (
-    request?.headers?.get?.("x-site-host") ||
-    request?.headers?.get?.("x-site-hostname") ||
-    null
-  );
+  // Check common headers set by middleware, then query-hint headers (x-q-*), then URL query params
+  const h = request?.headers;
+  const tryHeader = (name) => (h && h.get ? h.get(name) : null);
+  const headerCandidates = [
+    tryHeader("x-site-host"),
+    tryHeader("x-site-hostname"),
+    tryHeader("x-site-hostname"),
+    tryHeader("x-q-site"),
+    tryHeader("x-q-slug"),
+    tryHeader("x-q-host"),
+  ].filter(Boolean);
+  if (headerCandidates.length) return headerCandidates[0];
+
+  try {
+    const url = new URL(request.url);
+    return url.searchParams.get("site") || url.searchParams.get("siteHost") || url.searchParams.get("q") || null;
+  } catch (e) {
+    return null;
+  }
 }
 
 function absoluteUrl(maybeUrl) {
@@ -91,7 +115,7 @@ function transformSiteAttributes(attrs = {}) {
     menuBackground: attrs.menuBackground || "#FFFFFF",
     textColor: attrs.textColor || "#000000",
     logoImage: absoluteUrl(attrs.logoImage?.data?.attributes?.url || attrs.logoImage) || null,
-    menu: Array.isArray(attrs.menu) ? attrs.menu.map((m, i) => ({ id: m.id ?? i, label: m.label, url: m.url })) : [],
+  menu: Array.isArray(attrs.menu) ? attrs.menu.map((m, i) => ({ id: m.id ?? i, label: m.label, url: m.url })) : Array.isArray(attrs.Menu) ? attrs.Menu : [],
     hero: {
       background: absoluteUrl(heroObj?.background?.data?.attributes?.url || heroObj?.background) || null,
       eventDate: heroObj?.eventDate || heroObj?.date || null,
@@ -103,9 +127,15 @@ function transformSiteAttributes(attrs = {}) {
     eventDocuments: Array.isArray(attrs.eventDocuments) ? attrs.eventDocuments : [],
     websites: Array.isArray(attrs.websites)
       ? attrs.websites.map(w => ({ id: w.id, url: w.url, logo: absoluteUrl(w.logo?.data?.attributes?.url || w.logo), label: w.label }))
+      : Array.isArray(attrs.website)
+      ? attrs.website.map(w => ({ id: w.id, url: w.url, logo: absoluteUrl(w.logo?.data?.attributes?.url || w.logo), label: w.label }))
       : [],
-    newsItems: Array.isArray(attrs.newsItems) ? attrs.newsItems : [],
-    sponsors: Array.isArray(attrs.sponsors) ? attrs.sponsors.map(s => ({ ...s, logo: absoluteUrl(s.logo?.data?.attributes?.url || s.logo) })) : [],
+    newsItems: Array.isArray(attrs.newsItems) ? attrs.newsItems : Array.isArray(attrs.news_item) ? attrs.news_item : [],
+    sponsors: Array.isArray(attrs.sponsors)
+      ? attrs.sponsors.map(s => ({ ...s, logo: absoluteUrl(s.logo?.data?.attributes?.url || s.logo) }))
+      : Array.isArray(attrs.sponsor)
+      ? attrs.sponsor.map(s => ({ ...s, logo: absoluteUrl(s.logo?.data?.attributes?.url || s.logo) }))
+      : [],
     footer: {
       backgroundColor: (Array.isArray(attrs.footer) ? attrs.footer[0]?.backgroundColor : attrs.footer?.backgroundColor) || "#000000",
       textColor: (Array.isArray(attrs.footer) ? attrs.footer[0]?.textColor : attrs.footer?.textColor) || "#FFFFFF",
@@ -117,7 +147,17 @@ function transformSiteAttributes(attrs = {}) {
 function hasHeroButtons(attrs) {
   const heroArr = Array.isArray(attrs?.hero) ? attrs.hero : attrs?.hero ? [attrs.hero] : [];
   const h = heroArr[0] || {};
-  return (Array.isArray(h.button) && h.button.length > 0) || (Array.isArray(h.buttons) && h.buttons.length > 0);
+  const maybe = (obj, keys) => keys.some(k => Array.isArray(obj?.[k]) && obj[k].length > 0);
+  if (maybe(h, ["button", "buttons"])) return true;
+
+  // some Strapi shapes put components under nested keys e.g. { hero: { data: { attributes: { buttons: [...] }}}}
+  const nested = h.data?.attributes || h.attributes || {};
+  if (maybe(nested, ["button", "buttons"])) return true;
+
+  // fallback: check raw attrs for any top-level buttons array
+  if (Array.isArray(attrs?.buttons) && attrs.buttons.length > 0) return true;
+
+  return false;
 }
 
 async function fetchEventsInternal(request) {
@@ -146,18 +186,21 @@ async function fetchStrapiSite(request) {
   const base = STRAPI_URL.replace(/\/$/, "");
   // Try most explicit nested populates first, then fallbacks
   const candidates = [
+    // Prefer collection endpoints first (your Strapi uses /api/sites)
     "/api/sites?populate[hero][populate][button][populate]=*",
-    "/api/sites?populate[hero][populate]=button",
-    "/api/sites?populate=hero.button,hero,menu,websites,eventDocuments,news_item,footer,sponsors,socials",
     "/api/sites?populate[hero][populate]=*",
+    "/api/sites?populate[menu]=*&populate[websites][populate]=logo&populate[eventDocuments]=*&populate[newsItems]=*&populate[news_item]=*&populate[footer]=*&populate[sponsors][populate]=logo&populate[socials]=*",
     "/api/sites?populate=*",
-    "/api/site?populate[hero][populate][button][populate]=*",
-    "/api/site?populate[hero][populate]=button",
-    "/api/site?populate=hero.button,hero,menu,websites,eventDocuments,news_item,footer,sponsors,socials",
-    "/api/site?populate[hero][populate]=*",
-    "/api/site?populate=*",
-    "/api/sites",
-    "/api/site",
+
+    // // Then single-type fallbacks
+    // "/api/site?populate[hero][populate][button][populate]=*",
+    // "/api/site?populate[hero][populate]=*",
+    // "/api/site?populate[menu]=*&populate[websites][populate]=logo&populate[eventDocuments]=*&populate[newsItems]=*&populate[news_item]=*&populate[footer]=*&populate[sponsors][populate]=logo&populate[socials]=*",
+    // "/api/site?populate=*",
+
+    // // Bare endpoints last
+    // "/api/sites",
+    // "/api/site",
   ];
 
   const siteHost = getSiteFromRequest(request);
@@ -192,10 +235,27 @@ async function fetchStrapiSite(request) {
         if (!chosen) continue;
 
         const attrs = chosen.attributes || chosen;
-        if (hasHeroButtons(attrs)) {
-          console.log("[config] found hero.button via:", path);
+        // Decide if this response contains more than just a hero button
+        const hasUsefulContent =
+          (Array.isArray(attrs.menu) && attrs.menu.length > 0) ||
+          (Array.isArray(attrs.websites) && attrs.websites.length > 0) ||
+          (Array.isArray(attrs.newsItems) && attrs.newsItems.length > 0) ||
+          (Array.isArray(attrs.news_item) && attrs.news_item.length > 0) ||
+          (Array.isArray(attrs.sponsors) && attrs.sponsors.length > 0) ||
+          (Array.isArray(attrs.socials) && attrs.socials.length > 0) ||
+          (attrs.footer && Object.keys(attrs.footer).length > 0);
+
+        if (hasUsefulContent) {
+          console.log("[config] found useful site content via:", path);
           return { attrs, debug };
         }
+
+        if (hasHeroButtons(attrs)) {
+          console.log("[config] found hero.button via (keeping looking):", path);
+          lastOk = { attrs, debug };
+          continue;
+        }
+
         // remember and keep trying more explicit populates
         lastOk = { attrs, debug };
         continue;
@@ -204,21 +264,53 @@ async function fetchStrapiSite(request) {
       // Single-type response
       const attrs = json?.data?.attributes ?? null;
       if (attrs) {
-        if (hasHeroButtons(attrs)) {
-          console.log("[config] found hero.button via:", path);
+        const hasUsefulContent =
+          (Array.isArray(attrs.menu) && attrs.menu.length > 0) ||
+          (Array.isArray(attrs.websites) && attrs.websites.length > 0) ||
+          (Array.isArray(attrs.newsItems) && attrs.newsItems.length > 0) ||
+          (Array.isArray(attrs.news_item) && attrs.news_item.length > 0) ||
+          (Array.isArray(attrs.sponsors) && attrs.sponsors.length > 0) ||
+          (Array.isArray(attrs.socials) && attrs.socials.length > 0) ||
+          (attrs.footer && Object.keys(attrs.footer).length > 0);
+
+        if (hasUsefulContent) {
+          console.log("[config] found useful site content via:", path);
           return { attrs, debug };
         }
+
+        if (hasHeroButtons(attrs)) {
+          console.log("[config] found hero.button via (keeping looking):", path);
+          lastOk = { attrs, debug };
+          continue;
+        }
+
         lastOk = { attrs, debug };
         continue;
       }
 
       // Raw attrs (no data wrapper)
       if (json && Object.keys(json).length && !("data" in json)) {
-        if (hasHeroButtons(json)) {
-          console.log("[config] found hero.button via raw:", path);
-          return { attrs: json, debug };
+        const rawAttrs = json;
+        const hasUsefulContent =
+          (Array.isArray(rawAttrs.menu) && rawAttrs.menu.length > 0) ||
+          (Array.isArray(rawAttrs.websites) && rawAttrs.websites.length > 0) ||
+          (Array.isArray(rawAttrs.newsItems) && rawAttrs.newsItems.length > 0) ||
+          (Array.isArray(rawAttrs.news_item) && rawAttrs.news_item.length > 0) ||
+          (Array.isArray(rawAttrs.sponsors) && rawAttrs.sponsors.length > 0) ||
+          (Array.isArray(rawAttrs.socials) && rawAttrs.socials.length > 0) ||
+          (rawAttrs.footer && Object.keys(rawAttrs.footer).length > 0);
+
+        if (hasUsefulContent) {
+          console.log("[config] found useful site content via raw:", path);
+          return { attrs: rawAttrs, debug };
         }
-        lastOk = { attrs: json, debug };
+
+        if (hasHeroButtons(rawAttrs)) {
+          console.log("[config] found hero.button via raw (keeping looking):", path);
+          lastOk = { attrs: rawAttrs, debug };
+        } else {
+          lastOk = { attrs: rawAttrs, debug };
+        }
       }
     } catch (err) {
       debug.error = String(err?.message || err);
@@ -232,12 +324,25 @@ async function fetchStrapiSite(request) {
 
 export async function GET(request) {
   try {
-    const { attrs, debug } = await fetchStrapiSite(request);
+  const { attrs, debug } = await fetchStrapiSite(request);
+  const urlObj = new URL(request.url);
+  const wantDebug = (request.headers?.get?.("x-debug") === "1") || urlObj.searchParams.get("debug") === "1";
     let cfg;
     if (attrs) {
       cfg = transformSiteAttributes(attrs);
+      // Merge missing sections from the default local config only
+      const fallbackCfg = (await loadDefaultSiteConfig()) || {};
+      if (!Array.isArray(cfg.menu) || cfg.menu.length === 0) cfg.menu = fallbackCfg.menu || [];
+      if (!Array.isArray(cfg.websites) || cfg.websites.length === 0) cfg.websites = fallbackCfg.websites || [];
+      if (!Array.isArray(cfg.newsItems) || cfg.newsItems.length === 0) cfg.newsItems = fallbackCfg.newsItems || [];
+      if (!Array.isArray(cfg.sponsors) || cfg.sponsors.length === 0) cfg.sponsors = fallbackCfg.sponsors || [];
+      if (!cfg.hero || !Array.isArray(cfg.hero.buttons) || cfg.hero.buttons.length === 0) {
+        cfg.hero = { ...(cfg.hero || {}), buttons: fallbackCfg?.hero?.buttons || [] };
+      }
     } else {
-      cfg = {
+      // Local fallback: try the default site-config.json, else return a minimal object
+      const cfgFromFile = await loadDefaultSiteConfig();
+      cfg = cfgFromFile || {
         siteTitle: process.env.SITE_TITLE || "Site",
         primaryColor: process.env.PRIMARY_COLOR || "#000000",
         menuBackground: "#FFFFFF",
@@ -256,10 +361,14 @@ export async function GET(request) {
 
     const events = await fetchEventsInternal(request);
     const enriched = { ...cfg, events };
+    // If caller requested debug, include Strapi debug info and the raw attrs
+    if (wantDebug) {
+      return NextResponse.json({ ...enriched, _debug: debug, _attrs: attrs || null }, { status: 200 });
+    }
 
-    // Return debug when STRAPI_URL present but no attrs (helps troubleshooting)
+    // If STRAPI_URL present but no attrs, still return a plain config shape and attach minimal debug hints
     if (STRAPI_URL && !attrs) {
-      return NextResponse.json({ ok: false, message: "no site found", debug, result: enriched }, { status: 200 });
+      return NextResponse.json({ ...enriched, _ok: false, _message: "no site found", _debug: debug }, { status: 200 });
     }
 
     return NextResponse.json(enriched);

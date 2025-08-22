@@ -5,223 +5,40 @@
   "textColor": "#000000",
   "logoImage": "https://wakefield300.com.au/wp-content/uploads/2025/07/Wakefield300-Colour_TransparentBG-250x95.png",
   "menu": [
-    { "label": "Home", "url": "/" },
-    { "label": "Entry List", "url": "/entry-list/?id=1234" },
-    { "label": "Event Schedule", "url": "/event-schedule/?id=1234" }
+   
   ],
   "hero": {
-    "background": "https://images.pexels.com/photos/33184120/pexels-photo-33184120.jpeg?_gl=1*11hirpa*_ga*MTkxNjMyMzM5OS4xNzU0MzU1ODYy*_ga_8JE65Q40S6*czE3NTQzNTU4NjEkbzEkZzEkdDE3NTQzNTYwNDckajU5JGwwJGgw",
-    "eventDate": "2025-08-16T10:00:00+10:00",
-    "eventInfo": "/event-info/?id=1234",
-    "eventName": "Event Name",
-    "eventLocation": "Venue",
+    "background": "https://wakefield300.com.au/wp-content/uploads/2025/07/Wakefield300-hero.jpg",
+    "eventDate": "2025-08-30",
+    "eventInfo": "August 16, 2025 - August 17, 2025",
+    "eventName": "Road America",
+    "eventLocation": "One Raceway",
     "buttons": [
-      { "label": "Spectator Information", "url": "/spectator-info/?id=1234" },
-      { "label": "Enter now!", "url": "/entry-form/?id=1234" },
-      { "label": "Schedule", "url": "/event-schedule/?id=1234" }
+      {
+        "id": 88,
+        "label": "Spectator",
+        "url": "/tickets"
+      }
     ]
   },
   "websites": [
-    {
-      "url": "https://www.sro-motorsports.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/sro-motorsports-group-logo-neg-250x140.svg",
-      "label": "SRO Motorsports Group Logo"
-    },
-    {
-      "url": "https://www.sroamerica.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/sro-motorsports-group-america-logo-neg-250x140.svg",
-      "label": "SRO Motorsports Group America Logo"
-    },
-    {
-      "url": "https://www.intercontinentalgtchallenge.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/intercontinental-gt-challange-logo-neg-250x140.svg",
-      "label": "Intercontinental GT Challenge Logo"
-    },
-    {
-      "url": "https://www.gt-world-challenge.com",
-      "logo": "https://www.sro-motorsports.com/assets/img/gtwc-neg-250x140-2025.svg",
-      "label": "GT World Challenge Logo"
-    },
-    {
-      "url": "https://www.gt-world-challenge-europe.com",
-      "logo": "https://www.sro-motorsports.com/assets/img/gtwc-europe-neg-250x140-2025.svg",
-      "label": "GT World Challenge Europe Logo"
-    },
-    {
-      "url": "https://www.crowdstrike24hoursofspa.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/crowdstrike-24hrs-logo-neg-250x140.svg",
-      "label": "Crowdstrike 24 Hours of Spa Logo"
-    },
-    {
-      "url": "https://www.gt-world-challenge-asia.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/gtwc-asia-neg-250x140-2025.svg",
-      "label": "GT World Challenge Asia Logo"
-    },
-    {
-      "url": "https://www.gt-world-challenge-america.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/gtwc-america-neg-250x140-2025.svg",
-      "label": "GT World Challenge America Logo"
-    },
-    {
-      "url": "https://www.gt-world-challenge-australia.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/gtwc-australia-neg-250x140-2025.svg",
-      "label": "GT World Challenge Australia Logo"
-    },
-    {
-      "url": "https://www.gt2europeanseries.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/gt2-european-series-pirelli-250x140-logo-neg-2025.svg",
-      "label": "GT2 European Series Logo"
-    },
-    {
-      "url": "https://www.britishgt.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/british-gt-championship-logo-2024-250x140.svg",
-      "label": "British GT Championship Logo"
-    },
-    {
-      "url": "https://japancup.co",
-      "logo": "https://www.sro-motorsports.com/assets/img/japan-cup-logo-250x140.svg",
-      "label": "Japan Cup Logo"
-    },
-    {
-      "url": "https://www.gt4europeanseries.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/gt4-european-series-rafa-250x140-logo.svg",
-      "label": "GT4 European Series Logo"
-    },
-    {
-      "url": "https://ffsagt.gt4series.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/ffsa-gt4-france-logo-neg-250x140.svg",
-      "label": "FFSA GT – GT4 France Logo"
-    },
-    {
-      "url": "https://www.gt4-america.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/gt4-america-logo-250x140-2023-v2.svg",
-      "label": "GT4 America Logo"
-    },
-    {
-      "url": "https://gt4australia.com.au/",
-      "logo": "https://www.sro-motorsports.com/assets/img/gt4-australia-logo-250x140-neg.svg",
-      "label": "GT4 Australia Logo"
-    },
-    {
-      "url": "https://gt4series.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/gt4-logo-250x140-neg-2024.svg",
-      "label": "GT4 Manufacturer Ranking Logo"
-    },
-    {
-      "url": "https://www.gtamerica.us/",
-      "logo": "https://www.sro-motorsports.com/assets/img/gt-america-aws-logo-neg-250x140.svg",
-      "label": "GT America Logo"
-    },
-    {
-      "url": "https://www.tcamerica.us/",
-      "logo": "https://www.sro-motorsports.com/assets/img/tc-america-sbrs-logo-neg-250x140.svg",
-      "label": "TC America Logo"
-    },
-    {
-      "url": "https://www.ffsatourisme.fr/",
-      "logo": "https://www.sro-motorsports.com/assets/img/ffsa-tc-france-logo-250x140-neg.svg",
-      "label": "FFSA Tourisme TC France Logo"
-    },
-    {
-      "url": "https://www.grcupseries.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/toyota-gazoo-racing-gr-cup-north-america-logo-neg-250x140.svg",
-      "label": "GR Cup Logo"
-    },
-    {
-      "url": "https://www.fiamotorsportgames.com",
-      "logo": "https://www.sro-motorsports.com/assets/img/fia-motorsport-games-2024-250x140.svg",
-      "label": "FIA Motorsport Games Logo"
-    },
-    {
-      "url": "https://www.srorc.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/sro-motorsports-group-race-center-logo-neg-250x140.svg",
-      "label": "SRO Motorsports Group - Race Centre by MMC Logo"
-    },
-    {
-      "url": "https://www.curbstone.net/",
-      "logo": "https://www.sro-motorsports.com/assets/img/curbstone-track-events-logo-250x140.svg",
-      "label": "Curbstone Track Events Logo"
-    },
-    {
-      "url": "https://sro-esports.com/",
-      "logo": "https://www.sro-motorsports.com/assets/img/sro-esports-250x140.svg",
-      "label": "SRO E-Sport GT Series Championship Logo"
-    }
+   
   ],
   "eventDocuments": [
-    { "label": "Supplementary Regulations", "url": "/docs/supp-regs.pdf" },
-    { "label": "Further Regs", "url": "/docs/further-regulations.pdf" },
-    { "label": "Garage Allocations", "url": "/docs/garageallocations.pdf" },
-    { "label": "Carport Allocations", "url": "/docs/carportallocations.pdf" }
+   
   ],
   "newsItems": [
-    {
-      "title": "News Item #1",
-      "date": "2025-07-15",
-      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMZGwELE70XYdU6i4rl3vywZuj8jl2_7AZHA&s",
-      "url": "/news/item-1",
-      "slug": "item-1"
-    },
-    {
-      "title": "News Item #2",
-      "date": "2025-07-15",
-      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIIJdew4sk2nA4uE0PEl69DczjP5nPtRJWhA&s",
-      "url": "/news/item-2",
-      "slug": "item-2"
-    },
-    {
-      "title": "News Item #3",
-      "date": "2025-07-15",
-      "image": "https://corp.formula1.com/wp-content/uploads/2024/09/Ferrari-Challenge-2_Credit-Ferrari-North-America-1-2048x1365-1-1.webp",
-      "url": "/news/item-3",
-      "slug": "item-3"
-    },
-    {
-      "title": "News Item #4",
-      "date": "2025-07-15",
-      "image": "https://assets.maz.tv/y9q69x4vw6qn1gxez9c44z0jvokj-300.jpeg",
-      "url": "/news/item-4",
-      "slug": "item-4"
-    }
+    
   ],
   "sponsors": [
-    {
-      "name": "Honda Motor Co., Ltd.",
-      "logo": "https://logos-world.net/wp-content/uploads/2021/03/Honda-Logo-2000-present.png",
-      "url": "#"
-    },
-    {
-      "name": "Toyota Motor Corporation",
-      "logo": "https://wp.logos-download.com/wp-content/uploads/2016/02/Toyota_Europe_Logo_2020-700x453.png",
-      "url": "#"
-    },
-    {
-      "name": "Ford Motor Company",
-      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ford_logo_flat.svg/2560px-Ford_logo_flat.svg.png",
-      "url": "#"
-    }
+   
   ],
   "footer": {
     "backgroundColor": "#000000",
     "textColor": "#FFFFFF"
   },
   "socials": [
-    {
-      "platform": "Facebook",
-      "url": "https://facebook.com/"
-    },
-    {
-      "platform": "Instagram",
-      "url": "https://instagram.com/"
-    },
-    {
-      "platform": "Twitter",
-      "url": "https://twitter.com/"
-    },
-    {
-      "platform": "Youtube",
-      "url": "https://youtube.com/"
-    }
+   
   ],
   "eventInfo": "/event-info/?id=1234"
 }
