@@ -43,18 +43,40 @@ function normalizeHeroButtonsFromRoot(attrs = {}) {
 // 2) Update the transformer to use heroButton from root
 function transformSiteAttributes(attrs = {}) {
   const heroObj = Array.isArray(attrs?.hero) ? attrs.hero[0] : attrs?.hero || {};
+
+  // Preferred: structured menu from Site.menu
+  let menu = Array.isArray(attrs.menu)
+    ? attrs.menu.map((m, i) => ({ id: m.id ?? i, label: m.label, url: m.url }))
+    : [];
+
+  // Fallback: derive from Pages when menu is empty
+  if ((!menu || menu.length === 0) && Array.isArray(attrs.pages)) {
+    const withFlags = attrs.pages.map((p) => ({
+      id: p.id,
+      title: p.title || p.name || "Page",
+      path: p.path || (p.slug ? `/${p.slug}` : "/"),
+      showInNav: p.showInNav ?? p.isHome ?? false,
+      navOrder: typeof p.navOrder === "number" ? p.navOrder : 9999,
+    }));
+
+    const derived = withFlags
+      .filter(p =>
+        (p.showInNav === true) ||
+        (p.showInNav === false ? false : (p.path && (p.path === "/" || p.path.split("/").filter(Boolean).length <= 1)))
+      )
+      .sort((a, b) => a.navOrder - b.navOrder)
+      .map((p, i) => ({ id: p.id ?? i, label: p.title, url: p.path || "/" }));
+
+    if (derived.length) menu = derived;
+  }
+
   return {
     siteTitle: attrs.siteTitle || attrs.title || "",
     primaryColor: attrs.primaryColor || "#000000",
     menuBackground: attrs.menuBackground || "#FFFFFF",
     textColor: attrs.textColor || "#000000",
     logoImage: absoluteUrl(attrs.logoImage?.data?.attributes?.url || attrs.logoImage) || null,
-
-    menu: Array.isArray(attrs.menu)
-      ? attrs.menu.map((m, i) => ({ id: m.id ?? i, label: m.label, url: m.url }))
-      : [],
-
-    // Do NOT nest buttons inside hero
+    menu,
     hero: {
       background: absoluteUrl(heroObj?.background?.data?.attributes?.url || heroObj?.background) || null,
       eventDate: heroObj?.eventDate || heroObj?.date || null,
@@ -62,18 +84,10 @@ function transformSiteAttributes(attrs = {}) {
       eventName: heroObj?.eventName || heroObj?.title || null,
       eventLocation: heroObj?.eventLocation || null,
     },
-
-    // NEW: root-level heroButton normalized
     heroButton: normalizeHeroButtonsFromRoot(attrs),
-
     eventDocuments: Array.isArray(attrs.eventDocuments) ? attrs.eventDocuments : [],
     websites: Array.isArray(attrs.websites)
-      ? attrs.websites.map(w => ({
-          id: w.id,
-          url: w.url,
-          logo: absoluteUrl(w.logo?.data?.attributes?.url || w.logo),
-          label: w.label,
-        }))
+      ? attrs.websites.map(w => ({ id: w.id, url: w.url, logo: absoluteUrl(w.logo?.data?.attributes?.url || w.logo), label: w.label }))
       : [],
     newsItems: Array.isArray(attrs.news_item) ? attrs.news_item
              : Array.isArray(attrs.newsItems) ? attrs.newsItems : [],
