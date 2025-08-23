@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
+
 export const dynamic = "force-dynamic";
 
 const STRAPI_URL = process.env.STRAPI_URL || "";
 const STRAPI_TOKEN = process.env.STRAPI_TOKEN || "";
+const PUBLICATION_STATE = process.env.STRAPI_PUBLICATION_STATE || "preview";
 
+// Small helpers
 function getSiteFromRequest(request) {
   return (
     request?.headers?.get?.("x-site-host") ||
@@ -15,74 +18,29 @@ function getSiteFromRequest(request) {
 function absoluteUrl(maybeUrl) {
   if (!maybeUrl) return null;
   if (typeof maybeUrl !== "string") return null;
-  if (maybeUrl.startsWith("http")) return maybeUrl;
+  if (/^https?:\/\//i.test(maybeUrl)) return maybeUrl;
   if (!STRAPI_URL) return maybeUrl;
   return STRAPI_URL.replace(/\/$/, "") + (maybeUrl.startsWith("/") ? maybeUrl : `/${maybeUrl}`);
 }
 
-function slugify(input = "") {
-  return String(input || "")
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
+function buildPopulateQuery(fields = []) {
+  const sp = new URLSearchParams();
+  fields.forEach(f => sp.append("populate", f));
+  return sp.toString();
 }
 
-function normalizeHeroButtons(heroObj) {
-  // accept multiple possible container names
-  let raw =
-    Array.isArray(heroObj?.button) ? heroObj.button :
-    Array.isArray(heroObj?.buttons) ? heroObj.buttons :
-    Array.isArray(heroObj?.Button) ? heroObj.Button :
-    [];
-
-  // unwrap common Strapi shapes and normalize fields
-  const unwrap = (item) => {
-    if (!item) return null;
-    // media/component wrapped in { data: { attributes: { ... } } }
-    if (item.data && item.data.attributes) return item.data.attributes;
-    // direct attributes
-    if (item.attributes) return item.attributes;
-    // some nested component fields may be under an inner key (e.g. { button: { label, url } })
-    const innerKeys = Object.keys(item).filter(k => typeof item[k] === "object" && item[k] !== null);
-    if (innerKeys.length === 1 && (item[innerKeys[0]]?.label || item[innerKeys[0]]?.url)) {
-      return item[innerKeys[0]];
-    }
-    return item;
-  };
-
-  return raw
-    .map(unwrap)
-    .filter(Boolean)
-    .map((b, i) => {
-      const label =
-        (typeof b === "string" ? b : null) ??
-        b?.label ??
-        b?.text ??
-        b?.title ??
-        b?.buttonLabel ??
-        b?.name ??
-        null;
-
-      const url =
-        b?.url ??
-        b?.href ??
-        b?.link ??
-        b?.targetUrl ??
-        b?.linkUrl ??
-        b?.path ??
-        null;
-
-      return {
-        id: b?.id ?? i,
-        label: label ?? "Learn more",
-        url: url ?? "#",
-        target: b?.target || "_self",
-      };
-    });
+// Keep hero buttons simple (root-level heroButton[])
+function normalizeHeroButtonsFromRoot(attrs = {}) {
+  const raw = Array.isArray(attrs.heroButton) ? attrs.heroButton : [];
+  return raw.map((b, i) => ({
+    id: b?.id ?? i,
+    label: b?.label ?? b?.text ?? "Learn more",
+    url: b?.url ?? b?.href ?? "#",
+    target: b?.target || "_self",
+  }));
 }
 
+// 2) Update the transformer to use heroButton from root
 function transformSiteAttributes(attrs = {}) {
   const heroObj = Array.isArray(attrs?.hero) ? attrs.hero[0] : attrs?.hero || {};
   return {
@@ -91,21 +49,37 @@ function transformSiteAttributes(attrs = {}) {
     menuBackground: attrs.menuBackground || "#FFFFFF",
     textColor: attrs.textColor || "#000000",
     logoImage: absoluteUrl(attrs.logoImage?.data?.attributes?.url || attrs.logoImage) || null,
-    menu: Array.isArray(attrs.menu) ? attrs.menu.map((m, i) => ({ id: m.id ?? i, label: m.label, url: m.url })) : [],
+
+    menu: Array.isArray(attrs.menu)
+      ? attrs.menu.map((m, i) => ({ id: m.id ?? i, label: m.label, url: m.url }))
+      : [],
+
+    // Do NOT nest buttons inside hero
     hero: {
       background: absoluteUrl(heroObj?.background?.data?.attributes?.url || heroObj?.background) || null,
       eventDate: heroObj?.eventDate || heroObj?.date || null,
       eventInfo: heroObj?.eventInfo || heroObj?.eventInfoText || null,
       eventName: heroObj?.eventName || heroObj?.title || null,
       eventLocation: heroObj?.eventLocation || null,
-      buttons: normalizeHeroButtons(heroObj),
     },
+
+    // NEW: root-level heroButton normalized
+    heroButton: normalizeHeroButtonsFromRoot(attrs),
+
     eventDocuments: Array.isArray(attrs.eventDocuments) ? attrs.eventDocuments : [],
     websites: Array.isArray(attrs.websites)
-      ? attrs.websites.map(w => ({ id: w.id, url: w.url, logo: absoluteUrl(w.logo?.data?.attributes?.url || w.logo), label: w.label }))
+      ? attrs.websites.map(w => ({
+          id: w.id,
+          url: w.url,
+          logo: absoluteUrl(w.logo?.data?.attributes?.url || w.logo),
+          label: w.label,
+        }))
       : [],
-    newsItems: Array.isArray(attrs.newsItems) ? attrs.newsItems : [],
-    sponsors: Array.isArray(attrs.sponsors) ? attrs.sponsors.map(s => ({ ...s, logo: absoluteUrl(s.logo?.data?.attributes?.url || s.logo) })) : [],
+    newsItems: Array.isArray(attrs.news_item) ? attrs.news_item
+             : Array.isArray(attrs.newsItems) ? attrs.newsItems : [],
+    sponsors: Array.isArray(attrs.sponsors)
+      ? attrs.sponsors.map(s => ({ ...s, logo: absoluteUrl(s.logo?.data?.attributes?.url || s.logo) }))
+      : [],
     footer: {
       backgroundColor: (Array.isArray(attrs.footer) ? attrs.footer[0]?.backgroundColor : attrs.footer?.backgroundColor) || "#000000",
       textColor: (Array.isArray(attrs.footer) ? attrs.footer[0]?.textColor : attrs.footer?.textColor) || "#FFFFFF",
@@ -114,11 +88,23 @@ function transformSiteAttributes(attrs = {}) {
   };
 }
 
-function hasHeroButtons(attrs) {
-  const heroArr = Array.isArray(attrs?.hero) ? attrs.hero : attrs?.hero ? [attrs.hero] : [];
-  const h = heroArr[0] || {};
-  return (Array.isArray(h.button) && h.button.length > 0) || (Array.isArray(h.buttons) && h.buttons.length > 0);
-}
+// 3) Keep the fetch simple; just ensure heroButton is populated
+// In your fetchStrapiSite(), update populateFields to include heroButton
+// (replace the existing populateFields array)
+const populateFields = [
+  "hero",
+  "heroButton",       // CHANGED: pull root-level heroButton[]
+  "menu",
+  "websites",
+  "websites.logo",
+  "eventDocuments",
+  "news_item",
+  "pages",
+  "footer",
+  "sponsors",
+  "sponsors.logo",
+  "socials",
+];
 
 async function fetchEventsInternal(request) {
   try {
@@ -126,9 +112,12 @@ async function fetchEventsInternal(request) {
     const siteHost = getSiteFromRequest(request);
     if (siteHost) headers["x-site-host"] = siteHost;
 
-    const origin = (process.env.NODE_ENV !== "production")
-      ? `http://localhost:${process.env.PORT || 3000}`
-      : (process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || `http://localhost:${process.env.PORT || 3000}`);
+    const origin =
+      process.env.NODE_ENV !== "production"
+        ? `http://localhost:${process.env.PORT || 3000}`
+        : process.env.NEXT_PUBLIC_BASE_URL ||
+          process.env.NEXTAUTH_URL ||
+          `http://localhost:${process.env.PORT || 3000}`;
 
     const res = await fetch(new URL("/api/events", origin).toString(), { cache: "no-store", headers });
     if (!res.ok) return [];
@@ -139,100 +128,74 @@ async function fetchEventsInternal(request) {
   }
 }
 
+// New: get desired site slug
+function getSiteSlugFromRequest(request) {
+  try {
+    const u = request?.nextUrl ?? new URL(request.url);
+    const sp = u.searchParams;
+    const q = sp.get("site") || sp.get("slug");
+    const header = request?.headers?.get?.("x-site-slug");
+    return (q || header || process.env.DEFAULT_SITE_SLUG || "").trim() || null;
+  } catch {
+    return process.env.DEFAULT_SITE_SLUG || null;
+  }
+}
+
 async function fetchStrapiSite(request) {
-  const debug = { STRAPI_URL: STRAPI_URL || null, tried: [], tokenUsed: !!STRAPI_TOKEN };
   if (!STRAPI_URL) return { attrs: null, debug: { error: "STRAPI_URL not set" } };
 
   const base = STRAPI_URL.replace(/\/$/, "");
-  // Try most explicit nested populates first, then fallbacks
-  const candidates = [
-    "/api/sites?populate[hero][populate][button][populate]=*",
-    "/api/sites?populate[hero][populate]=button",
-    "/api/sites?populate=hero.button,hero,menu,websites,eventDocuments,news_item,footer,sponsors,socials",
-    "/api/sites?populate[hero][populate]=*",
-    "/api/sites?populate=*",
-    "/api/site?populate[hero][populate][button][populate]=*",
-    "/api/site?populate[hero][populate]=button",
-    "/api/site?populate=hero.button,hero,menu,websites,eventDocuments,news_item,footer,sponsors,socials",
-    "/api/site?populate[hero][populate]=*",
-    "/api/site?populate=*",
-    "/api/sites",
-    "/api/site",
-  ];
-
-  const siteHost = getSiteFromRequest(request);
   const headers = {};
-  if (siteHost) headers["x-site-host"] = siteHost;
   if (STRAPI_TOKEN) headers["Authorization"] = `Bearer ${STRAPI_TOKEN}`;
 
-  let lastOk = null; // remember the best ok response even if buttons not present
+  // Choose site by slug if provided
+  const slug = getSiteSlugFromRequest(request);
+  const filterQS = slug ? `&filters[slug][$eq]=${encodeURIComponent(slug)}` : "";
+  const sortQS = `&sort=updatedAt:desc`;
+  const pageQS = `&pagination[pageSize]=1`;
 
-  for (const path of candidates) {
-    const url = `${base}${path}`;
-    debug.tried.push(url);
-    try {
-      const res = await fetch(url, { cache: "no-store", headers });
-      const text = await res.text().catch(() => "");
-      debug[url] = { status: res.status, ok: res.ok, snippet: text ? (text.length > 300 ? text.slice(0, 300) + "…" : text) : null };
-      console.log(`[config] tried ${url} -> status=${res.status} ok=${res.ok}`);
-      if (!res.ok) continue;
+  // Readable bracket-style populate (hero + heroButton + common relations)
+  const urlPrimary =
+    `${base}/api/sites` +
+    `?populate[hero]=*` +
+    `&populate[heroButton]=*` +
+    `&populate[menu]=*` +
+    `&populate[websites][populate]=logo` +
+    `&populate[eventDocuments]=*` +
+    `&populate[newsItems]=*` +        // harmless if field doesn't exist
+    `&populate[news_item]=*` +        // actual field in your data
+    `&populate[footer]=*` +
+    `&populate[sponsors][populate]=logo` +
+    `&populate[socials]=*` +
+    filterQS + sortQS + pageQS;
 
-      let json = {};
-      try { json = text ? JSON.parse(text) : {}; } catch (e) { debug.parseError = String(e.message || e); continue; }
+  const urlFallback =
+    `${base}/api/sites?populate=*` + filterQS + sortQS + pageQS;
 
-      // Collection response
-      if (Array.isArray(json?.data)) {
-        const items = json.data;
-        const match = siteHost ? items.find((it) => {
-          const a = it.attributes || {};
-          const hostCandidates = [a.host, a.hostname, a.domain, a.slug, a.siteSlug, a.siteId].filter(Boolean).map(String);
-          return hostCandidates.some(h => siteHost.includes(h) || siteHost === h);
-        }) : null;
-        const chosen = match ?? items[0];
-        if (!chosen) continue;
-
-        const attrs = chosen.attributes || chosen;
-        if (hasHeroButtons(attrs)) {
-          console.log("[config] found hero.button via:", path);
-          return { attrs, debug };
-        }
-        // remember and keep trying more explicit populates
-        lastOk = { attrs, debug };
-        continue;
-      }
-
-      // Single-type response
-      const attrs = json?.data?.attributes ?? null;
-      if (attrs) {
-        if (hasHeroButtons(attrs)) {
-          console.log("[config] found hero.button via:", path);
-          return { attrs, debug };
-        }
-        lastOk = { attrs, debug };
-        continue;
-      }
-
-      // Raw attrs (no data wrapper)
-      if (json && Object.keys(json).length && !("data" in json)) {
-        if (hasHeroButtons(json)) {
-          console.log("[config] found hero.button via raw:", path);
-          return { attrs: json, debug };
-        }
-        lastOk = { attrs: json, debug };
-      }
-    } catch (err) {
-      debug.error = String(err?.message || err);
-    }
+  let res = await fetch(urlPrimary, { cache: "no-store", headers });
+  console.log(`[config] GET ${urlPrimary} -> ${res.status}`);
+  if (!res.ok) {
+    res = await fetch(urlFallback, { cache: "no-store", headers });
+    console.log(`[config] GET ${urlFallback} -> ${res.status}`);
+    if (!res.ok) return { attrs: null, debug: { status: res.status } };
   }
 
-  if (lastOk) return lastOk; // fallback to the best ok result even if no buttons populated
-  console.log("[config] no matching site endpoint found. debug:", JSON.stringify(debug, null, 2));
-  return { attrs: null, debug };
+  const json = await res.json().catch(() => null);
+  const items = Array.isArray(json?.data) ? json.data : [];
+  if (!items.length) return { attrs: null, debug: { note: "no items", slugTried: slug || null } };
+
+  // Extra safety: if API ignored filter, pick by slug manually
+  const chosen = slug
+    ? (items.find(it => (it.attributes?.slug || it.slug) === slug) || items[0])
+    : items[0];
+
+  const attrs = chosen?.attributes || chosen || null;
+  return { attrs, debug: { ok: true, slugUsed: slug || null } };
 }
 
 export async function GET(request) {
   try {
-    const { attrs, debug } = await fetchStrapiSite(request);
+    const { attrs } = await fetchStrapiSite(request);
     let cfg;
     if (attrs) {
       cfg = transformSiteAttributes(attrs);
@@ -255,14 +218,7 @@ export async function GET(request) {
     }
 
     const events = await fetchEventsInternal(request);
-    const enriched = { ...cfg, events };
-
-    // Return debug when STRAPI_URL present but no attrs (helps troubleshooting)
-    if (STRAPI_URL && !attrs) {
-      return NextResponse.json({ ok: false, message: "no site found", debug, result: enriched }, { status: 200 });
-    }
-
-    return NextResponse.json(enriched);
+    return NextResponse.json({ ...cfg, events });
   } catch (e) {
     return NextResponse.json({ error: e?.message || "failed" }, { status: 500 });
   }

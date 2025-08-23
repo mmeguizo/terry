@@ -61,13 +61,16 @@ const Hero = () => {
     }
   );
 
-  // Clone existing buttons safely
-  const heroButtons = Array.isArray(config?.hero?.buttons)
-    ? [...config.hero.buttons]
+  // Clone existing buttons safely from ROOT-LEVEL heroButton
+  const heroButtons = Array.isArray(config?.heroButton)
+    ? [...config.heroButton]
     : [];
 
   // Prefer Strapi setting if present, then env, then default
-  const eventId = (config?.eventId && String(config.eventId)) || process.env.NEXT_PUBLIC_EVENT_ID || "1389";
+  const eventId =
+    (config?.eventId && String(config.eventId)) ||
+    process.env.NEXT_PUBLIC_EVENT_ID ||
+    "1389";
   const eventPath = `/events/${eventId}`;
 
   // Only add if not already present (by exact URL or label)
