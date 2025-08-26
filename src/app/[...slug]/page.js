@@ -2,11 +2,10 @@ import { headers, draftMode } from "next/headers";
 import { notFound } from "next/navigation";
 import BlockRenderer from "@/components/blocks/BlockRenderer";
 
-export const dynamic = "force-dynamic";
 export const revalidate = 120;
 
 const STRAPI_URL = process.env.STRAPI_URL || "";
-const STRAPI_TOKEN = process.env.STRAPI_TOKEN || "";
+const STRAPI_TOKEN = process.env.STRAPI_TOKEN || process.env.STRAPI_API_TOKEN || "";
 
 // Simple helpers
 function authHeaders() {
@@ -100,18 +99,16 @@ async function fetchCandidatesBySlug(lastSeg, preview) {
 
 // Page entry
 export default async function Page(props) {
-  const p = await props.params; // await params in Next 15
+  const p = await props.params;
   const segs = Array.isArray(p?.slug) ? p.slug : [];
   const requestPath = normalizePath(segs.length ? `/${segs.join("/")}` : "/");
-  const { isEnabled: preview } = await draftMode(); // await draftMode
-  // 1) Try canonical lookup by path
+  const { isEnabled: preview } = await draftMode();
+
   let page = await fetchByPath(requestPath, preview);
 
-  // 2) Fallback: by slug candidates and compute path client-side
   if (!page) {
     const lastSeg = segs[segs.length - 1] || "";
-    const hdrs = await headers(); // await headers
-    // You can ignore site host filtering here since Strapi returns correct page by path/slug.
+    const hdrs = await headers();
     console.log("[pages] request host:", hdrs.get("x-site-hostname") || hdrs.get("host"));
     const candidates = await fetchCandidatesBySlug(lastSeg, preview);
     page = candidates.find((p) => computePagePath(p) === requestPath) || null;
@@ -128,10 +125,25 @@ export default async function Page(props) {
 
   if (!page) notFound();
 
+  // Fallback render if no blocks yet
+  const blocks = Array.isArray(page.blocks) ? page.blocks : Array.isArray(page.sections) ? page.sections : [];
+
+  if (!blocks.length) {
+    return (
+      <main className="min-h-[calc(100vh-14rem)] pt-28 pb-24 px-4 grid place-items-center">
+        <div className="container mx-auto max-w-3xl text-center">
+          <h1 className="text-3xl font-bold">{page.title || "Page"}</h1>
+          <p className="mt-4 opacity-70">No content yet for this page.</p>
+          <p className="mt-2 text-sm opacity-60">Path: {requestPath}</p>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main>
       <h1 className="sr-only">{page.title || "Page"}</h1>
-      <BlockRenderer blocks={page.blocks || page.sections || []} />
+      <BlockRenderer blocks={blocks} />
     </main>
   );
 }

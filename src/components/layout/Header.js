@@ -38,7 +38,7 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isWebsitesMenuOpen, setIsWebsitesMenuOpen] = useState(false);
 
-  console.log(config);
+  (config);
 
   // Inject "Events" link safely (do not mutate config.menu)
   const menuItems = Array.isArray(config?.menu) ? [...config.menu] : [];
