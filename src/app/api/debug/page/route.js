@@ -4,30 +4,38 @@ import { buildPageByPathUrl, authHeaders } from "@/lib/strapiQueries";
 export async function GET(req) {
   const url = new URL(req.url);
   const path = url.searchParams.get("path") || "/";
-  const siteSlug = url.searchParams.get("site") || "";
-  const forceSite = url.searchParams.get("forceSite") === "1";
+  const previewOverride = url.searchParams.get("preview") === "1";
+  const noSite = url.searchParams.get("nosite") === "1";
+  const siteParam = url.searchParams.get("site") || "";
 
   const hdrs = await headers();
-  const host = hdrs.get("x-site-host") || hdrs.get("x-site-hostname") || hdrs.get("host") || "";
-
+  const host = noSite ? "" : (hdrs.get("x-site-host") || hdrs.get("x-site-hostname") || hdrs.get("host") || "");
   const { isEnabled } = await draftMode();
-  const strapiUrl = buildPageByPathUrl({ path, host, siteSlug, preview: isEnabled, forceSite });
-  const res = await fetch(strapiUrl, { headers: authHeaders() });
-  const body = await res.text().catch(() => "");
-  try {
-    const json = JSON.parse(body || "{}");
-    return Response.json({
-      ok: res.ok,
-      status: res.status,
-      preview: isEnabled,
-      host,
-      siteSlug,
-      path,
-      strapiUrl,
-      dataCount: Array.isArray(json?.data) ? json.data.length : null,
-      raw: json,
-    }, { status: res.status });
-  } catch {
-    return new Response(body, { status: res.status, headers: { "content-type": "application/json" } });
+  const preview = previewOverride || isEnabled;
+
+  const strapiUrl = buildPageByPathUrl({ path, host, siteSlug: siteParam, preview });
+  const res = await fetch(strapiUrl, { headers: authHeaders(), cache: "no-store" });
+  const json = await res.json().catch(() => ({}));
+
+  // Optional draft-only fallback (publishedAt null isn’t needed in v5, but keep for safety)
+  let draftFallback = null;
+  if (preview && Array.isArray(json?.data) && json.data.length === 0) {
+    const draftUrl = buildPageByPathUrl({ path, host, siteSlug: siteParam, preview: true, draftOnly: true });
+    const dRes = await fetch(draftUrl, { headers: authHeaders(), cache: "no-store" });
+    const dJson = await dRes.json().catch(() => ({}));
+    draftFallback = { draftUrl, status: dRes.status, dataCount: Array.isArray(dJson?.data) ? dJson.data.length : null, raw: dJson };
   }
+
+  return Response.json({
+    ok: res.ok,
+    status: res.status,
+    preview,
+    host,
+    siteSlug: siteParam,
+    path,
+    strapiUrl,
+    dataCount: Array.isArray(json?.data) ? json.data.length : null,
+    raw: json,
+    draftFallback,
+  }, { status: res.status });
 }

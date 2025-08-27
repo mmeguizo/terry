@@ -66,7 +66,7 @@ export async function GET(req) {
 
   // 3) Derived: top-level Pages (path = "/" or one segment)
   try {
-    const pagesUrl = `${base()}/api/pages?${siteFilterQS({ host, siteSlug })}&populate=*&publicationState=live&pagination[pageSize]=100&sort=navOrder:asc`;
+    const pagesUrl = `${base()}/api/pages?${siteFilterQS({ host, siteSlug })}&populate=*&status=published&pagination[pageSize]=100&sort=navOrder:asc`;
     const res = await fetch(pagesUrl, { headers: authHeaders(), cache: "no-store" });
     if (res.ok) {
       const json = await res.json().catch(() => null);
