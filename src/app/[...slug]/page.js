@@ -1,49 +1,47 @@
 import { draftMode, headers as nextHeaders } from "next/headers";
-import { notFound } from "next/navigation"; // <-- add this
-import { strapiBase, siteFilterQS, authHeaders } from "@/lib/strapiQueries";
+import { notFound } from "next/navigation";
+import { fetchPageByPath } from "@/lib/strapiQueries";
 import BlockRenderer from "@/components/blocks/BlockRenderer";
 
 export const revalidate = 120;
 
-function pageQuery({ path, preview, siteQS }) {
-  const pub = preview ? "draft" : "published"; // Strapi v5
-  return [
-    siteQS,
-    `filters[path][$eq]=${encodeURIComponent(path)}`,
-    `status=${pub}`,
-    "populate=*",
-    "pagination[pageSize]=1",
-  ]
-    .filter(Boolean)
-    .join("&");
-}
-
-// Fetch helpers
-async function fetchByPath(path, preview, host, siteSlug) {
-  const siteQS = siteFilterQS({ host, siteSlug });
-  const url = `${strapiBase()}/api/pages?${pageQuery({ path, preview, siteQS })}`;
-  const init = preview
-    ? { headers: authHeaders(), cache: "no-store" } // live preview
-    : { headers: authHeaders() };                   // allow ISR
-  const res = await fetch(url, init);
-  if (!res.ok) return null;
-  const json = await res.json().catch(() => ({}));
-  return Array.isArray(json?.data) && json.data[0] ? json.data[0] : null;
-}
-
-// Page entry
 export default async function Page({ params }) {
-  const resolvedParams = await params;
-  const segs = Array.isArray(resolvedParams?.slug) ? resolvedParams.slug : [];
+  const awaitedParams = await params
+  const segs = Array.isArray(awaitedParams?.slug) ? awaitedParams.slug : [];
   const path = segs.length ? `/${segs.join("/")}` : "/";
+
   const { isEnabled: preview } = await draftMode();
   const hdrs = await nextHeaders();
-  const host = hdrs.get("x-site-host") || hdrs.get("x-site-hostname") || hdrs.get("host") || "";
+  const host =
+    hdrs.get("x-site-host") ||
+    hdrs.get("x-site-hostname") ||
+    hdrs.get("host") ||
+    "";
 
-  const page = await fetchByPath(path, preview, host, process.env.SITE_SLUG || process.env.DEFAULT_SITE_SLUG);
-  if (!page) notFound();
+  console.log("[page] request →", { path, preview, host });
 
-  const blocks = Array.isArray(page.blocks) ? page.blocks : Array.isArray(page.sections) ? page.sections : [];
+  // SITE_SLUG/DEFAULT_SITE_SLUG can be set in .env.local; leave undefined to use host
+  const siteSlug = process.env.SITE_SLUG || process.env.DEFAULT_SITE_SLUG;
+
+  const { page, url, dataCount, status } = await fetchPageByPath({
+    path,
+    host,
+    siteSlug,
+    preview,
+  });
+
+  console.log("[page] fetch summary →", { url, status, dataCount, foundId: page?.id });
+
+  if (!page) {
+    console.log("[page] notFound()");
+    notFound();
+  }
+
+  const blocks = Array.isArray(page.blocks)
+    ? page.blocks
+    : Array.isArray(page.sections)
+    ? page.sections
+    : [];
 
   if (!blocks.length) {
     return (
