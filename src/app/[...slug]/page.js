@@ -33,7 +33,8 @@ async function fetchByPath(path, preview, host, siteSlug) {
 
 // Page entry
 export default async function Page({ params }) {
-  const segs = Array.isArray(params?.slug) ? params.slug : [];
+  const resolvedParams = await params;
+  const segs = Array.isArray(resolvedParams?.slug) ? resolvedParams.slug : [];
   const path = segs.length ? `/${segs.join("/")}` : "/";
   const { isEnabled: preview } = await draftMode();
   const hdrs = await nextHeaders();

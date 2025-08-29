@@ -14,7 +14,8 @@ function slugify(input) {
 }
 
 export async function GET(_request, { params }) {
-  const id = params?.id; // <- use destructured params
+  const resolvedParams = await params;
+  const id = resolvedParams?.id; // <- use destructured params
   if (!id) return NextResponse.json({ error: "Missing id" }, { status: 400 });
 
   try {
