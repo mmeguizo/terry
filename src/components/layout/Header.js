@@ -210,20 +210,20 @@ const Header = () => {
             </button>
           </div>
 
-          <nav className="grow place-content-start grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 py-12 px-4 xs:px-6 sm:px-12 lg:px-24 overflow-auto [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:border-neutral-800 [&::-webkit-scrollbar-thumb]:bg-neutral-400 [&::-webkit-scrollbar-thumb]:rounded-full">
+          <nav className="grow place-content-start grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-5 py-12 px-4 xs:px-6 sm:px-12 lg:px-24 overflow-auto [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:border-neutral-800 [&::-webkit-scrollbar-thumb]:bg-neutral-400 [&::-webkit-scrollbar-thumb]:rounded-full">
             {config.websites && config.websites.length > 0 ? (
               config.websites.map((item, index) => (
                 <NavLink
                   key={index}
                   href={item.url}
                   target="_blank"
-                  className="aspect-video bg-neutral-700 rounded-md border-2 border-transparent hover:border-neutral-500 hover:scale-105 transition-[border-color, scale] duration-400"
+                  className="aspect-video bg-neutral-700 rounded-md border-2 border-transparent hover:border-neutral-500 hover:scale-105 transition-[border-color, scale] duration-400 max-w-[200px] mx-auto"
                 >
                   <Image
                     src={item.logo}
                     alt={item.label}
-                    width={300}
-                    height={200}
+                    width={150}
+                    height={100}
                     className="w-full h-full object-contain"
                     unoptimized={true}
                   />
