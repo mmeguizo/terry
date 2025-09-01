@@ -108,10 +108,12 @@ const Header = () => {
           {/* Websites button */}
           <div className="flex items-center">
             <button
+              type="button" // ensure no form submit
               onClick={toggleWebsitesMenu}
-              className="z-50 p-2 flex items-center overflow-hidden relative rounded-md cursor-pointer duration-300 bg-[var(--bgColor)] text-white after:content-[''] after:inset-1 after:rounded-sm after:absolute after:bg-[var(--bgColor)] after:transition-all after:scale-90 after:duration-200  after:brightness-70 after:opacity-0 hover:after:opacity-100 hover:after:scale-100"
+              aria-expanded={isWebsitesMenuOpen}
+              aria-controls="websites-drawer"
+              className="z-[60] p-2 flex items-center overflow-hidden relative rounded-md cursor-pointer duration-300 bg-[var(--bgColor)] text-white after:content-[''] after:inset-1 after:rounded-sm after:absolute after:bg-[var(--bgColor)] after:transition-all after:scale-90 after:duration-200  after:brightness-70 after:opacity-0 hover:after:opacity-100 hover:after:scale-100"
               style={{ "--bgColor": config.primaryColor }}
-              aria-label="Toggle websites menu"
             >
               <p className="md:block hidden text-lg font-semibold uppercase mx-2 relative z-50">
                 Websites
@@ -120,8 +122,12 @@ const Header = () => {
             </button>
           </div>
 
-          {/* Decorative SVGs unchanged */}
-          <svg className="relative z-50 hidden xs:block" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2500 97">
+          {/* Decorative SVGs unchanged, but make them ignore pointer events */}
+          <svg
+            className="pointer-events-none relative z-40 hidden xs:block"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 2500 97"
+          >
             <path
               fill={config.menuBackground}
               d="M -379.355 -0.012 L -379.355 74.988 L 1949.14 74.988 C 1964.82 74.988 1995.639 70.748 2006.719 59.658 C 2006.719 59.658 2035.045 35.513 2048.725 21.843 C 2067.695 2.873 2069.382 -0.012 2069.382 -0.012 L -379.355 -0.012 Z"
@@ -187,7 +193,8 @@ const Header = () => {
 
       {/* Websites drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full bg-neutral-900/90 backdrop-blur-xl transform transition-transform duration-600 ease-in-out z-50 ${
+        id="websites-drawer"
+        className={`fixed top-0 right-0 h-full w-full bg-neutral-900/90 backdrop-blur-xl transform transition-transform duration-600 ease-in-out z-[70] ${
           isWebsitesMenuOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -203,20 +210,20 @@ const Header = () => {
             </button>
           </div>
 
-          <nav className="grow place-content-start grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 py-12 px-4 xs:px-6 sm:px-12 lg:px-24 overflow-auto [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:border-neutral-800 [&::-webkit-scrollbar-thumb]:bg-neutral-400 [&::-webkit-scrollbar-thumb]:rounded-full">
+          <nav className="grow place-content-start grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-5 py-12 px-4 xs:px-6 sm:px-12 lg:px-24 overflow-auto [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:border-neutral-800 [&::-webkit-scrollbar-thumb]:bg-neutral-400 [&::-webkit-scrollbar-thumb]:rounded-full">
             {config.websites && config.websites.length > 0 ? (
               config.websites.map((item, index) => (
                 <NavLink
                   key={index}
                   href={item.url}
                   target="_blank"
-                  className="aspect-video bg-neutral-700 rounded-md border-2 border-transparent hover:border-neutral-500 hover:scale-105 transition-[border-color, scale] duration-400"
+                  className="aspect-video bg-neutral-700 rounded-md border-2 border-transparent hover:border-neutral-500 hover:scale-105 transition-[border-color, scale] duration-400 max-w-[200px] mx-auto"
                 >
                   <Image
                     src={item.logo}
                     alt={item.label}
-                    width={300}
-                    height={200}
+                    width={150}
+                    height={100}
                     className="w-full h-full object-contain"
                     unoptimized={true}
                   />

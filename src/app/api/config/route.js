@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+
 export const dynamic = "force-dynamic";
 
 const STRAPI_URL = process.env.STRAPI_URL || "";
@@ -14,6 +15,7 @@ async function loadDefaultSiteConfig() {
   }
 }
 
+// Small helpers
 function getSiteFromRequest(request) {
   // Check common headers set by middleware, then query-hint headers (x-q-*), then URL query params
   const h = request?.headers;
@@ -39,7 +41,7 @@ function getSiteFromRequest(request) {
 function absoluteUrl(maybeUrl) {
   if (!maybeUrl) return null;
   if (typeof maybeUrl !== "string") return null;
-  if (maybeUrl.startsWith("http")) return maybeUrl;
+  if (/^https?:\/\//i.test(maybeUrl)) return maybeUrl;
   if (!STRAPI_URL) return maybeUrl;
   return STRAPI_URL.replace(/\/$/, "") + (maybeUrl.startsWith("/") ? maybeUrl : `/${maybeUrl}`);
 }
@@ -120,8 +122,36 @@ function normalizeHeroButtons(heroObj) {
     });
 }
 
+// 2) Update the transformer to use heroButton from root
 function transformSiteAttributes(attrs = {}) {
   const heroObj = Array.isArray(attrs?.hero) ? attrs.hero[0] : attrs?.hero || {};
+
+  // Preferred: structured menu from Site.menu
+  let menu = Array.isArray(attrs.menu)
+    ? attrs.menu.map((m, i) => ({ id: m.id ?? i, label: m.label, url: m.url }))
+    : [];
+
+  // Fallback: derive from Pages when menu is empty
+  if ((!menu || menu.length === 0) && Array.isArray(attrs.pages)) {
+    const withFlags = attrs.pages.map((p) => ({
+      id: p.id,
+      title: p.title || p.name || "Page",
+      path: p.path || (p.slug ? `/${p.slug}` : "/"),
+      showInNav: p.showInNav ?? p.isHome ?? false,
+      navOrder: typeof p.navOrder === "number" ? p.navOrder : 9999,
+    }));
+
+    const derived = withFlags
+      .filter(p =>
+        (p.showInNav === true) ||
+        (p.showInNav === false ? false : (p.path && (p.path === "/" || p.path.split("/").filter(Boolean).length <= 1)))
+      )
+      .sort((a, b) => a.navOrder - b.navOrder)
+      .map((p, i) => ({ id: p.id ?? i, label: p.title, url: p.path || "/" }));
+
+    if (derived.length) menu = derived;
+  }
+
   return {
     siteTitle: attrs.siteTitle || attrs.title || "",
     primaryColor: attrs.primaryColor || "#000000",
@@ -135,8 +165,8 @@ function transformSiteAttributes(attrs = {}) {
       eventInfo: heroObj?.eventInfo || heroObj?.eventInfoText || null,
       eventName: heroObj?.eventName || heroObj?.title || null,
       eventLocation: heroObj?.eventLocation || null,
-      buttons: normalizeHeroButtons(heroObj),
     },
+    heroButton: normalizeHeroButtonsFromRoot(attrs),
     eventDocuments: Array.isArray(attrs.eventDocuments) ? attrs.eventDocuments : [],
     websites: Array.isArray(attrs.websites)
       ? attrs.websites.map(w => ({ id: w.id, url: w.url, logo: absoluteUrl(w.logo?.data?.attributes?.url || w.logo), label: w.label }))
@@ -184,9 +214,12 @@ async function fetchEventsInternal(request) {
     const siteHost = getSiteFromRequest(request);
     if (siteHost) headers["x-site-host"] = siteHost;
 
-    const origin = (process.env.NODE_ENV !== "production")
-      ? `http://localhost:${process.env.PORT || 3000}`
-      : (process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || `http://localhost:${process.env.PORT || 3000}`);
+    const origin =
+      process.env.NODE_ENV !== "production"
+        ? `http://localhost:${process.env.PORT || 3000}`
+        : process.env.NEXT_PUBLIC_BASE_URL ||
+          process.env.NEXTAUTH_URL ||
+          `http://localhost:${process.env.PORT || 3000}`;
 
     const res = await fetch(new URL("/api/events", origin).toString(), { cache: "no-store", headers });
     if (!res.ok) return [];
@@ -197,8 +230,20 @@ async function fetchEventsInternal(request) {
   }
 }
 
+// New: get desired site slug
+function getSiteSlugFromRequest(request) {
+  try {
+    const u = request?.nextUrl ?? new URL(request.url);
+    const sp = u.searchParams;
+    const q = sp.get("site") || sp.get("slug");
+    const header = request?.headers?.get?.("x-site-slug");
+    return (q || header || process.env.DEFAULT_SITE_SLUG || "").trim() || null;
+  } catch {
+    return process.env.DEFAULT_SITE_SLUG || null;
+  }
+}
+
 async function fetchStrapiSite(request) {
-  const debug = { STRAPI_URL: STRAPI_URL || null, tried: [], tokenUsed: !!STRAPI_TOKEN };
   if (!STRAPI_URL) return { attrs: null, debug: { error: "STRAPI_URL not set" } };
 
   const base = STRAPI_URL.replace(/\/$/, "");
@@ -223,7 +268,6 @@ async function fetchStrapiSite(request) {
 
   const siteHost = getSiteFromRequest(request);
   const headers = {};
-  if (siteHost) headers["x-site-host"] = siteHost;
   if (STRAPI_TOKEN) headers["Authorization"] = `Bearer ${STRAPI_TOKEN}`;
 
   let lastOk = null; // remember the best ok response even if buttons not present

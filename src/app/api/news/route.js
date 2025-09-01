@@ -1,13 +1,8 @@
 // Simple News API proxy for Next.js (server-side)
-// - Reads STRAPI_URL and SITE_SLUG from env
-// - Fetches NewsItem records linked to the Site (relation key: "sites")
-// - Sorts by "date" first, then falls back to "publishedAt" if Strapi rejects the sort
-// - Returns a minimal array of news objects
-
+// Strapi v5: uses status=published
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 
-// Slug helper
 function slugify(input) {
   return String(input || "")
     .toLowerCase()
@@ -17,13 +12,23 @@ function slugify(input) {
     .replace(/-+/g, "-");
 }
 
-export async function GET() {
+function normHost(h = "") {
+  return String(h).replace(/^https?:\/\//, "").replace(/\/$/, "");
+}
+
+export async function GET(req) {
   const base = (process.env.STRAPI_URL || "").replace(/\/+$/, "");
-  const siteSlug = process.env.SITE_SLUG || "";
   const token = process.env.STRAPI_API_TOKEN || "";
 
+  // Prefer site from header (middleware sets x-site-host); allow ?site= override; fallback to env
+  const url = new URL(req.url);
+  const siteFromQuery = url.searchParams.get("site") || "";
+  const host = req.headers.get("x-site-host") || req.headers.get("host") || "";
+  const defaultSite = process.env.SITE_SLUG || "";
+  const siteSlug = siteFromQuery || defaultSite;
+
   if (!base || !siteSlug) {
-    console.warn("api/news: missing STRAPI_URL or SITE_SLUG");
+    console.warn("[news] missing STRAPI_URL or SITE_SLUG", { base: !!base, siteSlug });
     return NextResponse.json([]);
   }
 
@@ -34,20 +39,20 @@ export async function GET() {
   const toAbs = (v) =>
     !v ? null : /^https?:\/\//i.test(String(v)) ? String(v) : `${base}/${String(v).replace(/^\/+/, "")}`;
 
-  // Try combinations of relation + sort
+  console.log("[news] request →", { siteSlug, host: normHost(host) });
+
   for (const rel of RELS) {
     for (const sort of SORTS) {
-      const url =
+      const urlStr =
         `${base}/api/news-items?filters[${rel}][slug][$eq]=${encodeURIComponent(siteSlug)}` +
-        `&sort[0]=${encodeURIComponent(sort)}&pagination[limit]=8`;
+        `&status=published&sort[0]=${encodeURIComponent(sort)}&pagination[limit]=8`;
 
       try {
-        const res = await fetch(url, { headers, cache: "no-store" });
+        const res = await fetch(urlStr, { headers, cache: "no-store" });
         if (!res.ok) {
           const body = await res.text().catch(() => "");
-          // Only keep looping on "Invalid key ..." 400s
           if (!(res.status === 400 && /Invalid key/i.test(body))) {
-            console.warn("api/news fetch failed:", res.status, body);
+            console.warn("[news] fetch failed:", res.status, body);
             break;
           }
           continue;
@@ -55,6 +60,7 @@ export async function GET() {
 
         const json = await res.json();
         const items = Array.isArray(json?.data) ? json.data : [];
+        console.log("[news] try:", { rel, sort, count: items.length });
         if (!items.length) continue;
 
         const out = items.map((row) => {
@@ -83,20 +89,21 @@ export async function GET() {
 
         return NextResponse.json(out);
       } catch (e) {
-        console.warn("api/news network error:", e.message || e);
+        console.warn("[news] network error:", e.message || e);
       }
     }
   }
 
-  // Final fallback: no sort
+  // Final fallback without sort
   try {
-    const url =
+    const urlStr =
       `${base}/api/news-items?filters[sites][slug][$eq]=${encodeURIComponent(siteSlug)}` +
-      `&pagination[limit]=8`;
-    const res = await fetch(url, { headers, cache: "no-store" });
+      `&status=published&pagination[limit]=8`;
+    const res = await fetch(urlStr, { headers, cache: "no-store" });
     if (!res.ok) return NextResponse.json([]);
     const json = await res.json();
     const items = Array.isArray(json?.data) ? json.data : [];
+    console.log("[news] fallback count:", items.length);
     const out = items.map((row) => {
       const a = row?.attributes || row || {};
       const slug = a.slug || slugify(a.title) || String(row?.id || "");

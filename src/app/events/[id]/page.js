@@ -1,217 +1,300 @@
-export const dynamic = "force-dynamic";
 import Image from "next/image";
+import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
+function fmtDate(d) {
+  try {
+    return d ? new Date(d).toLocaleDateString() : "";
+  } catch {
+    return d || "";
+  }
+}
 function fmtRange(start, end) {
-  if (!start && !end) return null;
-  try {
-    const s = start ? new Date(start) : null;
-    const e = end ? new Date(end) : null;
-    if (s && e) {
-      const sameMonth = s.getMonth() === e.getMonth() && s.getFullYear() === e.getFullYear();
-      const sStr = s.toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
-      const eStr = e.toLocaleDateString("en-AU", {
-        day: "numeric",
-        month: sameMonth ? undefined : "long",
-        year: sameMonth ? undefined : "numeric",
-      });
-      return `${sStr} – ${eStr}`;
-    }
-    const one = (s || e).toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
-    return one;
-  } catch {
-    return start || end;
-  }
+  const s = fmtDate(start);
+  const e = fmtDate(end);
+  return s && e && s !== e ? `${s} — ${e}` : s || e || "";
 }
 
-const isNumeric = (v) => /^\d+$/.test(String(v));
+async function fetchEventFromApi(id) {
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/events/${encodeURIComponent(id)}`;
+  const finalUrl = url.startsWith("/") ? `http://localhost:3000${url}` : url || `http://localhost:3000/api/events/${id}`;
+  console.log("[event-page] fetch →", finalUrl);
 
-function getOrigin() {
-  const isDev = process.env.NODE_ENV !== "production";
-  const local = `http://localhost:${process.env.PORT || 3000}`;
-  return isDev ? local : (process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXTAUTH_URL || local);
-}
+  const res = await fetch(finalUrl, { cache: "no-store" });
+  const json = await res.json().catch(() => ({}));
 
-async function getEventById(id) {
-  const url = new URL(`/api/raceready/event/${id}`, getOrigin()).toString();
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) return null;
-  return res.json();
-}
-
-async function getEventBySlug(slug) {
-  // 1) Try env-driven single event
-  const envId = process.env.NEXT_PUBLIC_EVENT_ID;
-  if (envId) {
-    const ev = await getEventById(envId);
-    if (ev && String(ev.slug || "").toLowerCase() === String(slug).toLowerCase()) return ev;
-  }
-
-  // 2) Fallback: try /api/events to map slug -> id/data
-  try {
-    const listRes = await fetch(new URL("/api/events", getOrigin()).toString(), { cache: "no-store" });
-    if (!listRes.ok) return null;
-    const list = await listRes.json();
-    const found = Array.isArray(list)
-      ? list.find((it) => String(it.slug || "").toLowerCase() === String(slug).toLowerCase())
-      : null;
-    if (!found) return null;
-
-    if (found.id && isNumeric(found.id)) {
-      return await getEventById(found.id);
-    }
-    return found;
-  } catch {
+  if (!res.ok || !json?.ok || !json?.event) {
+    console.warn("[event-page] not ok:", res.status, json?.error);
     return null;
   }
+
+  console.log("[event-page] found →", {
+    id: json.event.id,
+    title: json.event.title,
+    docs: json.event.documents?.length || 0,
+    entries: json.event.entries?.length || 0,
+    categories: json.event.categories?.length || 0,
+  });
+  return json.event;
 }
 
-function eventToJsonLd(event, path) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "SportsEvent",
-    name: event.name,
-    startDate: event.startDate || undefined,
-    endDate: event.endDate || undefined,
-    location: event.venue
-      ? { "@type": "Place", name: event.venue }
-      : undefined,
-    image: event.heroImage ? [event.heroImage] : undefined,
-    description: event.description || undefined,
-    url: path,
-  };
+function SectionTitle({ id, children }) {
+  return (
+    <h2 id={id} className="text-xl font-bold scroll-mt-28">
+      {children}
+    </h2>
+  );
 }
 
 export default async function EventPage({ params }) {
-  const { id: handle } = await params;
-  const event = isNumeric(handle) ? await getEventById(handle) : await getEventBySlug(handle);
+  const awaited = await params;
+  const id = awaited?.id;
+  console.log("[event-page] request →", { id });
 
+  const event = await fetchEventFromApi(id);
   if (!event) {
-    return (
-      <main className="container py-14">
-        <h1 className="text-3xl font-semibold mb-2">Event Not Found</h1>
-        <p className="text-neutral-500">The event you’re looking for doesn’t exist or failed to load.</p>
-      </main>
-    );
+    console.log("[event-page] notFound");
+    notFound();
   }
 
-  const isNumHandle = isNumeric(handle);
-  const canonicalPath = `/events/${isNumHandle ? (event.slug || handle) : handle}`;
-  const jsonLd = eventToJsonLd(event, canonicalPath);
-
-  const dateRange = fmtRange(event.startDate, event.endDate);
+  const dateStr = fmtRange(event.startDate, event.endDate);
+  const docs = event.documents || [];
+  const entries = event.entries || [];
+  const cats = event.categories || [];
+  const sponsors = event.sponsors || [];
+  console.log("[event-page] counts →", {
+    docs: docs.length,
+    entries: entries.length,
+    categories: cats.length,
+    sponsors: sponsors.length,
+  });
 
   return (
-    <main>
-      {/* JSON-LD for rich results */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
-      <section className="bg-[#0f1216] text-white">
-        <div className="container py-10">
-          <div className="grid md:grid-cols-[2fr_1fr] items-center gap-8">
-            <div>
-              <h1 className="text-4xl font-bold mb-3">{event.name}</h1>
-              <div className="text-white/80 space-x-3">
-                {dateRange && <span>{dateRange}</span>}
-                {event.venue && (
-                  <>
-                    <span className="opacity-50">•</span>
-                    <span>{event.venue}</span>
-                  </>
-                )}
-              </div>
-              {event.description && <p className="mt-6 text-white/80 max-w-3xl">{event.description}</p>}
+    <main className="pt-16 md:pt-24">
+      {/* Hero */}
+      <section
+        className="relative h-72 md:h-[28rem] bg-neutral-800"
+        style={{
+          backgroundImage: event.heroImage ? `url(${event.heroImage})` : undefined,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/55" />
+        <div className="absolute inset-0 grid place-items-center text-center px-4">
+          <div className="max-w-5xl">
+            <p className="text-white/70 text-sm md:text-base tracking-wide uppercase">
+              {dateStr}{event.location ? (dateStr ? " · " : "") + event.location : ""}
+            </p>
+            <h1 className="mt-2 text-3xl md:text-5xl font-extrabold text-white">{event.title || "Event"}</h1>
+            <div className="mt-5 flex flex-wrap justify-center gap-3">
+              {event.infoUrl && (
+                <a
+                  href={event.infoUrl}
+                  className="inline-block bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Event Info
+                </a>
+              )}
+              {Array.isArray(event.buttons) &&
+                event.buttons.map((b) => (
+                  <a
+                    key={b.id}
+                    href={b.url}
+                    target={b.target || "_self"}
+                    rel={b.target === "_blank" ? "noopener noreferrer" : undefined}
+                    className="inline-block bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-md"
+                  >
+                    {b.label}
+                  </a>
+                ))}
             </div>
-            {event.heroImage ? (
-              <div className="relative w-full aspect-video rounded overflow-hidden ring-1 ring-white/10">
-                <Image
-                  src={event.heroImage}
-                  alt={event.name}
-                  className="object-cover"
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  priority
-                />
-              </div>
-            ) : null}
           </div>
         </div>
       </section>
 
-      <section className="bg-[#171717]">
-        <div className="container py-10">
-          <h2 className="text-xl font-semibold text-white mb-4">Event Documents</h2>
-          {Array.isArray(event.documents) && event.documents.length > 0 ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {event.documents.map((d) => (
-                <a
-                  key={d.id}
-                  href={d.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-3 rounded bg-white/5 text-white hover:bg-white/10 transition"
-                >
-                  {d.label}
-                </a>
-              ))}
+      {/* Sticky sub‑nav */}
+      <nav className="sticky top-16 md:top-24 z-20 bg-white/85 backdrop-blur border-b">
+        <div className="container mx-auto max-w-6xl">
+          <ul className="flex flex-wrap gap-4 px-4 py-3 text-sm font-semibold">
+            <li><a href="#overview" className="hover:text-red-600">Overview</a></li>
+            <li><a href="#documents" className="hover:text-red-600">Documents{docs.length ? ` (${docs.length})` : ""}</a></li>
+            <li><a href="#entries" className="hover:text-red-600">Entry List{entries.length ? ` (${entries.length})` : ""}</a></li>
+            <li><a href="#categories" className="hover:text-red-600">Categories{cats.length ? ` (${cats.length})` : ""}</a></li>
+            <li><a href="#sponsors" className="hover:text-red-600">Sponsors</a></li>
+            <li><a href="#schedule" className="hover:text-red-600">Schedule</a></li>
+          </ul>
+        </div>
+      </nav>
+
+      {/* Top stats */}
+      <section className="px-4 py-8">
+        <div className="container mx-auto max-w-6xl grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-md border border-neutral-200 bg-white p-4">
+            <p className="text-xs uppercase text-neutral-500">Date</p>
+            <p className="mt-1 font-semibold">{dateStr || "TBC"}</p>
+          </div>
+          <div className="rounded-md border border-neutral-200 bg-white p-4">
+            <p className="text-xs uppercase text-neutral-500">Location</p>
+            <p className="mt-1 font-semibold">{event.location || "TBC"}</p>
+          </div>
+          <div className="rounded-md border border-neutral-200 bg-white p-4">
+            <p className="text-xs uppercase text-neutral-500">Categories</p>
+            <p className="mt-1 font-semibold">{cats.length || 0}</p>
+          </div>
+          <div className="rounded-md border border-neutral-200 bg-white p-4">
+            <p className="text-xs uppercase text-neutral-500">Entries</p>
+            <p className="mt-1 font-semibold">{entries.length || 0}</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Overview */}
+      <section className="px-4 py-10">
+        <div className="container mx-auto max-w-6xl grid lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <SectionTitle id="overview">Overview</SectionTitle>
+            <p className="mt-3 text-neutral-700 leading-relaxed">
+              {event.description || "Event details coming soon."}
+            </p>
+
+            {cats.length ? (
+              <div className="mt-6">
+                <h3 className="font-semibold">Categories</h3>
+                <div className="mt-2 flex flex-wrap gap-2" id="categories">
+                  {cats.map((c, i) => (
+                    <span key={i} className="inline-block rounded-full bg-neutral-100 border border-neutral-200 px-3 py-1 text-sm">
+                      {String(c)}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          {/* Actions / Quick links */}
+          <aside className="lg:col-span-1">
+            <div className="rounded-md border border-neutral-200 bg-white p-4">
+              <h3 className="font-semibold">Event Actions</h3>
+              <div className="mt-3 flex flex-col gap-2">
+                {event.infoUrl && (
+                  <a
+                    href={event.infoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-center rounded-md bg-red-600 hover:bg-red-700 text-white px-4 py-2"
+                  >
+                    Event Info
+                  </a>
+                )}
+                {(event.buttons || []).map((b) => (
+                  <a
+                    key={b.id}
+                    href={b.url}
+                    target={b.target || "_self"}
+                    rel={b.target === "_blank" ? "noopener noreferrer" : undefined}
+                    className="text-center rounded-md border border-neutral-200 hover:bg-neutral-50 px-4 py-2"
+                  >
+                    {b.label}
+                  </a>
+                ))}
+              </div>
             </div>
+          </aside>
+        </div>
+      </section>
+
+      {/* Documents */}
+      <section className="px-4 py-10 bg-neutral-50">
+        <div className="container mx-auto max-w-6xl">
+          <SectionTitle id="documents">Documents</SectionTitle>
+          {docs.length ? (
+            <ul className="mt-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {docs.map((doc) => (
+                <li key={doc.id}>
+                  <a
+                    href={doc.url}
+                    className="block rounded-md border border-neutral-200 bg-white hover:bg-neutral-50 px-4 py-3"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {doc.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
           ) : (
-            <p className="text-white/70">No documents yet.</p>
+            <p className="mt-3 text-neutral-600">No documents yet.</p>
           )}
         </div>
       </section>
 
-      <section className="bg-white">
-        <div className="container py-10">
-          <div className="grid lg:grid-cols-3 gap-10">
-            <div className="lg:col-span-1">
-              <h2 className="text-xl font-semibold mb-3">Categories</h2>
-              {Array.isArray(event.categories) && event.categories.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {event.categories.map((c, i) => (
-                    <span key={i} className="px-3 py-1 bg-neutral-100 rounded-full text-neutral-700 text-sm">
-                      {c}
-                    </span>
+      {/* Entry List */}
+      <section className="px-4 py-10">
+        <div className="container mx-auto max-w-6xl">
+          <SectionTitle id="entries">Entry List</SectionTitle>
+          {entries.length ? (
+            <div className="mt-4 overflow-x-auto rounded-md border border-neutral-200">
+              <table className="min-w-full bg-white text-sm">
+                <thead className="bg-neutral-50">
+                  <tr>
+                    <th className="text-left px-3 py-2">No.</th>
+                    <th className="text-left px-3 py-2">Name / Team</th>
+                    <th className="text-left px-3 py-2">Vehicle</th>
+                    <th className="text-left px-3 py-2">Category</th>
+                    <th className="text-left px-3 py-2">Country</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {entries.map((e) => (
+                    <tr key={e.id} className="border-t">
+                      <td className="px-3 py-2">{e.number || "-"}</td>
+                      <td className="px-3 py-2">{e.name || "-"}</td>
+                      <td className="px-3 py-2">{e.vehicle || "-"}</td>
+                      <td className="px-3 py-2">{e.category || "-"}</td>
+                      <td className="px-3 py-2">{e.nationality || "-"}</td>
+                    </tr>
                   ))}
-                </div>
-              ) : (
-                <p className="text-neutral-500">No categories yet.</p>
-              )}
+                </tbody>
+              </table>
             </div>
+          ) : (
+            <p className="mt-3 text-neutral-600">No entries published yet.</p>
+          )}
+        </div>
+      </section>
 
-            <div className="lg:col-span-2">
-              <h2 className="text-xl font-semibold mb-3">Entry List</h2>
-              {Array.isArray(event.entries) && event.entries.length > 0 ? (
-                <div className="overflow-x-auto ring-1 ring-neutral-200 rounded">
-                  <table className="min-w-[680px] w-full text-sm">
-                    <thead className="bg-neutral-50">
-                      <tr>
-                        <th className="text-left font-medium p-3">#</th>
-                        <th className="text-left font-medium p-3">Team</th>
-                        <th className="text-left font-medium p-3">Drivers</th>
-                        <th className="text-left font-medium p-3">Car</th>
-                        <th className="text-left font-medium p-3">Class</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {event.entries.map((e) => (
-                        <tr key={e.id} className="border-t">
-                          <td className="p-3">{e.number ?? "-"}</td>
-                          <td className="p-3">{e.team ?? "-"}</td>
-                          <td className="p-3">{Array.isArray(e.drivers) ? e.drivers.join(", ") : "-"}</td>
-                          <td className="p-3">{e.car ?? "-"}</td>
-                          <td className="p-3">{e.class ?? "-"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-neutral-500">No entries yet.</p>
-              )}
+      {/* Sponsors */}
+      <section className="px-4 py-10 bg-neutral-50">
+        <div className="container mx-auto max-w-6xl">
+          <SectionTitle id="sponsors">Sponsors</SectionTitle>
+          {sponsors.length ? (
+            <div className="mt-4 flex flex-wrap gap-6 items-center">
+              {sponsors.map((s) => (
+                <a key={s.id} href={s.url || "#"} target="_blank" rel="noopener noreferrer" className="block">
+                  {s.logo ? (
+                    <img src={s.logo} alt={s.name} className="h-12 object-contain" />
+                  ) : (
+                    <span className="text-sm">{s.name}</span>
+                  )}
+                </a>
+              ))}
             </div>
+          ) : (
+            <p className="mt-3 text-neutral-600">Sponsors to be announced.</p>
+          )}
+        </div>
+      </section>
+
+      {/* Schedule */}
+      <section className="px-4 py-10">
+        <div className="container mx-auto max-w-6xl">
+          <SectionTitle id="schedule">Schedule</SectionTitle>
+          <div className="mt-3 rounded-md border border-neutral-200 bg-white p-4">
+            <p className="text-neutral-700">Coming soon. Check back for the full timetable.</p>
           </div>
         </div>
       </section>
@@ -222,11 +305,11 @@ export default async function EventPage({ params }) {
 export async function generateMetadata({ params }) {
   const { id: handle } = await params;
   const isNum = /^\d+$/.test(String(handle));
-  const event = isNum ? await getEventById(handle) : await getEventBySlug(handle);
+  const event = isNum ? await fetchEventFromApi(handle) : null;
 
   if (!event) return { title: "Event Not Found" };
 
-  const title = event.name || "Event";
+  const title = event.title || event.name || "Event";
   const description =
     event.description ||
     (Array.isArray(event.categories) && event.categories.length
@@ -234,7 +317,7 @@ export async function generateMetadata({ params }) {
       : undefined);
 
   const images = event.heroImage ? [event.heroImage] : undefined;
-  const canonical = `/events/${isNum ? handle : (event.slug || handle)}`;
+  const canonical = `/events/${handle}`;
 
   return {
     title: `${title} | ${process.env.SITE_SLUG || "Site"}`,

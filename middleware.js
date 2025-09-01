@@ -1,19 +1,19 @@
 import { NextResponse } from "next/server";
 
 export function middleware(req) {
-  const url = req.nextUrl;
   const requestHeaders = new Headers(req.headers);
+  // Forward host in stable headers (used by your fetchers)
+  requestHeaders.set("x-site-hostname", req.nextUrl.host);
+  requestHeaders.set("x-site-host", `${req.nextUrl.protocol}//${req.nextUrl.host}`);
 
-  requestHeaders.set("x-site-host", url.host);
-  requestHeaders.set("x-site-hostname", url.hostname);
-
-  url.searchParams.forEach((value, key) => {
-    requestHeaders.set(`x-q-${key}`, value);
+  return NextResponse.next({
+    request: { headers: requestHeaders },
   });
-
-  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
+// Exclude static assets, include pages and API
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:css|js|png|jpg|jpeg|gif|svg|webp|ico)).*)",
+  ],
 };
