@@ -36,7 +36,7 @@ export default async function Page({ params }) {
     console.log("[page] notFound()");
     notFound();
   }
-
+     
   const blocks = Array.isArray(page.blocks)
     ? page.blocks
     : Array.isArray(page.sections)
