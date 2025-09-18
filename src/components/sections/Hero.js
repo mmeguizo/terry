@@ -60,56 +60,55 @@ const Hero = () => {
   return (
     <section
       id="home"
-      className="z-0 relative w-full h-[900px] lg:h-[750px] bg-neutral-700 bg-cover bg-center bg-fixed after:z-0 after:content-[''] after:bg-black/70 after:inset-0 after:absolute scroll-mt-24"
+      className="z-0 relative w-full h-[900px] lg:h-[750px] bg-neutral-700 bg-cover bg-center bg-fixed overflow-hidden scroll-mt-24"
       style={{
         backgroundImage: `url(${config.hero.background})`,
         backgroundPosition: `center ${offsetY * -0.5}px`,
       }}
     >
+      {/* Enhanced overlay with gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/40 z-0"></div>
+      
+      {/* Animated background elements */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500/20 rounded-full mix-blend-overlay filter blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-purple-500/20 rounded-full mix-blend-overlay filter blur-3xl animate-pulse delay-1000"></div>
+      </div>
       <div className="container absolute z-10 inset-0 flex items-center text-center gap-4 text-white pt-20">
         <div className="grid xl:grid-cols-[2fr_1fr] gap-12 w-full lg:grid-cols-[1fr_1fr]">
           <div className="grow font-bold flex flex-col gap-4">
-            <h1 className="xs:text-6xl text-5xl xs:gap-4 gap-1 flex font-normal text-white">
-              <span className="flex shrink-0 flex-col gap-1">
-                <span>{formatTime(timeLeft.days)}</span>
-                <span
-                  className="font-medium relative flex items-center gap-1.5 text-start text-sm uppercase after:content-[''] after:relative after:bg-[var(--primary-color)] after:h-[2px] after:w-[100%]"
-                  style={{ color: config.primaryColor, "--primary-color": config.primaryColor }}
-                >
-                  Days
-                </span>
-              </span>
-              <span>:</span>
-              <span className="flex flex-col gap-1">
-                <span>{formatTime(timeLeft.hours)}</span>
-                <span
-                  className="font-medium relative flex items-center gap-1.5 text-start text-sm uppercase after:content-[''] after:relative after:bg-[var(--primary-color)] after:h-[2px] after:w-[100%]"
-                  style={{ color: config.primaryColor, "--primary-color": config.primaryColor }}
-                >
-                  Hrs
-                </span>
-              </span>
-              <span>:</span>
-              <span className="flex flex-col gap-1">
-                <span>{formatTime(timeLeft.minutes)}</span>
-                <span
-                  className="font-medium relative flex items-center gap-1.5 text-start text-sm uppercase after:content-[''] after:relative after:bg-[var(--primary-color)] after:h-[2px] after:w-[100%]"
-                  style={{ color: config.primaryColor, "--primary-color": config.primaryColor }}
-                >
-                  Mins
-                </span>
-              </span>
-              <span>:</span>
-              <span className="flex flex-col gap-1">
-                <span>{formatTime(timeLeft.seconds)}</span>
-                <span
-                  className="font-medium relative flex items-center gap-1.5 text-start text-sm uppercase after:content-[''] after:relative after:bg-[var(--primary-color)] after:h-[2px] after:w-[100%]"
-                  style={{ color: config.primaryColor, "--primary-color": config.primaryColor }}
-                >
-                  Secs
-                </span>
-              </span>
-            </h1>
+            <div className="flex justify-center lg:justify-start mb-8">
+              <div className="grid grid-cols-4 gap-4 xs:gap-6">
+                {[
+                  { value: timeLeft.days, label: 'Days' },
+                  { value: timeLeft.hours, label: 'Hours' },
+                  { value: timeLeft.minutes, label: 'Minutes' },
+                  { value: timeLeft.seconds, label: 'Seconds' }
+                ].map((item, index) => (
+                  <div key={index} className="flex flex-col items-center">
+                    <div 
+                      className="relative bg-white/10 backdrop-blur-lg rounded-2xl p-4 xs:p-6 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 min-w-[80px] xs:min-w-[100px]"
+                      style={{ boxShadow: `0 8px 32px ${config.primaryColor}20` }}
+                    >
+                      <div className="text-3xl xs:text-4xl lg:text-5xl font-bold text-white mb-2 text-center">
+                        {formatTime(item.value)}
+                      </div>
+                      <div 
+                        className="text-xs xs:text-sm font-semibold uppercase tracking-wider text-center"
+                        style={{ color: config.primaryColor }}
+                      >
+                        {item.label}
+                      </div>
+                      {/* Glow effect */}
+                      <div 
+                        className="absolute inset-0 rounded-2xl opacity-20 blur-xl"
+                        style={{ background: config.primaryColor }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
             <h1 className="xs:text-5xl text-4xl font-semibold text-start uppercase">{config.hero.eventName}</h1>
 
             <h1 className="xs:text-4xl text-3xl font-medium text-start uppercase">{config.hero.eventLocation}</h1>
