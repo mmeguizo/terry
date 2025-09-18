@@ -26,11 +26,11 @@ const EventDocuments = () => {
           </p>
         </div>
         
-        <div className="grid lg:grid-cols-2 2xl:grid-cols-4 grid-cols-1 justify-between gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {config.eventDocuments.map((eventDocument, index) => (
             <div
               key={index}
-              className="opacity-0 translate-y-8 animate-[fadeInUp_0.6s_ease-out_forwards]"
+              className="opacity-0 translate-y-8 animate-[fadeInUp_0.6s_ease-out_forwards] flex"
               style={{ animationDelay: `${index * 100}ms` }}
             >
               <IconLinkButton href={eventDocument.url}>

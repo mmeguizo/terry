@@ -45,12 +45,12 @@ const IconLinkButton = ({ href, children, newTab }) => {
   return (
     <Link 
       href={href} 
-      className="group relative flex items-center overflow-hidden rounded-xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1 hover:scale-105 shrink-0"
+      className="group relative flex items-stretch overflow-hidden rounded-xl bg-white/10 backdrop-blur-lg border border-white/20 shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1 hover:scale-[1.02] w-full min-h-[72px]"
       target={newTab ? "_blank" : "_self"} 
       rel={newTab ? "noopener noreferrer" : undefined}
     >
       <div 
-        className="flex items-center justify-center w-16 h-16 rounded-l-xl transition-all duration-300 group-hover:scale-110"
+        className="flex items-center justify-center w-20 flex-shrink-0 transition-all duration-300 group-hover:scale-110"
         style={{ 
           background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}DD 100%)`,
           boxShadow: `inset 0 1px 0 rgba(255,255,255,0.2)`
@@ -60,8 +60,8 @@ const IconLinkButton = ({ href, children, newTab }) => {
           {childrenArray[0]}
         </span>
       </div>
-      <div className="flex-1 px-6 py-4">
-        <span className="text-white font-semibold uppercase tracking-wide text-sm group-hover:text-blue-100 transition-colors duration-300">
+      <div className="flex-1 flex items-center px-6 py-4">
+        <span className="text-white font-bold uppercase tracking-wide text-sm leading-tight group-hover:text-blue-100 transition-colors duration-300">
           {childrenArray[1]}
         </span>
       </div>
