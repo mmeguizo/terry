@@ -13,6 +13,8 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isWebsitesMenuOpen, setIsWebsitesMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
   const websitesPanelRef = useRef(null);
   const mobilePanelRef = useRef(null);
 
@@ -41,6 +43,26 @@ const Header = () => {
   const closeWebsitesMenu = () => {
     setIsWebsitesMenuOpen(false);
   };
+
+  // Scroll detection for header animations
+  useEffect(() => {
+    let ticking = false;
+    
+    const handleScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          setScrollY(currentScrollY);
+          setIsScrolled(currentScrollY > 5); // Immediate transition on any scroll
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Active section highlighting
   useEffect(() => {
@@ -104,59 +126,104 @@ const Header = () => {
   }, [isWebsitesMenuOpen, isMobileMenuOpen]);
 
   return (
-    <header className="fixed w-full top-0 z-50 flex items-stretch">
-      <div className="flex items-center w-full px-3 xs:px-8">
-        <div className="logo-container relative z-50 h-full flex after:text-[var(--logoContainerBG)]" style={{ "--logoContainerBG": config.primaryColor }}>
+    <header className={`fixed w-full top-0 z-50 flex items-stretch transition-all duration-400 ease-out ${
+      isScrolled 
+        ? 'backdrop-blur-3xl bg-gradient-to-r from-neutral-900/98 via-neutral-800/95 to-neutral-900/98 shadow-2xl border-b border-blue-500/30' 
+        : 'bg-transparent backdrop-blur-0'
+    }`}>
+      {/* Enhanced scroll effects */}
+      <div className={`absolute inset-0 transition-all duration-400 ease-out ${
+        isScrolled ? 'opacity-100' : 'opacity-0'
+      }`}>
+        {/* Racing stripes animation */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+        
+        {/* Corner accents */}
+        <div className="absolute top-2 left-4 w-4 h-4 border-l-2 border-t-2 border-blue-400/60 transition-all duration-500"></div>
+        <div className="absolute top-2 right-4 w-4 h-4 border-r-2 border-t-2 border-blue-400/60 transition-all duration-500"></div>
+        
+        {/* Animated glow effect */}
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-cyan-500/5 animate-pulse"></div>
+      </div>
+      
+      <div className={`flex items-center justify-between w-full px-3 xs:px-8 xl:px-16 2xl:px-24 3xl:px-32 relative z-10 transition-all duration-400 ease-out ${
+        isScrolled ? 'py-3' : 'py-0'
+      }`}>
+        <div className={`logo-container relative z-50 h-full flex after:text-[var(--logoContainerBG)] transition-all duration-400 ease-out ${
+          isScrolled ? 'transform scale-95' : ''
+        }`} style={{ "--logoContainerBG": config.primaryColor }}>
           <Link href="/">
-            <Image src={config.logoImage} alt="Logo" width={360} height={120} priority className="w-auto h-full object-contain z-50 relative xs:mt-4 mt-[5px]" />
+            <Image 
+              src={config.logoImage} 
+              alt="Logo" 
+              width={360} 
+              height={120} 
+              priority 
+              className={`w-auto h-full object-contain z-50 relative xs:mt-4 mt-[5px] xl:scale-110 2xl:scale-125 transition-all duration-400 ease-out ${
+                isScrolled ? 'brightness-125 drop-shadow-xl' : ''
+              }`} 
+            />
           </Link>
         </div>
-        <div className="relative h-full menu-container flex gap-4 flex-grow justify-end items-center pt-[5px] xs:ps-30 z-50">
-          <div className="hidden lg:flex gap-4 items-center" role="navigation" aria-label="Primary">
+        <div className="relative h-full menu-container flex gap-4 xl:gap-6 2xl:gap-8 items-center z-50">
+          <div className="hidden lg:flex gap-6 xl:gap-8 2xl:gap-10 items-center" role="navigation" aria-label="Primary">
             {config.menu.map((item, index) => {
               const isActive = item.url.startsWith('#') && activeSection && (`#${activeSection}` === item.url);
               return (
                 <Link
-                  className="z-50 px-3 py-2 whitespace-nowrap uppercase font-bold relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-1 after:bg-[var(--primaryColor)] after:transition-all after:duration-300 hover:after:w-full"
+                  className={`z-50 px-4 py-3 xl:px-5 xl:py-3 2xl:px-6 2xl:py-4 whitespace-nowrap uppercase font-bold relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-1 after:bg-[var(--primaryColor)] after:transition-all after:duration-300 hover:after:w-full text-sm xl:text-base 2xl:text-lg transition-all duration-400 ease-out flex items-center ${
+                    isScrolled 
+                      ? 'text-white drop-shadow-lg hover:text-cyan-300 hover:scale-105 transform' 
+                      : 'hover:scale-105'
+                  } ${isActive ? 'text-cyan-400 after:w-full' : ''}`}
                   key={index}
                   href={item.url}
                   onClick={(e) => handleSmoothAnchorClick(e, item.url)}
                   aria-current={isActive ? 'page' : undefined}
-                  style={{ color: config.textColor, "--primaryColor": config.primaryColor }}
+                  style={{ 
+                    color: isScrolled ? '#ffffff' : config.textColor, 
+                    "--primaryColor": config.primaryColor 
+                  }}
                 >
                   {item.label}
                 </Link>
               );
             })}
-            {Array.isArray(config.actions) && config.actions.length > 0 && (
-              <div className="ms-4 flex items-center gap-3">
-                {config.actions.map((action, i) => (
-                  <LinkButton key={i} href={action.url} newTab={action.newTab}>
-                    {action.label}
-                  </LinkButton>
-                ))}
-              </div>
-            )}
           </div>
 
-          <div className="lg:hidden flex items-center">
-            <button onClick={toggleMobileMenu} className="z-50 p-2 rounded-md cursor-pointer transition-colors duration-300 hover:bg-black/10 text-white xs:text-[var(--txtColor)]" style={{ "--txtColor": config.textColor }} aria-label="Toggle mobile menu">
-              <HiBars3 className="size-8" />
-            </button>
-          </div>
+          <div className="flex items-center gap-3 xl:gap-4 2xl:gap-5 ml-4 xl:ml-6 2xl:ml-8">
+            <div className="lg:hidden">
+              <button onClick={toggleMobileMenu} className="z-50 p-3 rounded-md cursor-pointer transition-colors duration-300 hover:bg-black/10 text-white xs:text-[var(--txtColor)] flex items-center justify-center" style={{ "--txtColor": config.textColor }} aria-label="Toggle mobile menu">
+                <HiBars3 className="size-8" />
+              </button>
+            </div>
 
-          <div className="flex items-center">
             <button
               onClick={toggleWebsitesMenu}
-              className="z-50 p-2 flex items-center overflow-hidden relative rounded-md cursor-pointer duration-300 bg-[var(--bgColor)] text-white after:content-[''] after:inset-1 after:rounded-sm after:absolute after:bg-[var(--bgColor)] after:transition-all after:scale-90 after:duration-200  after:brightness-70 after:opacity-0 hover:after:opacity-100 hover:after:scale-100"
+              className={`z-50 px-4 py-3 xl:px-5 xl:py-3 2xl:px-6 2xl:py-4 flex items-center justify-center gap-2 xl:gap-3 2xl:gap-3 overflow-hidden relative rounded-lg cursor-pointer duration-400 ease-out bg-[var(--bgColor)] text-white transition-all hover:scale-105 shadow-lg ${
+                isScrolled 
+                  ? 'shadow-2xl shadow-blue-500/30 ring-2 ring-blue-400/40 hover:ring-blue-400/60 brightness-110 transform scale-105' 
+                  : 'shadow-lg'
+              }`}
               style={{ "--bgColor": config.primaryColor }}
               aria-label="Open websites panel"
             >
-              <p className="md:block hidden text-lg font-semibold uppercase mx-2 relative z-50">Websites</p> <CgMenuGridR className="size-8 relative z-50" />
+              <span className="md:block hidden text-sm xl:text-base 2xl:text-lg font-semibold uppercase relative z-50">Websites</span>
+              <CgMenuGridR className="size-6 xl:size-7 2xl:size-8 relative z-50" />
             </button>
           </div>
 
-          <svg className="relative z-40 hidden xs:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2500 97">
+          <svg 
+            className={`relative z-40 hidden xs:block pointer-events-none transition-all duration-500 ease-out ${
+              isScrolled ? 'opacity-0 scale-95' : 'opacity-100'
+            }`} 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 2500 97"
+            style={{ 
+              transform: `translateY(${scrollY * -0.02}px)` 
+            }}
+          >
             <defs>
               <linearGradient id="headerShineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="white" stopOpacity="0" />
@@ -253,40 +320,123 @@ const Header = () => {
         </div>
       </div>
 
-      <div ref={websitesPanelRef} className={`fixed top-0 right-0 h-full w-full bg-neutral-900/90 backdrop-blur-xl transform transition-transform duration-600 ease-in-out z-50 ${isWebsitesMenuOpen ? "translate-x-0" : "translate-x-full"}`} role="dialog" aria-modal="true" aria-label="Websites Menu">
-        <div className="flex flex-col h-full" onClick={(e) => { if (e.target === e.currentTarget) closeWebsitesMenu(); }}>
-          <div className="flex items-center justify-between ps-8 pe-6 py-6 border-b border-white/20">
-            <h2 className="text-xl font-bold uppercase text-white">Websites</h2>
-            <button onClick={closeWebsitesMenu} className="p-2 cursor-pointer rounded-md transition-colors duration-300 hover:bg-white/10 text-white" aria-label="Close websites menu">
-              <HiXMark className="size-6" />
-            </button>
-          </div>
+       <div ref={websitesPanelRef} className={`fixed top-0 right-0 h-full w-full bg-gradient-to-br from-neutral-900/95 via-neutral-800/90 to-black/95 backdrop-blur-2xl transform transition-transform duration-600 ease-in-out z-50 ${isWebsitesMenuOpen ? "translate-x-0" : "translate-x-full"}`} role="dialog" aria-modal="true" aria-label="Websites Menu">
+         {/* Racing-themed background effects */}
+         <div className="absolute inset-0 pointer-events-none overflow-hidden">
+           {/* Grid pattern overlay */}
+           <div className="absolute inset-0 opacity-5">
+             <div className="w-full h-full" style={{
+               backgroundImage: `
+                 linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                 linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px)
+               `,
+               backgroundSize: '50px 50px'
+             }}></div>
+           </div>
+           
+           {/* Animated racing stripes */}
+           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-blue-500/30 to-transparent animate-pulse"></div>
+           <div className="absolute bottom-0 left-0 w-full h-2 bg-gradient-to-r from-transparent via-red-500/30 to-transparent animate-pulse" style={{ animationDelay: '1s' }}></div>
+           
+           {/* Corner accents */}
+           <div className="absolute top-4 left-4 w-16 h-16 border-l-2 border-t-2 border-blue-400/40"></div>
+           <div className="absolute top-4 right-4 w-16 h-16 border-r-2 border-t-2 border-blue-400/40"></div>
+           <div className="absolute bottom-4 left-4 w-16 h-16 border-l-2 border-b-2 border-red-400/40"></div>
+           <div className="absolute bottom-4 right-4 w-16 h-16 border-r-2 border-b-2 border-red-400/40"></div>
+         </div>
 
-          <nav className="grow place-content-start grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-5 py-12 px-4 xs:px-6 sm:px-12 lg:px-24 overflow-auto [&::-webkit-scrollbar]:w-3 [&::-webkit-scrollbar-track]:bg-neutral-800 [&::-webkit-scrollbar-thumb]:border-neutral-800 [&::-webkit-scrollbar-thumb]:bg-neutral-400 [&::-webkit-scrollbar-thumb]:rounded-full">
-            {config.websites && config.websites.length > 0 ? (
-              config.websites.map((item, index) => (
-                <Link href={item.url} key={index} target="_blank" className="aspect-video bg-neutral-700 rounded-md border-2 border-transparent hover:border-neutral-500 hover:scale-105 transition-[border-color, scale] duration-400">
-                  <Image 
-                    src={item.logo} 
-                    alt={item.label} 
-                    width={300} 
-                    height={200} 
-                    className="w-full h-full object-contain" 
-                    unoptimized={true}
-                  />
-                </Link>
-              ))
-            ) : (
-              <div className="col-span-full text-center text-white/70">
-                <p>No websites available</p>
-              </div>
-            )}
+         <div className="flex flex-col h-full relative z-10" onClick={(e) => { if (e.target === e.currentTarget) closeWebsitesMenu(); }}>
+           {/* Enhanced header */}
+           <div className="relative flex items-center justify-between ps-8 pe-6 py-6 border-b border-gradient-to-r from-blue-500/20 via-white/20 to-red-500/20">
+             <div className="flex items-center gap-4">
+               <div className="w-1 h-8 bg-gradient-to-b from-blue-400 to-red-400 rounded-full"></div>
+               <div>
+                 <h2 className="text-2xl font-bold uppercase text-white tracking-wider">Racing Network</h2>
+                 <p className="text-sm text-blue-400/80 font-mono">MOTORSPORTS ECOSYSTEM</p>
+               </div>
+             </div>
+             <button onClick={closeWebsitesMenu} className="p-3 cursor-pointer rounded-lg transition-all duration-300 hover:bg-white/10 hover:scale-110 text-white border border-white/20 hover:border-white/40" aria-label="Close websites menu">
+               <HiXMark className="size-5" />
+             </button>
+           </div>
+
+          {/* Racing-themed navigation grid */}
+          <nav className="flex-1 p-8 overflow-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-neutral-800/50 [&::-webkit-scrollbar-thumb]:bg-blue-500/50 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-blue-400/70">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6 max-w-7xl mx-auto">
+              {config.websites && config.websites.length > 0 ? (
+                config.websites.map((item, index) => (
+                  <div
+                    key={index}
+                    className="group relative"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <Link 
+                      href={item.url} 
+                      target="_blank" 
+                      className="block relative overflow-hidden rounded-xl bg-gradient-to-br from-neutral-800/80 via-neutral-700/60 to-neutral-800/80 backdrop-blur-sm border border-neutral-600/30 hover:border-blue-400/50 transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-2 aspect-video"
+                    >
+                      {/* Racing-themed background effects */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-red-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      
+                      {/* Corner racing stripes */}
+                      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400/0 via-blue-400/60 to-blue-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-red-400/0 via-red-400/60 to-red-400/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      
+                      {/* Logo container */}
+                      <div className="relative z-10 p-4 h-full flex items-center justify-center">
+                        <Image 
+                          src={item.logo} 
+                          alt={item.label} 
+                          width={300} 
+                          height={200} 
+                          className="w-full h-full object-contain transition-all duration-500 group-hover:scale-110 group-hover:brightness-110 filter drop-shadow-lg" 
+                          unoptimized={true}
+                        />
+                      </div>
+                      
+                      {/* Hover overlay with racing theme */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      
+                      {/* Racing-style corner indicators */}
+                      <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 border-blue-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 border-blue-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 border-red-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 border-red-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      
+                      {/* Scanning line effect */}
+                      <div className="absolute inset-0 overflow-hidden rounded-xl">
+                        <div className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400/60 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"></div>
+                      </div>
+                    </Link>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full text-center py-16">
+                  <div className="inline-flex items-center gap-3 text-white/70">
+                    <div className="w-2 h-2 bg-blue-400/60 rounded-full animate-pulse"></div>
+                    <p className="text-lg font-mono uppercase tracking-wider">No Racing Networks Available</p>
+                    <div className="w-2 h-2 bg-red-400/60 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+                  </div>
+                </div>
+              )}
+            </div>
           </nav>
 
-          <div className="p-6 border-t border-white/20">
-            <p className="text-sm opacity-70 text-white">
-              © {new Date().getFullYear()} {config.siteTitle}
-            </p>
+          {/* Enhanced footer */}
+          <div className="relative p-6 border-t border-gradient-to-r from-blue-500/20 via-white/20 to-red-500/20 bg-gradient-to-r from-neutral-900/50 via-neutral-800/30 to-neutral-900/50">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <p className="text-sm text-white/80 font-mono">
+                  RACING NETWORK ACTIVE
+                </p>
+              </div>
+              <div className="flex items-center gap-2 text-xs text-white/60">
+                <span>© {new Date().getFullYear()}</span>
+                <div className="w-1 h-1 bg-white/40 rounded-full"></div>
+                <span className="uppercase tracking-wider">{config.siteTitle}</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

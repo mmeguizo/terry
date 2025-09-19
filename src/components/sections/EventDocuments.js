@@ -15,6 +15,20 @@ const EventDocuments = () => {
         <div className="absolute bottom-10 left-10 w-72 h-72 bg-indigo-600 rounded-full mix-blend-multiply filter blur-3xl"></div>
       </div>
       
+      {/* Racing corner designs */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Top corners */}
+        <div className="absolute top-8 left-8 w-16 h-16 border-l-2 border-t-2 border-blue-400/40"></div>
+        <div className="absolute top-8 right-8 w-16 h-16 border-r-2 border-t-2 border-blue-400/40"></div>
+        {/* Bottom corners */}
+        <div className="absolute bottom-8 left-8 w-16 h-16 border-l-2 border-b-2 border-indigo-400/40"></div>
+        <div className="absolute bottom-8 right-8 w-16 h-16 border-r-2 border-b-2 border-indigo-400/40"></div>
+        
+        {/* Racing stripes */}
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400/30 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-400/30 to-transparent"></div>
+      </div>
+      
       <div className="container relative z-10">
         <div className="text-center mb-16">
           <h1 className="xs:text-5xl text-4xl font-bold text-white mb-4 uppercase tracking-wider">

@@ -45,11 +45,11 @@ export default async function Page({ params }) {
 
   if (!blocks.length) {
     return (
-      <main className="min-h-[calc(100vh-14rem)] pt-28 pb-24 px-4 grid place-items-center">
-        <div className="container mx-auto max-w-3xl text-center">
-          <h1 className="text-3xl font-bold">{page.title || "Page"}</h1>
-          <p className="mt-4 opacity-70">No content yet for this page.</p>
-          <p className="mt-2 text-sm opacity-60">Path: {path}</p>
+      <main className="min-h-[calc(100vh-14rem)] pt-28 xl:pt-32 2xl:pt-36 pb-24 xl:pb-28 2xl:pb-32 px-4 grid place-items-center">
+        <div className="container mx-auto max-w-3xl xl:max-w-6xl 2xl:max-w-7xl text-center">
+          <h1 className="text-3xl xl:text-4xl 2xl:text-5xl font-bold">{page.title || "Page"}</h1>
+          <p className="mt-4 xl:mt-6 2xl:mt-8 opacity-70 text-lg xl:text-xl 2xl:text-2xl">No content yet for this page.</p>
+          <p className="mt-2 xl:mt-3 2xl:mt-4 text-sm xl:text-base 2xl:text-lg opacity-60">Path: {path}</p>
         </div>
       </main>
     );

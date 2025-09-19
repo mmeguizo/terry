@@ -62,6 +62,14 @@ const NewsCard = ({ href, image, title, date, category }) => {
         }}
       ></div>
 
+      {/* Racing corner designs */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-3 left-3 w-4 h-4 border-l-2 border-t-2 border-cyan-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <div className="absolute top-3 right-3 w-4 h-4 border-r-2 border-t-2 border-cyan-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <div className="absolute bottom-3 left-3 w-4 h-4 border-l-2 border-b-2 border-blue-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <div className="absolute bottom-3 right-3 w-4 h-4 border-r-2 border-b-2 border-blue-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      </div>
+
       {/* Main content container */}
       <div className="relative z-10">
         {/* Image section with modern effects */}
