@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -59,8 +60,8 @@ export default async function EventsIndexPage() {
               className="group block rounded overflow-hidden ring-1 ring-neutral-200 hover:shadow-md transition"
             >
               {e.image ? (
-                <div className="aspect-video bg-neutral-100">
-                  <img src={e.image} alt={e.title || e.name} className="w-full h-full object-cover" />
+                <div className="relative aspect-video bg-neutral-100">
+                  <Image src={e.image} alt={e.title || e.name} fill className="object-cover" />
                 </div>
               ) : (
                 <div className="aspect-video bg-neutral-100" />

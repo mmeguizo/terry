@@ -276,7 +276,9 @@ export default async function EventPage({ params }) {
               {sponsors.map((s) => (
                 <a key={s.id} href={s.url || "#"} target="_blank" rel="noopener noreferrer" className="block">
                   {s.logo ? (
-                    <img src={s.logo} alt={s.name} className="h-12 object-contain" />
+                    <div className="relative h-12 w-24">
+                      <Image src={s.logo} alt={s.name} fill className="object-contain" />
+                    </div>
                   ) : (
                     <span className="text-sm">{s.name}</span>
                   )}

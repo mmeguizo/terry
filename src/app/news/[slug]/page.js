@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import configData from '@/config/site-config.json';
 import fs from 'fs';
 import path from 'path';
@@ -80,10 +81,11 @@ export default async function NewsPage({ params }) {
                 {/* Hero Section */}
                 <div className="mb-10">
                     <div className="relative w-full aspect-video max-h-[600px] overflow-hidden mb-6 rounded-md">
-                        <img
+                        <Image
                             src={newsItem.image}
                             alt={newsItem.title}
-                            className="w-full h-full object-cover"
+                            fill
+                            className="object-cover"
                         />
                     </div>
 
