@@ -32,7 +32,7 @@ const Footer = () => {
               </h1>
             </Link>
             <p className="text-white/70 text-sm mt-3 text-center lg:text-left leading-relaxed">
-              Premier motorsport racing event featuring the world's top drivers and teams.
+              Premier motorsport racing event featuring the world&apos;s top drivers and teams.
             </p>
           </div>
 

@@ -8,19 +8,35 @@ export async function GET() {
       return NextResponse.json({ error: "SITE_SLUG not set" }, { status: 400 });
     }
 
-    // Fetch news related to this site by slug
-    // Use a valid sortable field for Strapi v5; fall back if datePublished is not present
-    const newsUrl = `${process.env.STRAPI_URL}/api/news-items?filters[sites][slug][$eq]=${siteSlug}&sort[0]=publishedAt:desc&populate[image]=*`;
+    // Try multiple approaches for Strapi v5 compatibility
+    let newsUrl = `${process.env.STRAPI_URL}/api/news-items?filters[sites][slug][$eq]=${siteSlug}&sort[0]=publishedAt:desc`;
     console.log('Fetching news with URL:', newsUrl);
-    const newsRes = await fetch(newsUrl, {
+    
+    let newsRes = await fetch(newsUrl, {
       headers: {
         Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}`,
         "Content-Type": "application/json",
       },
       cache: "no-store",
     });
+    
     console.log('News response status:', newsRes.status);
-    const newsData = await newsRes.json();
+    let newsData = await newsRes.json();
+    
+    // If that fails, try without site filtering as fallback
+    if (!newsRes.ok || newsData.error) {
+      console.log('Trying fallback approach without site filtering...');
+      newsUrl = `${process.env.STRAPI_URL}/api/news-items?sort[0]=publishedAt:desc`;
+      newsRes = await fetch(newsUrl, {
+        headers: {
+          Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      });
+      newsData = await newsRes.json();
+    }
+    
     const strapiUrl = process.env.STRAPI_URL || "";
     console.log({ newsData });
 

@@ -25,8 +25,12 @@ const EventDocuments = () => {
         <div className="absolute bottom-8 right-8 w-16 h-16 border-r-2 border-b-2 border-indigo-400/40"></div>
         
         {/* Racing stripes */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400/30 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-400/30 to-transparent"></div>
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400/40 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-400/40 to-transparent"></div>
+        
+        {/* Additional alignment lines */}
+        <div className="absolute top-2 left-8 right-8 h-px bg-gradient-to-r from-blue-400/20 via-transparent to-blue-400/20"></div>
+        <div className="absolute bottom-2 left-8 right-8 h-px bg-gradient-to-r from-indigo-400/20 via-transparent to-indigo-400/20"></div>
       </div>
       
       <div className="container relative z-10">

@@ -2,6 +2,7 @@
 
 import { useConfig } from "@/context/ConfigContext";
 import Link from "next/link";
+import Image from "next/image";
 import { HiArrowRight } from "react-icons/hi2";
 
 const Card = ({ href, children, className = "" }) => {
@@ -25,7 +26,12 @@ const CardHeader = ({ children, className = "" }) => {
 const CardImage = ({ src, alt = "", className = "" }) => {
   return (
     <div className={`relative w-full aspect-video overflow-hidden ${className}`}>
-      <img src={src} alt={alt} className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-1" />
+      <Image 
+        src={src} 
+        alt={alt} 
+        fill
+        className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-1" 
+      />
       <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
     </div>
   );
@@ -74,10 +80,11 @@ const NewsCard = ({ href, image, title, date, category }) => {
       <div className="relative z-10">
         {/* Image section with modern effects */}
         <div className="relative aspect-video overflow-hidden">
-          <img
+          <Image
             src={image}
             alt={title || ""}
-            className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+            fill
+            className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
           />
           
           {/* Modern gradient overlay */}

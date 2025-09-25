@@ -44,6 +44,8 @@ export async function GET() {
 
     // Check if we got a site with the requested slug
     if (!strapiData.data || strapiData.data.length === 0) {
+      console.warn(`No site found with slug: ${siteSlug}. Available sites should be checked in Strapi CMS.`);
+      console.warn(`Falling back to local configuration...`);
       throw new Error(`No site found with slug: ${siteSlug}`);
     }
 

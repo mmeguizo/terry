@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { STRAPI_URL, authHeaders, siteFilterQS } from "@/lib/strapiQueries";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 
 export const dynamic = "force-dynamic";
 
@@ -193,7 +194,14 @@ export default async function NewsPage({ params }) {
               {related.map((item) => (
                 <div key={item.id} className="rounded-md border border-neutral-200 bg-white overflow-hidden">
                   {item.image && (
-                    <img src={item.image} alt={item.title} className="w-full h-40 object-cover" />
+                    <div className="relative w-full h-40">
+                      <Image 
+                        src={item.image} 
+                        alt={item.title} 
+                        fill
+                        className="object-cover" 
+                      />
+                    </div>
                   )}
                   <div className="p-4">
                     <h3 className="font-semibold text-sm">{item.title}</h3>

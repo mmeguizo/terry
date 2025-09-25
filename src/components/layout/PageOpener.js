@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useConfig } from "@/context/ConfigContext";
+import Image from "next/image";
 
 const SESSION_KEY = "page-opener-played";
 
@@ -33,7 +34,13 @@ export default function PageOpener() {
       <div className="opener-glow" style={{ background: `radial-gradient(60% 60% at 50% 50%, ${config.primaryColor}66 0%, transparent 60%)` }} />
       <div className="opener-slice" style={{ background: `linear-gradient(90deg, transparent, #ffffff, transparent)` }} />
       <div className="opener-logo">
-        <img src={config.logoImage} alt="Logo" />
+        <Image 
+          src={config.logoImage} 
+          alt="Logo" 
+          width={120}
+          height={120}
+          className="w-auto h-full object-contain"
+        />
       </div>
     </div>
   );

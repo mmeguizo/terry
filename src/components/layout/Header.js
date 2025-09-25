@@ -13,8 +13,7 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isWebsitesMenuOpen, setIsWebsitesMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [scrollY, setScrollY] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
   const websitesPanelRef = useRef(null);
   const mobilePanelRef = useRef(null);
 
@@ -44,23 +43,14 @@ const Header = () => {
     setIsWebsitesMenuOpen(false);
   };
 
-  // Scroll detection for header animations
+  // Scroll detection for header animation
   useEffect(() => {
-    let ticking = false;
-    
     const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY;
-          setScrollY(currentScrollY);
-          setIsScrolled(currentScrollY > 5); // Immediate transition on any scroll
-          ticking = false;
-        });
-        ticking = true;
-      }
+      const scrollPosition = window.scrollY;
+      setScrolled(scrollPosition > 100);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -126,63 +116,38 @@ const Header = () => {
   }, [isWebsitesMenuOpen, isMobileMenuOpen]);
 
   return (
-    <header className={`fixed w-full top-0 z-50 flex items-stretch transition-all duration-400 ease-out ${
-      isScrolled 
-        ? 'backdrop-blur-3xl bg-gradient-to-r from-neutral-900/98 via-neutral-800/95 to-neutral-900/98 shadow-2xl border-b border-blue-500/30' 
-        : 'bg-transparent backdrop-blur-0'
+    <header className={`fixed w-full top-0 z-50 flex items-stretch transition-all duration-500 ease-in-out ${
+      scrolled 
+        ? 'bg-neutral-900/95 backdrop-blur-xl shadow-2xl border-b border-white/10' 
+        : 'bg-transparent'
     }`}>
-      {/* Enhanced scroll effects */}
-      <div className={`absolute inset-0 transition-all duration-400 ease-out ${
-        isScrolled ? 'opacity-100' : 'opacity-0'
-      }`}>
-        {/* Racing stripes animation */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent animate-pulse"></div>
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-        
-        {/* Corner accents */}
-        <div className="absolute top-2 left-4 w-4 h-4 border-l-2 border-t-2 border-blue-400/60 transition-all duration-500"></div>
-        <div className="absolute top-2 right-4 w-4 h-4 border-r-2 border-t-2 border-blue-400/60 transition-all duration-500"></div>
-        
-        {/* Animated glow effect */}
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-cyan-500/5 animate-pulse"></div>
-      </div>
-      
-      <div className={`flex items-center justify-between w-full px-3 xs:px-8 xl:px-16 2xl:px-24 3xl:px-32 relative z-10 transition-all duration-400 ease-out ${
-        isScrolled ? 'py-3' : 'py-0'
-      }`}>
-        <div className={`logo-container relative z-50 h-full flex after:text-[var(--logoContainerBG)] transition-all duration-400 ease-out ${
-          isScrolled ? 'transform scale-95' : ''
-        }`} style={{ "--logoContainerBG": config.primaryColor }}>
+      {/* Racing-themed scroll indicator */}
+      <div className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent transition-all duration-500 ${
+        scrolled ? 'opacity-100' : 'opacity-0'
+      }`}></div>
+      <div className="flex items-center w-full px-3 xs:px-8 xl:px-16 2xl:px-24 3xl:px-32 relative z-40">
+        <div className="logo-container relative z-50 h-full flex after:text-[var(--logoContainerBG)]" style={{ "--logoContainerBG": config.primaryColor }}>
           <Link href="/">
-            <Image 
-              src={config.logoImage} 
-              alt="Logo" 
-              width={360} 
-              height={120} 
-              priority 
-              className={`w-auto h-full object-contain z-50 relative xs:mt-4 mt-[5px] xl:scale-110 2xl:scale-125 transition-all duration-400 ease-out ${
-                isScrolled ? 'brightness-125 drop-shadow-xl' : ''
-              }`} 
-            />
+            <Image src={config.logoImage} alt="Logo" width={360} height={120} priority className="w-auto h-full object-contain z-50 relative xs:mt-4 mt-[5px] xl:scale-110 2xl:scale-125" />
           </Link>
         </div>
-        <div className="relative h-full menu-container flex gap-4 xl:gap-6 2xl:gap-8 items-center z-50">
-          <div className="hidden lg:flex gap-6 xl:gap-8 2xl:gap-10 items-center" role="navigation" aria-label="Primary">
+        <div className="relative h-full menu-container flex gap-4 xl:gap-6 2xl:gap-8 flex-grow justify-end items-center pt-[5px] xs:ps-30 z-50">
+          <div className="hidden lg:flex gap-4 xl:gap-6 2xl:gap-8 items-center" role="navigation" aria-label="Primary">
             {config.menu.map((item, index) => {
               const isActive = item.url.startsWith('#') && activeSection && (`#${activeSection}` === item.url);
               return (
                 <Link
-                  className={`z-50 px-4 py-3 xl:px-5 xl:py-3 2xl:px-6 2xl:py-4 whitespace-nowrap uppercase font-bold relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-1 after:bg-[var(--primaryColor)] after:transition-all after:duration-300 hover:after:w-full text-sm xl:text-base 2xl:text-lg transition-all duration-400 ease-out flex items-center ${
-                    isScrolled 
-                      ? 'text-white drop-shadow-lg hover:text-cyan-300 hover:scale-105 transform' 
-                      : 'hover:scale-105'
-                  } ${isActive ? 'text-cyan-400 after:w-full' : ''}`}
+                  className={`z-50 px-3 py-2 xl:px-4 xl:py-3 2xl:px-5 2xl:py-4 whitespace-nowrap uppercase font-bold relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-1 after:bg-[var(--primaryColor)] after:transition-all after:duration-300 hover:after:w-full text-sm xl:text-base 2xl:text-lg transition-all duration-300 ${
+                    scrolled 
+                      ? 'text-white hover:text-white/90' 
+                      : ''
+                  }`}
                   key={index}
                   href={item.url}
                   onClick={(e) => handleSmoothAnchorClick(e, item.url)}
                   aria-current={isActive ? 'page' : undefined}
                   style={{ 
-                    color: isScrolled ? '#ffffff' : config.textColor, 
+                    color: scrolled ? 'white' : config.textColor, 
                     "--primaryColor": config.primaryColor 
                   }}
                 >
@@ -190,22 +155,34 @@ const Header = () => {
                 </Link>
               );
             })}
+            {Array.isArray(config.actions) && config.actions.length > 0 && (
+              <div className="ms-4 xl:ms-6 2xl:ms-8 flex items-center gap-3 xl:gap-4 2xl:gap-5">
+                {config.actions.map((action, i) => (
+                  <LinkButton key={i} href={action.url} newTab={action.newTab}>
+                    {action.label}
+                  </LinkButton>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="flex items-center gap-3 xl:gap-4 2xl:gap-5 ml-4 xl:ml-6 2xl:ml-8">
+          <div className="flex items-center gap-2 xl:gap-3 2xl:gap-4 mr-4 xl:mr-6 2xl:mr-8">
             <div className="lg:hidden">
-              <button onClick={toggleMobileMenu} className="z-50 p-3 rounded-md cursor-pointer transition-colors duration-300 hover:bg-black/10 text-white xs:text-[var(--txtColor)] flex items-center justify-center" style={{ "--txtColor": config.textColor }} aria-label="Toggle mobile menu">
+              <button 
+                onClick={toggleMobileMenu} 
+                className={`z-50 p-2 rounded-md cursor-pointer transition-all duration-300 hover:bg-black/10 ${
+                  scrolled ? 'text-white' : 'text-white xs:text-[var(--txtColor)]'
+                }`} 
+                style={{ "--txtColor": scrolled ? 'white' : config.textColor }} 
+                aria-label="Toggle mobile menu"
+              >
                 <HiBars3 className="size-8" />
               </button>
             </div>
 
             <button
               onClick={toggleWebsitesMenu}
-              className={`z-50 px-4 py-3 xl:px-5 xl:py-3 2xl:px-6 2xl:py-4 flex items-center justify-center gap-2 xl:gap-3 2xl:gap-3 overflow-hidden relative rounded-lg cursor-pointer duration-400 ease-out bg-[var(--bgColor)] text-white transition-all hover:scale-105 shadow-lg ${
-                isScrolled 
-                  ? 'shadow-2xl shadow-blue-500/30 ring-2 ring-blue-400/40 hover:ring-blue-400/60 brightness-110 transform scale-105' 
-                  : 'shadow-lg'
-              }`}
+              className="z-50 px-3 py-2.5 xl:px-4 xl:py-3 2xl:px-5 2xl:py-3.5 flex items-center justify-center gap-2 xl:gap-2.5 2xl:gap-3 overflow-hidden relative rounded-lg cursor-pointer duration-300 bg-[var(--bgColor)] text-white transition-all hover:scale-105 shadow-lg ml-2 xl:ml-3 2xl:ml-4"
               style={{ "--bgColor": config.primaryColor }}
               aria-label="Open websites panel"
             >
@@ -214,16 +191,9 @@ const Header = () => {
             </button>
           </div>
 
-          <svg 
-            className={`relative z-40 hidden xs:block pointer-events-none transition-all duration-500 ease-out ${
-              isScrolled ? 'opacity-0 scale-95' : 'opacity-100'
-            }`} 
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="0 0 2500 97"
-            style={{ 
-              transform: `translateY(${scrollY * -0.02}px)` 
-            }}
-          >
+          <svg className={`relative z-30 hidden xs:block pointer-events-none transition-opacity duration-500 ease-in-out ${
+            scrolled ? 'opacity-20' : 'opacity-100'
+          }`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2500 97">
             <defs>
               <linearGradient id="headerShineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="white" stopOpacity="0" />
