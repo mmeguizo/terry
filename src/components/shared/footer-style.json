@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_shared_footer_styles",
+  "info": {
+    "displayName": "FooterStyle"
+  },
+  "options": {},
+  "attributes": {
+    "backgroundColor": {
+      "type": "string"
+    },
+    "textColor": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

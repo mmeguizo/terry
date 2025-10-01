@@ -89,16 +89,12 @@ export default async function EventPage({ params }) {
             </p>
             <h1 className="mt-2 text-3xl md:text-5xl font-extrabold text-white">{event.title || "Event"}</h1>
             <div className="mt-5 flex flex-wrap justify-center gap-3">
-              {event.infoUrl && (
-                <a
-                  href={event.infoUrl}
-                  className="inline-block bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Event Info
-                </a>
-              )}
+              <a
+                href="/event-info"
+                className="inline-block bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md"
+              >
+                Event Info
+              </a>
               {Array.isArray(event.buttons) &&
                 event.buttons.map((b) => (
                   <a
@@ -180,22 +176,22 @@ export default async function EventPage({ params }) {
             <div className="rounded-md border border-neutral-200 bg-white p-4">
               <h3 className="font-semibold">Event Actions</h3>
               <div className="mt-3 flex flex-col gap-2">
-                {event.infoUrl && (
-                  <a
-                    href={event.infoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-center rounded-md bg-red-600 hover:bg-red-700 text-white px-4 py-2"
-                  >
-                    Event Info
-                  </a>
-                )}
+                <a
+                  href="/event-info"
+                  className="text-center rounded-md bg-red-600 hover:bg-red-700 text-white px-4 py-2"
+                >
+                  Event Info
+                </a>
                 {(event.buttons || []).map((b) => (
                   <a
                     key={b.id}
-                    href={b.url}
-                    target={b.target || "_self"}
-                    rel={b.target === "_blank" ? "noopener noreferrer" : undefined}
+                    href={(() => {
+                      if (!b.url || typeof b.url !== 'string') return '#';
+                      if (b.url.startsWith('/')) return b.url;
+                      if (b.label?.toLowerCase().includes('event')) return '/events';
+                      if (b.label?.toLowerCase().includes('document')) return '#documents';
+                      return '#';
+                    })()}
                     className="text-center rounded-md border border-neutral-200 hover:bg-neutral-50 px-4 py-2"
                   >
                     {b.label}
@@ -273,8 +269,8 @@ export default async function EventPage({ params }) {
           <SectionTitle id="sponsors">Sponsors</SectionTitle>
           {sponsors.length ? (
             <div className="mt-4 flex flex-wrap gap-6 items-center">
-              {sponsors.map((s) => (
-                <a key={s.id} href={s.url || "#"} target="_blank" rel="noopener noreferrer" className="block">
+                {sponsors.map((s) => (
+                <div key={s.id} className="block cursor-pointer">
                   {s.logo ? (
                     <div className="relative h-12 w-24">
                       <Image src={s.logo} alt={s.name} fill className="object-contain" />
@@ -282,7 +278,7 @@ export default async function EventPage({ params }) {
                   ) : (
                     <span className="text-sm">{s.name}</span>
                   )}
-                </a>
+                </div>
               ))}
             </div>
           ) : (

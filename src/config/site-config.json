@@ -5,10 +5,11 @@
   "textColor": "#000000",
   "logoImage": "https://wakefield300.com.au/wp-content/uploads/2025/07/Wakefield300-Colour_TransparentBG-250x95.png",
   "menu": [
-    { "label": "Home", "url": "#home" },
-    { "label": "Documents", "url": "#documents" },
-    { "label": "News", "url": "#news" },
-    { "label": "Sponsors", "url": "#sponsors" }
+    { "id": 1, "label": "Home", "url": "/" },
+    { "id": 2, "label": "Events", "url": "/events" },
+    { "id": 3, "label": "Event Info", "url": "/event-info" },
+    { "id": 4, "label": "News", "url": "/#news" },
+    { "id": 5, "label": "Documents", "url": "/#documents" }
   ],
   "actions": [
     { "label": "Enter Now", "url": "/entry-form/?id=1234" },
@@ -17,10 +18,10 @@
   "currentEventId": 1389,
   "hero": {
     "background": "https://images.pexels.com/photos/33184120/pexels-photo-33184120.jpeg?_gl=1*11hirpa*_ga*MTkxNjMyMzM5OS4xNzU0MzU1ODYy*_ga_8JE65Q40S6*czE3NTQzNTU4NjEkbzEkZzEkdDE3NTQzNTYwNDckajU5JGwwJGgw",
-    "eventDate": "2025-08-16T10:00:00+10:00",
+    "eventDate": "2025-08-30T10:00:00-05:00",
     "eventInfo": "/event-info/?id=1234",
-    "eventName": "Event Name",
-    "eventLocation": "Venue",
+    "eventName": "ROAD AMERICA",
+    "eventLocation": "ONE RACEWAY",
     "buttons": [
       { "label": "Spectator Information", "url": "/spectator-info/?id=1234" },
       { "label": "Enter now!", "url": "/entry-form/?id=1234" },

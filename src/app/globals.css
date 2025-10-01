@@ -148,20 +148,9 @@ header {
   }
 }
 
-/* .logo-container {
-  &::after {
-    content: "";
-    position: absolute;
-    top: -40%;
-    left: 50%;
-    width: 200vw;
-    height: 400%;
-    z-index: 20;
-    transform: translate(-50%, -50%);
-    background: radial-gradient(closest-side, rgba(0, 0, 0, 0.8) 25%, transparent 80%);
-    border-radius: 100%;
-  }
-} */
+.logo-container {
+  /* Removed background - always transparent */
+}
 
 .button {
   @apply block uppercase w-fit px-5 py-3;

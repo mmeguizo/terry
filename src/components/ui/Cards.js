@@ -5,22 +5,93 @@ import Link from "next/link";
 import Image from "next/image";
 import { HiArrowRight } from "react-icons/hi2";
 
-const Card = ({ href, children, className = "" }) => {
+// Utility function to determine if a color is dark or light
+const isColorDark = (color) => {
+  if (!color) return false;
+  
+  // Remove # if present
+  const hex = color.replace('#', '');
+  
+  // Convert to RGB
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  
+  // Calculate luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  
+  return luminance < 0.5;
+};
+
+// Get contrasting text color
+const getContrastColor = (backgroundColor) => {
+  return isColorDark(backgroundColor) ? '#ffffff' : '#000000';
+};
+
+// Get card background based on section background
+const getCardBackground = (config, sectionBg = null) => {
+  const primaryColor = config.primaryColor || '#3b82f6';
+  const baseBg = sectionBg || config.menuBackground || '#ffffff';
+  const isDarkBg = isColorDark(baseBg);
+  
+  // Use the section background as base with subtle primary color accent
+  if (isDarkBg) {
+    return `linear-gradient(135deg, ${baseBg}F0 0%, ${primaryColor}08 50%, ${baseBg}F0 100%)`;
+  } else {
+    return `linear-gradient(135deg, ${baseBg}F8 0%, ${primaryColor}05 50%, ${baseBg}F8 100%)`;
+  }
+};
+
+const Card = ({ href, children, className = "", sectionBg = null }) => {
+  const config = useConfig();
+  const baseBg = sectionBg || config.menuBackground || '#ffffff';
+  const isDarkTheme = isColorDark(baseBg);
+  const primaryColor = config.primaryColor || '#3b82f6';
+  const textColor = getContrastColor(baseBg);
+  
   return (
     <div
-      className={`group relative rounded-xl overflow-hidden bg-gradient-to-br from-white/95 via-white/90 to-white/85 backdrop-blur-lg border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.12)] hover:shadow-[0_20px_60px_rgba(0,0,0,0.25)] transition-all duration-500 hover:-translate-y-2 hover:scale-[1.02] ${className}`}
+      className={`group relative rounded-xl overflow-hidden backdrop-blur-lg border transition-all duration-500 hover:-translate-y-2 hover:scale-[1.02] ${className}`}
+      style={{
+        background: getCardBackground(config, sectionBg),
+        borderColor: `${primaryColor}30`,
+        boxShadow: `0 8px 32px rgba(0,0,0,${isDarkTheme ? '0.4' : '0.12'}), 0 0 0 1px ${primaryColor}10`,
+        color: textColor
+      }}
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 via-transparent to-purple-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+      <div 
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{
+          background: `linear-gradient(135deg, ${primaryColor}10 0%, transparent 50%, ${primaryColor}05 100%)`
+        }}
+      ></div>
       <div className="relative z-10">
         {href ? <a href={href} className="block">{children}</a> : children}
       </div>
-      <div className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/10"></div>
+      <div 
+        className="absolute inset-0 rounded-xl ring-1 ring-inset"
+        style={{ ringColor: `${primaryColor}20` }}
+      ></div>
     </div>
   );
 };
 
 const CardHeader = ({ children, className = "" }) => {
-  return <div className={`px-6 py-5 border-b border-gradient-to-r from-neutral-200/50 via-neutral-100 to-neutral-200/50 bg-gradient-to-r from-gray-50/50 to-blue-50/30 ${className}`}>{children}</div>;
+  const config = useConfig();
+  const primaryColor = config.primaryColor || '#3b82f6';
+  const isDarkTheme = isColorDark(config.menuBackground);
+  
+  return (
+    <div 
+      className={`px-6 py-5 border-b ${className}`}
+      style={{
+        borderColor: `${primaryColor}20`,
+        background: `linear-gradient(to right, ${primaryColor}${isDarkTheme ? '15' : '08'}, ${primaryColor}${isDarkTheme ? '08' : '03'}, ${primaryColor}${isDarkTheme ? '15' : '08'})`
+      }}
+    >
+      {children}
+    </div>
+  );
 };
 
 const CardImage = ({ src, alt = "", className = "" }) => {
@@ -42,149 +113,218 @@ const CardBody = ({ children, className = "" }) => {
 };
 
 const CardFooter = ({ children, className = "" }) => {
-  return <div className={`px-6 py-4 border-t border-gradient-to-r from-neutral-200/50 via-neutral-100 to-neutral-200/50 bg-gradient-to-r from-gray-50/30 to-blue-50/20 ${className}`}>{children}</div>;
+  const config = useConfig();
+  const primaryColor = config.primaryColor || '#3b82f6';
+  const isDarkTheme = isColorDark(config.menuBackground);
+  
+  return (
+    <div 
+      className={`px-6 py-4 border-t ${className}`}
+      style={{
+        borderColor: `${primaryColor}20`,
+        background: `linear-gradient(to right, ${primaryColor}${isDarkTheme ? '10' : '05'}, ${primaryColor}${isDarkTheme ? '05' : '02'}, ${primaryColor}${isDarkTheme ? '10' : '05'})`
+      }}
+    >
+      {children}
+    </div>
+  );
 };
 
 export { Card, CardHeader, CardImage, CardBody, CardFooter };
 
 // NewsCard: Tailwind overlay style adapted from HyperUI patterns
-const NewsCard = ({ href, image, title, date, category }) => {
+const NewsCard = ({ href, image, title, date, category, sectionBg = null }) => {
   const config = useConfig();
   const accent = config?.primaryColor || "#0ea5e9";
+  const baseBg = sectionBg || config.menuBackground || '#ffffff';
+  const isDarkTheme = isColorDark(baseBg);
+  
+  // Use the same clean style as sponsors section
+  const cardBg = 'rgba(255, 255, 255, 0.8)';
+  const textColor = '#374151'; // Clean dark gray text like sponsors
 
-  return (
-    <Link
-      href={href}
-      className="group relative block overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900/95 via-slate-800/90 to-slate-900/95 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-700 hover:scale-[1.02] hover:-rotate-1"
-      style={{ 
-        boxShadow: `0 25px 50px -12px rgba(0,0,0,0.4), 0 0 40px ${accent}15`
-      }}
-    >
-      {/* Animated background gradient */}
+  const normalize = (val) => {
+    if (typeof val !== "string") return "";
+    let v = val.trim();
+    while (v.startsWith("@")) v = v.slice(1);
+    return v;
+  };
+
+  const isValidUrl = (url) => {
+    if (!url || typeof url !== "string") return false;
+    try {
+      if (url.startsWith("/")) return true; // internal paths are valid
+      if (url.startsWith("http://") || url.startsWith("https://")) {
+        new URL(url); // test if it's a valid URL
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
+  const rawHref = normalize(href);
+  const safeHref = isValidUrl(rawHref) ? rawHref : "#";
+  const isHttp = safeHref.startsWith("http://") || safeHref.startsWith("https://");
+  const isInternal = safeHref.startsWith("/");
+
+  const commonProps = {
+    className: "group relative block overflow-hidden rounded-2xl backdrop-blur-sm border transition-all duration-500 hover:scale-105 hover:-translate-y-2 shadow-lg hover:shadow-2xl",
+    style: { 
+      background: cardBg,
+      borderColor: 'rgba(255, 255, 255, 0.5)',
+      boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+      color: textColor
+    },
+  };
+
+  const content = (
+    <>
+      {/* Clean background glow effect - same as sponsors */}
       <div 
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-        style={{
-          background: `radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), ${accent}15 0%, transparent 40%)`
-        }}
+        className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/30 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
       ></div>
 
-      {/* Racing corner designs */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-3 left-3 w-4 h-4 border-l-2 border-t-2 border-cyan-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        <div className="absolute top-3 right-3 w-4 h-4 border-r-2 border-t-2 border-cyan-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        <div className="absolute bottom-3 left-3 w-4 h-4 border-l-2 border-b-2 border-blue-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-        <div className="absolute bottom-3 right-3 w-4 h-4 border-r-2 border-b-2 border-blue-400/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-      </div>
+        {/* Racing corner designs - same as sponsors */}
+        <div className="absolute inset-0 pointer-events-none rounded-2xl">
+          <div 
+            className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            style={{ borderColor: `${accent}80` }}
+          ></div>
+          <div 
+            className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            style={{ borderColor: `${accent}80` }}
+          ></div>
+          <div 
+            className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            style={{ borderColor: `${accent}60` }}
+          ></div>
+          <div 
+            className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            style={{ borderColor: `${accent}60` }}
+          ></div>
+        </div>
 
       {/* Main content container */}
       <div className="relative z-10">
         {/* Image section with modern effects */}
         <div className="relative aspect-video overflow-hidden">
-          <Image
-            src={image}
-            alt={title || ""}
-            fill
-            className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-          />
+          {(() => {
+            const img = normalize(image);
+            const valid = isValidUrl(img);
+            return valid ? (
+            <Image
+              src={img}
+              alt={title || ""}
+              fill
+              className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+            />
+          ) : (
+              <div className="absolute inset-0 bg-neutral-800/60" />
+            );
+          })()}
           
-          {/* Modern gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-          
-          {/* Animated mesh overlay */}
-          <div 
-            className="absolute inset-0 opacity-0 group-hover:opacity-30 transition-opacity duration-700"
-            style={{
-              backgroundImage: `radial-gradient(circle at 25% 25%, ${accent}40 0%, transparent 50%), radial-gradient(circle at 75% 75%, ${accent}30 0%, transparent 50%)`
-            }}
-          ></div>
+          {/* Clean gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
 
-          {/* Category pill with modern styling */}
+          {/* Clean category pill */}
           {category && (
             <div className="absolute left-4 top-4">
               <span
-                className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold text-white backdrop-blur-md border border-white/20 shadow-lg"
+                className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-bold text-white backdrop-blur-sm border border-white/30 shadow-sm"
                 style={{ 
-                  background: `linear-gradient(135deg, ${accent}90 0%, ${accent}70 100%)`,
-                  boxShadow: `0 8px 32px ${accent}40`
+                  background: `linear-gradient(135deg, ${accent} 0%, ${accent}CC 100%)`,
+                  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
                 }}
               >
-                {category}
+                {typeof category === 'string' ? category : 'News'}
               </span>
             </div>
           )}
           
-          {/* Futuristic date display */}
+          {/* Clean date display */}
           {date && (
             <div className="absolute right-4 top-4">
-              <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/20">
-                <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></div>
-                <span className="text-white text-xs font-mono font-medium">{date}</span>
+              <div className="flex items-center space-x-2 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-sm border border-white/50 shadow-sm">
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: accent }}></div>
+                <span className="text-gray-700 text-xs font-medium">{typeof date === 'string' ? date : 'Date TBA'}</span>
               </div>
             </div>
           )}
 
-          {/* Scanning line effect */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div 
-              className="absolute top-0 left-0 w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"
-              style={{ animationDelay: '200ms' }}
-            ></div>
-          </div>
+          {/* Clean shine effect - same as sponsors */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-t-2xl"></div>
         </div>
 
-        {/* Content section with glassmorphism */}
-        <div className="relative p-6 bg-gradient-to-b from-white/5 to-transparent backdrop-blur-sm">
-          {/* Decorative elements */}
-          <div className="absolute top-0 left-6 w-12 h-0.5 bg-gradient-to-r from-cyan-400 to-transparent"></div>
-          
+        {/* Clean content section - same style as sponsors */}
+        <div className="relative p-6 bg-white/10 backdrop-blur-sm">
           <div className="flex items-start justify-between mb-4">
-            <h3 className="text-xl font-bold text-white leading-tight flex-1 mr-4 group-hover:text-cyan-100 transition-colors duration-300">
-              {title}
+            <h3 
+              className="text-lg font-semibold leading-tight flex-1 mr-4 group-hover:text-gray-900 transition-colors duration-300"
+              style={{ color: textColor }}
+            >
+              {typeof title === 'string' ? title : 'Article Title'}
             </h3>
             
-            {/* Futuristic icon */}
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400/20 to-blue-500/20 backdrop-blur-sm border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-              <HiArrowRight className="w-5 h-5 text-cyan-400 group-hover:translate-x-0.5 transition-transform duration-300" />
+            {/* Clean icon */}
+            <div 
+              className="flex-shrink-0 w-8 h-8 rounded-full backdrop-blur-sm border flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+              style={{
+                background: `linear-gradient(135deg, ${accent}20 0%, ${accent}10 100%)`,
+                borderColor: 'rgba(255, 255, 255, 0.3)'
+              }}
+            >
+              <HiArrowRight 
+                className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300"
+                style={{ color: accent }}
+              />
             </div>
           </div>
 
-          {/* Interactive read indicator */}
+          {/* Clean read indicator */}
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="flex space-x-1">
                 {[0, 1, 2].map((i) => (
                   <div 
                     key={i}
-                    className="w-1.5 h-1.5 rounded-full bg-cyan-400/60 group-hover:bg-cyan-400 transition-colors duration-300"
-                    style={{ animationDelay: `${i * 100}ms` }}
+                    className="w-1.5 h-1.5 rounded-full transition-colors duration-300"
+                    style={{ 
+                      backgroundColor: `${accent}80`,
+                      animationDelay: `${i * 100}ms`
+                    }}
                   ></div>
                 ))}
               </div>
-              <span className="text-cyan-400 text-sm font-medium tracking-wide">READ</span>
-            </div>
-            
-            <div className="text-xs text-gray-400 font-mono opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              ACCESSING...
+              <span 
+                className="text-sm font-medium tracking-wide"
+                style={{ color: accent }}
+              >
+                READ
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Bottom tech accent */}
-        <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400 to-transparent group-hover:via-cyan-300 transition-colors duration-300"></div>
-        
-        {/* Corner accent */}
-        <div className="absolute bottom-4 right-4 w-6 h-6 border-r-2 border-b-2 border-cyan-400/40 group-hover:border-cyan-400/80 transition-colors duration-300"></div>
+        {/* Clean border glow - same as sponsors */}
+        <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/20 group-hover:ring-blue-200/50 transition-all duration-300"></div>
       </div>
+    </>
+  );
 
-      {/* Hover glow effect */}
-      <div 
-        className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-        style={{
-          background: `linear-gradient(135deg, transparent 0%, ${accent}10 50%, transparent 100%)`,
-          filter: 'blur(1px)'
-        }}
-      ></div>
-    </Link>
+  if (isInternal) {
+    return (
+      <Link href={safeHref} {...commonProps}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <a href={safeHref} {...commonProps} target={isHttp ? "_blank" : undefined} rel={isHttp ? "noopener noreferrer" : undefined}>
+      {content}
+    </a>
   );
 };
 

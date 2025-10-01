@@ -153,7 +153,7 @@ export default async function EventPage({ params }) {
                     {trackWebsite ? (
                       <div className="sm:col-span-2 flex items-center gap-2">
                         <HiGlobeAlt className="text-white/80" />
-                        <a href={trackWebsite} target="_blank" rel="noreferrer" className="text-sm underline text-white/90 hover:text-white">{trackWebsite}</a>
+                        <span className="text-sm text-white/90">{trackWebsite}</span>
                       </div>
                     ) : null}
                   </dl>

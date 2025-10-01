@@ -16,7 +16,8 @@ export async function GET() {
       `&populate[eventDocuments]=*` +
       `&populate[menu]=*` +
       `&populate[websites]=*` +
-      `&populate[hero]=*`;
+      `&populate[hero]=*` +
+      `&populate[heroButton]=*`;
 
     // Fetch site configuration from Strapi based on slug
     const strapiResponse = await fetch(
@@ -51,10 +52,12 @@ export async function GET() {
 
     // Transform Strapi data to match your existing structure
     const transformedConfig = transformStrapiData(strapiData.data[0]);
+    console.log("Using Strapi config with menu items:", transformedConfig.menu.length);
     return NextResponse.json(transformedConfig);
   } catch (error) {
     console.warn("Falling back to local JSON config:", error);
     const configModule = await import("@/config/site-config.json");
+    console.log("Using local config with menu items:", configModule.default.menu.length);
     return NextResponse.json(configModule.default);
   }
 }
@@ -72,9 +75,15 @@ function transformStrapiData(data) {
     menuBackground: data.menuBackground,
     textColor: data.textColor,
     logoImage: data.logoImage,
-    menu: data.menu || [],
+      menu: [
+        { id: 1, label: 'Home', url: '/' },
+        { id: 2, label: 'Events', url: '/events' },
+        { id: 3, label: 'Event Info', url: '/event-info' },
+        { id: 4, label: 'News', url: '/#news' },
+        { id: 5, label: 'Documents', url: '/#documents' }
+      ],
     actions: data.actions || [],
-    currentEventId: data.currentEventId || null,
+    currentEventId: data.eventId || data.currentEventId || null,
     hero: {
       background: data.hero?.[0]?.background?.data?.attributes?.url
         ? `${strapiUrl}${data.hero[0].background.data.attributes.url}`
@@ -83,28 +92,43 @@ function transformStrapiData(data) {
       eventInfo: data.hero?.[0]?.eventInfo,
       eventName: data.hero?.[0]?.eventName,
       eventLocation: data.hero?.[0]?.eventLocation,
-      buttons: data.hero?.[0]?.button || [],
+      buttons: data.heroButton || data.hero?.[0]?.button || [],
     },
 
     eventDocuments: data.eventDocuments || [],
-    websites: (data.websites || []).map((site) => ({
-      ...site,
-      logo: site.logo?.data?.attributes?.url
+    websites: (data.websites || []).map((site) => {
+      console.log('Processing website:', site);
+      const mediaFromObject = site.logo?.data?.attributes?.url
         ? `${strapiUrl}${site.logo.data.attributes.url}`
-        : site.logo,
-    })),
-    newsItems: (data.newsItems || []).map((item) => ({
-      ...item,
-      image: item.image?.data?.attributes?.url
+        : null;
+      const raw = mediaFromObject || site.logo || null;
+      const normalizedLogo = typeof raw === "string"
+        ? (raw.startsWith("http") ? raw : `${strapiUrl}${raw}`)
+        : raw;
+      const processed = { ...site, logo: normalizedLogo };
+      console.log('Processed website:', processed);
+      return processed;
+    }),
+    newsItems: (data.newsItems || []).map((item) => {
+      const mediaFromObject = item.image?.data?.attributes?.url
         ? `${strapiUrl}${item.image.data.attributes.url}`
-        : item.image,
-    })),
-    sponsors: (data.sponsors || []).map((sponsor) => ({
-      ...sponsor,
-      logo: sponsor.logo?.data?.attributes?.url
+        : null;
+      const raw = mediaFromObject || item.image || null;
+      const normalizedImage = typeof raw === "string"
+        ? (raw.startsWith("http") ? raw : `${strapiUrl}${raw}`)
+        : raw;
+      return { ...item, image: normalizedImage };
+    }),
+    sponsors: (data.sponsors || []).map((sponsor) => {
+      const mediaFromObject = sponsor.logo?.data?.attributes?.url
         ? `${strapiUrl}${sponsor.logo.data.attributes.url}`
-        : sponsor.logo,
-    })),
+        : null;
+      const raw = mediaFromObject || sponsor.logo || null;
+      const normalizedLogo = typeof raw === "string"
+        ? (raw.startsWith("http") ? raw : `${strapiUrl}${raw}`)
+        : raw;
+      return { ...sponsor, logo: normalizedLogo };
+    }),
     // footer: data.footer ||[],
     footer: {
       backgroundColor: data.footer?.[0]?.backgroundColor || "#000000",

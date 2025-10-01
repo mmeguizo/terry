@@ -11,7 +11,13 @@ const Sponsors = () => {
   const sponsorItems = [...config.sponsors, ...config.sponsors, ...config.sponsors];
 
   return (
-    <section id="sponsors" className="relative bg-gradient-to-br from-neutral-50 via-white to-neutral-100 py-20 xl:py-24 2xl:py-28 scroll-mt-24 overflow-hidden">
+    <section 
+      id="sponsors" 
+      className="relative py-20 xl:py-24 2xl:py-28 scroll-mt-24 overflow-hidden"
+      style={{
+        background: config.menuBackground || '#ffffff'
+      }}
+    >
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"></div>
@@ -61,11 +67,8 @@ const Sponsors = () => {
                 key={index} 
                 className="inline-flex flex-shrink-0 w-56 xl:w-72 2xl:w-80 3xl:w-96 mx-6 xl:mx-10 2xl:mx-12 3xl:mx-16"
               >
-                <Link
-                  href={sponsor.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group relative block w-full bg-white/80 backdrop-blur-sm rounded-2xl p-6 xl:p-8 2xl:p-10 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 border border-white/50"
+                <div
+                  className="group relative block w-full bg-white/80 backdrop-blur-sm rounded-2xl p-6 xl:p-8 2xl:p-10 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 border border-white/50 cursor-pointer"
                 >
                   {/* Background glow effect */}
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/30 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -90,7 +93,7 @@ const Sponsors = () => {
                   
                   <div className="relative z-10 text-center">
                     <p className="text-sm xl:text-base 2xl:text-lg font-semibold text-gray-700 leading-tight group-hover:text-gray-900 transition-colors duration-300">
-                      {sponsor.name}
+                      {typeof sponsor.name === 'string' ? sponsor.name : 'Sponsor'}
                     </p>
                   </div>
                   
@@ -99,7 +102,7 @@ const Sponsors = () => {
                   
                   {/* Border glow */}
                   <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/20 group-hover:ring-blue-200/50 transition-all duration-300"></div>
-                </Link>
+                </div>
               </div>
             ))}
           </div>

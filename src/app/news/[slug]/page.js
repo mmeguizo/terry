@@ -14,7 +14,35 @@ export async function generateStaticParams() {
 // Function to get news item by slug
 async function getNewsItem(slug) {
     try {
-        // First, check if the news item exists in our config
+        // First try to fetch from Strapi API
+        const baseUrl = process.env.SITE_DOMAIN || 'http://localhost:3000';
+        const newsRes = await fetch(`${baseUrl}/api/news`, { cache: "no-store" });
+        
+        if (newsRes.ok) {
+            const newsItems = await newsRes.json();
+            const strapiItem = newsItems.find(item => item.slug === slug);
+            
+            if (strapiItem) {
+                return {
+                    title: strapiItem.title,
+                    date: strapiItem.date,
+                    image: strapiItem.image,
+                    content: strapiItem.content,
+                    slug: strapiItem.slug,
+                    url: `/news/${strapiItem.slug}`,
+                    // Parse content if it's rich text
+                    body: strapiItem.content 
+                        ? [strapiItem.content] 
+                        : ["This news article content is being updated. Please check back later."],
+                    author: "News Team",
+                    category: "Motorsport News",
+                    readTime: "2 min read",
+                    tags: ["motorsport", "racing"]
+                };
+            }
+        }
+
+        // Fallback to local config
         const newsItem = configData.newsItems.find(item =>
             item.url === `/news/${slug}`
         );

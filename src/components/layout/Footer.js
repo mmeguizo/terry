@@ -10,110 +10,141 @@ const Footer = () => {
   const config = useConfig();
   
   return (
-    <footer style={{ backgroundColor: config.footer.backgroundColor }} className="relative">
-      {/* Main Footer Content */}
-      <div className="container py-16 lg:py-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+    <footer style={{ backgroundColor: config.footer?.backgroundColor || config.menuBackground || '#1f2937' }} className="relative overflow-hidden">
+      {/* Racing background pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute top-0 left-0 w-full h-1" style={{ background: `linear-gradient(to right, transparent, ${config.primaryColor || '#3b82f6'}, transparent)` }}></div>
+        <div className="absolute bottom-0 left-0 w-full h-1" style={{ background: `linear-gradient(to right, transparent, ${config.primaryColor || '#3b82f6'}, transparent)` }}></div>
+        {/* Racing corner designs */}
+        <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2" style={{ borderColor: config.primaryColor || '#3b82f6' }}></div>
+        <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2" style={{ borderColor: config.primaryColor || '#3b82f6' }}></div>
+        <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2" style={{ borderColor: config.primaryColor || '#3b82f6' }}></div>
+        <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2" style={{ borderColor: config.primaryColor || '#3b82f6' }}></div>
+      </div>
+
+      {/* Main Footer Content - Mobile Optimized */}
+      <div className="relative z-10 px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        {/* Mobile-first layout */}
+        <div className="max-w-7xl mx-auto">
           
-          {/* Logo and Brand Section */}
-          <div className="lg:col-span-1 flex flex-col items-center lg:items-start">
-            <Link href="/" className="group transition-all duration-300 hover:scale-105">
+          {/* Logo and Brand Section - Full width on mobile */}
+          <div className="text-center mb-8 lg:mb-12">
+            <Link href="/" className="inline-block group transition-all duration-300 hover:scale-105">
               <div className="mb-4">
                 <Image 
                   src={config.logoImage} 
                   alt={config.siteTitle} 
                   width={200} 
                   height={200} 
-                  className="w-auto h-20 lg:h-24"
+                  className="w-auto h-16 sm:h-20 lg:h-24 mx-auto"
                 />
               </div>
-              <h1 className="text-xl lg:text-2xl font-bold text-white group-hover:text-blue-300 transition-colors duration-300">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white group-hover:opacity-80 transition-opacity duration-300">
                 {config.siteTitle}
               </h1>
             </Link>
-            <p className="text-white/70 text-sm mt-3 text-center lg:text-left leading-relaxed">
+            <p className="text-white/70 text-sm sm:text-base mt-3 max-w-md mx-auto leading-relaxed">
               Premier motorsport racing event featuring the world&apos;s top drivers and teams.
             </p>
           </div>
 
-          {/* Quick Links Section */}
-          <div className="flex flex-col items-center lg:items-start">
-            <h2 className="text-white text-lg font-bold mb-4 relative">
-              Quick Links
-              <div className="absolute -bottom-1 left-0 w-12 h-0.5 bg-blue-400"></div>
-            </h2>
-            <nav className="flex flex-col gap-2">
-              {config.menu.map((item, index) => (
-                <Link 
-                  key={index} 
-                  href={item.url} 
-                  className="text-white/80 hover:text-white hover:text-blue-300 transition-all duration-200 py-1 px-2 rounded hover:bg-white/5 w-fit"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          {/* Event Information Section */}
-          <div className="flex flex-col items-center lg:items-start">
-            <h2 className="text-white text-lg font-bold mb-4 relative">
-              Event Info
-              <div className="absolute -bottom-1 left-0 w-12 h-0.5 bg-blue-400"></div>
-            </h2>
-            <div className="flex flex-col gap-2">
-              {config.eventDocuments.slice(0, 4).map((doc, index) => (
-                <Link 
-                  key={index} 
-                  href={doc.url} 
-                  className="text-white/80 hover:text-white hover:text-blue-300 transition-all duration-200 py-1 px-2 rounded hover:bg-white/5 w-fit text-sm"
-                >
-                  {doc.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Social Media and Contact Section */}
-          <div className="flex flex-col items-center lg:items-start">
-            <h2 className="text-white text-lg font-bold mb-4 relative">
-              Connect With Us
-              <div className="absolute -bottom-1 left-0 w-12 h-0.5 bg-blue-400"></div>
-            </h2>
+          {/* Mobile-optimized grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
             
-            {/* Social Media Icons */}
-            <div className="flex gap-3 mb-6">
-              {config.socials.map((social, index) => {
-                const IconComponent = FaIcons[`Fa${social.platform.charAt(0) + social.platform.slice(1)}`];
-                return (
+            {/* Quick Links Section */}
+            <div className="text-center sm:text-left">
+              <h2 className="text-white text-lg font-bold mb-4 relative inline-block">
+                Quick Links
+                <div className="absolute -bottom-1 left-1/2 sm:left-0 transform -translate-x-1/2 sm:translate-x-0 w-12 h-0.5" style={{ backgroundColor: config.primaryColor || '#3b82f6' }}></div>
+              </h2>
+              <nav className="flex flex-col gap-2">
+                {config.menu.map((item, index) => (
                   <Link 
                     key={index} 
-                    href={social.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="group bg-white/10 hover:bg-blue-500 text-white/80 hover:text-white rounded-full p-3 transition-all duration-300 hover:scale-110 hover:shadow-lg"
-                    aria-label={`Follow us on ${social.platform}`}
+                    href={item.url} 
+                    className="text-white/80 hover:text-white transition-all duration-200 py-2 px-3 rounded-lg hover:bg-white/5 inline-block text-center sm:text-left"
                   >
-                    {IconComponent ? <IconComponent size={20} /> : null}
+                    {item.label}
                   </Link>
-                );
-              })}
+                ))}
+              </nav>
             </div>
 
-            {/* Contact Information */}
-            <div className="text-center lg:text-left">
-              <div className="text-white/70 text-sm space-y-1">
-                <p className="flex items-center justify-center lg:justify-start gap-2">
-                  <FaIcons.FaEnvelope className="text-blue-400" />
-                  info@wakefield300.com.au
+            {/* Event Information Section */}
+            <div className="text-center sm:text-left">
+              <h2 className="text-white text-lg font-bold mb-4 relative inline-block">
+                Event Info
+                <div className="absolute -bottom-1 left-1/2 sm:left-0 transform -translate-x-1/2 sm:translate-x-0 w-12 h-0.5" style={{ backgroundColor: config.primaryColor || '#3b82f6' }}></div>
+              </h2>
+              <div className="flex flex-col gap-2">
+                {config.eventDocuments?.slice(0, 4).map((doc, index) => (
+                  <Link 
+                    key={index} 
+                    href={doc.url} 
+                    className="text-white/80 hover:text-white transition-all duration-200 py-2 px-3 rounded-lg hover:bg-white/5 text-sm inline-block text-center sm:text-left"
+                  >
+                    {doc.label}
+                  </Link>
+                )) || (
+                  <p className="text-white/60 text-sm">Event documents coming soon</p>
+                )}
+              </div>
+            </div>
+
+            {/* Social Media and Contact Section */}
+            <div className="text-center sm:text-left sm:col-span-2 lg:col-span-1">
+              <h2 className="text-white text-lg font-bold mb-4 relative inline-block">
+                Connect With Us
+                <div className="absolute -bottom-1 left-1/2 sm:left-0 transform -translate-x-1/2 sm:translate-x-0 w-12 h-0.5" style={{ backgroundColor: config.primaryColor || '#3b82f6' }}></div>
+              </h2>
+              
+              {/* Social Media Icons */}
+              <div className="flex justify-center sm:justify-start gap-3 mb-6">
+                {config.socials?.map((social, index) => {
+                  const IconComponent = FaIcons[`Fa${social.platform.charAt(0) + social.platform.slice(1)}`];
+                  return (
+                    <div 
+                      key={index} 
+                      className="group bg-white/10 hover:bg-white/20 text-white/80 hover:text-white rounded-full p-3 transition-all duration-300 hover:scale-110 hover:shadow-lg cursor-pointer border border-white/10"
+                      style={{
+                        '&:hover': {
+                          backgroundColor: config.primaryColor || '#3b82f6',
+                          borderColor: config.primaryColor || '#3b82f6'
+                        }
+                      }}
+                      aria-label={`Follow us on ${social.platform}`}
+                    >
+                      {IconComponent ? <IconComponent size={18} /> : null}
+                    </div>
+                  );
+                }) || (
+                  <div className="flex gap-3">
+                    <div className="bg-white/10 rounded-full p-3 border border-white/10">
+                      <FaIcons.FaFacebook size={18} className="text-white/60" />
+                    </div>
+                    <div className="bg-white/10 rounded-full p-3 border border-white/10">
+                      <FaIcons.FaTwitter size={18} className="text-white/60" />
+                    </div>
+                    <div className="bg-white/10 rounded-full p-3 border border-white/10">
+                      <FaIcons.FaInstagram size={18} className="text-white/60" />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Contact Information */}
+              <div className="space-y-2">
+                <p className="flex items-center justify-center sm:justify-start gap-2 text-white/70 text-sm">
+                  <FaIcons.FaEnvelope style={{ color: config.primaryColor || '#3b82f6' }} />
+                  info@{config.siteTitle?.toLowerCase().replace(/\s+/g, '') || 'racing'}.com.au
                 </p>
-                <p className="flex items-center justify-center lg:justify-start gap-2">
-                  <FaIcons.FaPhone className="text-blue-400" />
+                <p className="flex items-center justify-center sm:justify-start gap-2 text-white/70 text-sm">
+                  <FaIcons.FaPhone style={{ color: config.primaryColor || '#3b82f6' }} />
                   +61 (0) 123 456 789
                 </p>
-                <p className="flex items-center justify-center lg:justify-start gap-2">
-                  <FaIcons.FaMapMarkerAlt className="text-blue-400" />
-                  Wakefield Park, NSW
+                <p className="flex items-center justify-center sm:justify-start gap-2 text-white/70 text-sm">
+                  <FaIcons.FaMapMarkerAlt style={{ color: config.primaryColor || '#3b82f6' }} />
+                  {config.hero?.eventLocation || 'Racing Venue'}
                 </p>
               </div>
             </div>
@@ -121,30 +152,32 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Bottom Bar */}
-      <div className="border-t border-white/10">
-        <div className="container py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-white/60 text-sm text-center md:text-left">
-              <p>&copy; {new Date().getFullYear()} {config.siteTitle}. All rights reserved.</p>
-            </div>
-            <div className="flex flex-wrap justify-center md:justify-end gap-6 text-sm">
-              <Link href="/privacy" className="text-white/60 hover:text-white transition-colors duration-200">
-                Privacy Policy
-              </Link>
-              <Link href="/terms" className="text-white/60 hover:text-white transition-colors duration-200">
-                Terms & Conditions
-              </Link>
-              <Link href="/contact" className="text-white/60 hover:text-white transition-colors duration-200">
-                Contact Us
-              </Link>
+      {/* Bottom Bar - Mobile Optimized */}
+      <div className="border-t border-white/10 relative z-10">
+        <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+              <div className="text-white/60 text-xs sm:text-sm text-center sm:text-left">
+                <p>&copy; {new Date().getFullYear()} {config.siteTitle}. All rights reserved.</p>
+              </div>
+              <div className="flex flex-wrap justify-center sm:justify-end gap-4 sm:gap-6 text-xs sm:text-sm">
+                <Link href="/privacy" className="text-white/60 hover:text-white transition-colors duration-200 hover:underline">
+                  Privacy Policy
+                </Link>
+                <Link href="/terms" className="text-white/60 hover:text-white transition-colors duration-200 hover:underline">
+                  Terms & Conditions
+                </Link>
+                <Link href="/contact" className="text-white/60 hover:text-white transition-colors duration-200 hover:underline">
+                  Contact Us
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+      <div className="absolute top-0 left-0 w-full h-px" style={{ background: `linear-gradient(to right, transparent, ${config.primaryColor || '#3b82f6'}, transparent)` }}></div>
     </footer>
   );
 };
