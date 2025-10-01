@@ -82,13 +82,19 @@ const Sponsors = () => {
                   </div>
                   
                   <div className="relative z-10 flex flex-col items-center justify-center h-24 xl:h-28 2xl:h-32 mb-4 xl:mb-5 2xl:mb-6">
-                    <Image
-                      src={sponsor.logo}
-                      alt={sponsor.name}
-                      width={200}
-                      height={100}
-                      className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
-                    />
+                    {sponsor.logo && sponsor.logo.trim() !== '' ? (
+                      <Image
+                        src={sponsor.logo}
+                        alt={sponsor.name}
+                        width={200}
+                        height={100}
+                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">
+                        <span className="text-gray-500 font-medium text-sm">LOGO</span>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="relative z-10 text-center">

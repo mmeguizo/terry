@@ -97,12 +97,18 @@ const CardHeader = ({ children, className = "" }) => {
 const CardImage = ({ src, alt = "", className = "" }) => {
   return (
     <div className={`relative w-full aspect-video overflow-hidden ${className}`}>
-      <Image 
-        src={src} 
-        alt={alt} 
-        fill
-        className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-1" 
-      />
+      {src && src.trim() !== '' ? (
+        <Image 
+          src={src} 
+          alt={alt} 
+          fill
+          className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-1" 
+        />
+      ) : (
+        <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+          <span className="text-gray-500 font-medium text-sm">NO IMAGE</span>
+        </div>
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
     </div>
   );
@@ -152,10 +158,12 @@ const NewsCard = ({ href, image, title, date, category, sectionBg = null }) => {
 
   const isValidUrl = (url) => {
     if (!url || typeof url !== "string") return false;
+    const trimmed = url.trim();
+    if (!trimmed || trimmed === "" || trimmed === "null" || trimmed === "undefined") return false;
     try {
-      if (url.startsWith("/")) return true; // internal paths are valid
-      if (url.startsWith("http://") || url.startsWith("https://")) {
-        new URL(url); // test if it's a valid URL
+      if (trimmed.startsWith("/")) return true; // internal paths are valid
+      if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+        new URL(trimmed); // test if it's a valid URL
         return true;
       }
       return false;
@@ -213,16 +221,33 @@ const NewsCard = ({ href, image, title, date, category, sectionBg = null }) => {
           {(() => {
             const img = normalize(image);
             const valid = isValidUrl(img);
-            return valid ? (
-            <Image
-              src={img}
-              alt={title || ""}
-              fill
-              className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-            />
-          ) : (
-              <div className="absolute inset-0 bg-neutral-800/60" />
-            );
+            if (valid && img) {
+              return (
+                <Image
+                  src={img}
+                  alt={title || "News Image"}
+                  fill
+                  className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+                  onError={(e) => {
+                    console.warn('Image failed to load:', img);
+                    e.target.style.display = 'none';
+                  }}
+                />
+              );
+            } else {
+              return (
+                <div className="absolute inset-0 bg-gradient-to-br from-neutral-700 to-neutral-800 flex items-center justify-center">
+                  <div className="text-white/60 text-center">
+                    <div className="w-16 h-16 mx-auto mb-2 rounded-full bg-white/10 flex items-center justify-center">
+                      <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <p className="text-sm font-medium">News Image</p>
+                  </div>
+                </div>
+              );
+            }
           })()}
           
           {/* Clean gradient overlay */}

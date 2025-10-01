@@ -318,19 +318,13 @@ export default async function EventInfoPage() {
                     />
                   ) : (
                     <div>
-                      <p 
-                        className="leading-relaxed mb-6"
-                        style={{ color: config.textColor + 'E0' || '#374151' }}
-                      >
+                      <p className="leading-relaxed mb-6 text-white">
                         Join us for an exciting motorsport event featuring world-class racing action. 
                         {(eventData?.name || config.hero?.eventName) && ` ${eventData?.name || config.hero?.eventName} promises to deliver thrilling competition and unforgettable moments.`}
                       </p>
-                      <p 
-                        className="leading-relaxed"
-                        style={{ color: config.textColor + 'E0' || '#374151' }}
-                      >
-                        Whether you're a seasoned motorsport fan or new to racing, this event offers something for everyone. 
-                        Don't miss your chance to witness high-speed action at {eventData?.venue || config.hero?.eventLocation || "this premier venue"}.
+                      <p className="leading-relaxed text-white">
+                        Whether you&apos;re a seasoned motorsport fan or new to racing, this event offers something for everyone. 
+                        Don&apos;t miss your chance to witness high-speed action at {eventData?.venue || config.hero?.eventLocation || "this premier venue"}.
                       </p>
                     </div>
                   )}
@@ -386,7 +380,7 @@ export default async function EventInfoPage() {
                         <div>
                           <h4 className="font-semibold text-green-900 mb-2">Entries Now Open</h4>
                           <p className="text-green-800 text-sm">
-                            Event entries are currently open. Don't miss your chance to compete - register now!
+                            Event entries are currently open. Don&apos;t miss your chance to compete - register now!
                           </p>
                         </div>
                       </div>

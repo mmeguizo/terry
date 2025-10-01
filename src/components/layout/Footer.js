@@ -31,13 +31,19 @@ const Footer = () => {
           <div className="text-center mb-8 lg:mb-12">
             <Link href="/" className="inline-block group transition-all duration-300 hover:scale-105">
               <div className="mb-4">
-                <Image 
-                  src={config.logoImage} 
-                  alt={config.siteTitle} 
-                  width={200} 
-                  height={200} 
-                  className="w-auto h-16 sm:h-20 lg:h-24 mx-auto"
-                />
+                {config.logoImage && config.logoImage.trim() !== '' ? (
+                  <Image 
+                    src={config.logoImage} 
+                    alt={config.siteTitle} 
+                    width={200} 
+                    height={200} 
+                    className="w-auto h-16 sm:h-20 lg:h-24 mx-auto"
+                  />
+                ) : (
+                  <div className="w-auto h-16 sm:h-20 lg:h-24 mx-auto flex items-center justify-center bg-white/10 rounded-lg px-6">
+                    <span className="text-white/80 font-bold text-lg">LOGO</span>
+                  </div>
+                )}
               </div>
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white group-hover:opacity-80 transition-opacity duration-300">
                 {config.siteTitle}

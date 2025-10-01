@@ -189,15 +189,15 @@ const Hero = () => {
                 ))}
               </div>
             </div>
-            <h1 className="xs:text-5xl text-4xl xl:text-6xl 2xl:text-7xl 3xl:text-8xl font-semibold text-start uppercase leading-tight">
+            <h1 className="xs:text-5xl text-4xl xl:text-6xl 2xl:text-7xl 3xl:text-8xl text-start uppercase leading-tight text-white font-bold">
               {typeof config.hero?.eventName === 'string' ? config.hero.eventName : 'Event Name TBA'}
             </h1>
 
-            <h1 className="xs:text-4xl text-3xl xl:text-5xl 2xl:text-6xl 3xl:text-7xl font-medium text-start uppercase leading-tight">
+            <h1 className="xs:text-4xl text-3xl xl:text-5xl 2xl:text-6xl 3xl:text-7xl text-start uppercase leading-tight text-white font-semibold">
               {typeof config.hero?.eventLocation === 'string' ? config.hero.eventLocation : 'Venue TBA'}
             </h1>
 
-            <p className="font-medium text-start uppercase text-lg xl:text-xl 2xl:text-2xl">{formattedEventDate}</p>
+            <p className="text-start uppercase text-lg xl:text-xl 2xl:text-2xl text-gray-200 font-medium">{formattedEventDate}</p>
             {/* Dynamic button based on event state - TODO: implement when API is updated */}
             <LinkButton href="/event-info">Event Info</LinkButton>
           </div>

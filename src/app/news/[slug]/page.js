@@ -32,7 +32,7 @@ async function getNewsItem(slug) {
                     url: `/news/${strapiItem.slug}`,
                     // Parse content if it's rich text
                     body: strapiItem.content 
-                        ? [strapiItem.content] 
+                        ? (Array.isArray(strapiItem.content) ? strapiItem.content : [strapiItem.content])
                         : ["This news article content is being updated. Please check back later."],
                     author: "News Team",
                     category: "Motorsport News",
@@ -83,7 +83,8 @@ async function getNewsItem(slug) {
 }
 
 export default async function NewsPage({ params }) {
-    const newsItem = await getNewsItem(params.slug);
+    const awaitedParams = await params;
+    const newsItem = await getNewsItem(awaitedParams.slug);
 
     if (!newsItem) {
         notFound();
@@ -95,7 +96,7 @@ export default async function NewsPage({ params }) {
         '@context': 'https://schema.org',
         '@type': 'NewsArticle',
         headline: newsItem.title,
-        image: [newsItem.image],
+        image: newsItem.image && newsItem.image.trim() && newsItem.image !== 'null' && newsItem.image !== 'undefined' ? [newsItem.image] : undefined,
         datePublished: newsItem.date,
         dateModified: newsItem.date,
         author: newsItem.author ? { '@type': 'Person', name: newsItem.author } : undefined,
@@ -108,14 +109,27 @@ export default async function NewsPage({ params }) {
             <div className="">
                 {/* Hero Section */}
                 <div className="mb-10">
-                    <div className="relative w-full aspect-video max-h-[600px] overflow-hidden mb-6 rounded-md">
-                        <Image
-                            src={newsItem.image}
-                            alt={newsItem.title}
-                            fill
-                            className="object-cover"
-                        />
-                    </div>
+                    {newsItem.image && newsItem.image.trim() && newsItem.image !== 'null' && newsItem.image !== 'undefined' ? (
+                        <div className="relative w-full aspect-video max-h-[600px] overflow-hidden mb-6 rounded-md">
+                            <Image
+                                src={newsItem.image}
+                                alt={newsItem.title}
+                                fill
+                                className="object-cover"
+                            />
+                        </div>
+                    ) : (
+                        <div className="relative w-full aspect-video max-h-[600px] overflow-hidden mb-6 rounded-md bg-gradient-to-br from-neutral-700 to-neutral-800 flex items-center justify-center">
+                            <div className="text-white/60 text-center">
+                                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-white/10 flex items-center justify-center">
+                                    <svg className="w-10 h-10" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                                <p className="text-lg font-medium">News Article</p>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="container">
                         <div>
@@ -174,14 +188,38 @@ export default async function NewsPage({ params }) {
                                 <div className="max-w-none">
                                     {/* Render body content */}
                                     {Array.isArray(newsItem.body) ? (
-                                        newsItem.body.map((paragraph, index) => (
-                                            <p key={index} className="text-[17px] text-white/90 leading-8 mb-5">
-                                                {paragraph}
-                                            </p>
-                                        ))
-                                    ) : (
+                                        newsItem.body.map((item, index) => {
+                                            // Handle Strapi block content
+                                            if (typeof item === 'object' && item.type === 'paragraph') {
+                                                return (
+                                                    <p key={index} className="text-[17px] text-white/90 leading-8 mb-5">
+                                                        {item.children?.map((child, childIndex) => {
+                                                            if (typeof child === 'object' && child.text) {
+                                                                return child.text;
+                                                            }
+                                                            return typeof child === 'string' ? child : '';
+                                                        }).join('')}
+                                                    </p>
+                                                );
+                                            }
+                                            // Handle plain string content
+                                            else if (typeof item === 'string') {
+                                                return (
+                                                    <p key={index} className="text-[17px] text-white/90 leading-8 mb-5">
+                                                        {item}
+                                                    </p>
+                                                );
+                                            }
+                                            // Skip invalid content
+                                            return null;
+                                        })
+                                    ) : typeof newsItem.body === 'string' ? (
                                         <p className="text-[17px] text-white/90 leading-8">
                                             {newsItem.body}
+                                        </p>
+                                    ) : (
+                                        <p className="text-[17px] text-white/90 leading-8">
+                                            This news article content is being updated. Please check back later.
                                         </p>
                                     )}
                                     {/* Tags */}
@@ -219,9 +257,37 @@ export default async function NewsPage({ params }) {
     );
 }
 
+// Helper function to extract text content from body structure
+function extractTextFromBody(body) {
+    if (typeof body === 'string') {
+        return body;
+    }
+    
+    if (Array.isArray(body)) {
+        let text = '';
+        for (const item of body) {
+            if (typeof item === 'string') {
+                text += item + ' ';
+            } else if (typeof item === 'object' && item.type === 'paragraph' && item.children) {
+                for (const child of item.children) {
+                    if (typeof child === 'object' && child.text) {
+                        text += child.text + ' ';
+                    } else if (typeof child === 'string') {
+                        text += child + ' ';
+                    }
+                }
+            }
+        }
+        return text.trim();
+    }
+    
+    return '';
+}
+
 // Generate metadata for SEO
 export async function generateMetadata({ params }) {
-    const newsItem = await getNewsItem(params.slug);
+    const awaitedParams = await params;
+    const newsItem = await getNewsItem(awaitedParams.slug);
 
     if (!newsItem) {
         return {
@@ -229,9 +295,10 @@ export async function generateMetadata({ params }) {
         };
     }
 
+    const bodyText = extractTextFromBody(newsItem.body);
     const description = newsItem.seo?.metaDescription ||
         newsItem.excerpt ||
-        (Array.isArray(newsItem.body) ? newsItem.body[0]?.substring(0, 160) : newsItem.body?.substring(0, 160)) ||
+        (bodyText ? bodyText.substring(0, 160) : '') ||
         `Read about ${newsItem.title}`;
 
     return {
@@ -241,7 +308,7 @@ export async function generateMetadata({ params }) {
         openGraph: {
             title: newsItem.title,
             description: description,
-            images: [newsItem.image],
+            images: newsItem.image && newsItem.image.trim() && newsItem.image !== 'null' && newsItem.image !== 'undefined' ? [newsItem.image] : [],
             type: 'article',
             publishedTime: newsItem.date,
         },
@@ -249,7 +316,7 @@ export async function generateMetadata({ params }) {
             card: 'summary_large_image',
             title: newsItem.title,
             description: description,
-            images: [newsItem.image],
+            images: newsItem.image && newsItem.image.trim() && newsItem.image !== 'null' && newsItem.image !== 'undefined' ? [newsItem.image] : [],
         }
     };
 }

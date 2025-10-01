@@ -6,16 +6,11 @@ import { useConfig } from "@/context/ConfigContext";
 
 const LinkButton = ({ href, children, newTab }) => {
   const config = useConfig();
-  const primaryColor = config?.primaryColor || "#ffffff";
 
   return (
     <Link 
       href={href} 
-      className="group relative inline-flex items-center justify-center px-8 py-4 text-sm font-bold text-white uppercase tracking-wider transition-all duration-300 transform rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:scale-105"
-      style={{ 
-        background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}CC 100%)`,
-        boxShadow: `0 4px 15px 0 ${primaryColor}40`
-      }}
+      className="group relative inline-flex items-center justify-center px-8 py-4 text-sm uppercase tracking-wider transition-all duration-300 transform rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:scale-105 smart-button-primary"
       target={newTab ? "_blank" : "_self"} 
       rel={newTab ? "noopener noreferrer" : undefined}
     >
@@ -34,12 +29,6 @@ const LinkButton = ({ href, children, newTab }) => {
 
 const IconLinkButton = ({ href, children, newTab, sectionBg = null }) => {
   const config = useConfig();
-  const primaryColor = config?.primaryColor || "#3b82f6";
-  const baseBg = sectionBg || config.menuBackground || '#ffffff';
-  
-  // Use clean white background like sponsors and news cards
-  const cardBg = 'rgba(255, 255, 255, 0.8)';
-  const textColor = '#374151'; // Clean dark gray text
 
   const childrenArray = React.Children.toArray(children);
 
@@ -50,59 +39,27 @@ const IconLinkButton = ({ href, children, newTab, sectionBg = null }) => {
   return (
     <Link 
       href={href} 
-      className="group relative flex items-stretch overflow-hidden rounded-2xl backdrop-blur-sm border shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 w-full min-h-[72px]"
+      className="group relative flex items-stretch overflow-hidden rounded-2xl backdrop-blur-sm border shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 w-full min-h-[72px] smart-card"
       target={newTab ? "_blank" : "_self"} 
       rel={newTab ? "noopener noreferrer" : undefined}
-      style={{ 
-        backgroundColor: cardBg,
-        borderColor: 'rgba(255, 255, 255, 0.5)',
-        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-      }}
     >
-      <div 
-        className="flex items-center justify-center w-20 flex-shrink-0 transition-all duration-300 group-hover:scale-110"
-        style={{ 
-          background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor}DD 100%)`,
-          boxShadow: `inset 0 1px 0 rgba(255,255,255,0.2)`
-        }}
-      >
+      <div className="flex items-center justify-center w-20 flex-shrink-0 transition-all duration-300 group-hover:scale-110 smart-accent-bg">
         <span className="text-white text-xl group-hover:rotate-12 transition-transform duration-300">
           {childrenArray[0]}
         </span>
       </div>
-      <div 
-        className="flex-1 flex items-center px-6 py-4" 
-        style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
-      >
-        <span 
-          className="font-semibold uppercase tracking-wide text-sm leading-tight group-hover:text-gray-900 transition-colors duration-300"
-          style={{ 
-            color: textColor,
-            fontWeight: '600'
-          }}
-        >
+      <div className="flex-1 flex items-center px-6 py-4 bg-white/10">
+        <span className="font-semibold uppercase tracking-wide text-sm leading-tight smart-text-primary transition-colors duration-300">
           {childrenArray[1]}
         </span>
       </div>
       
       {/* Racing corner designs */}
       <div className="absolute inset-0 pointer-events-none rounded-xl">
-        <div 
-          className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{ borderColor: `${primaryColor}80` }}
-        ></div>
-        <div 
-          className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{ borderColor: `${primaryColor}80` }}
-        ></div>
-        <div 
-          className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{ borderColor: `${primaryColor}60` }}
-        ></div>
-        <div 
-          className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{ borderColor: `${primaryColor}60` }}
-        ></div>
+        <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 border-[var(--accent-color)]"></div>
+        <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 border-[var(--accent-color)]"></div>
+        <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 border-[var(--accent-color)]"></div>
+        <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500 border-[var(--accent-color)]"></div>
       </div>
 
       {/* Clean shine effect - same as sponsors */}

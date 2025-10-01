@@ -34,13 +34,19 @@ export default function PageOpener() {
       <div className="opener-glow" style={{ background: `radial-gradient(60% 60% at 50% 50%, ${config.primaryColor}66 0%, transparent 60%)` }} />
       <div className="opener-slice" style={{ background: `linear-gradient(90deg, transparent, #ffffff, transparent)` }} />
       <div className="opener-logo">
-        <Image 
-          src={config.logoImage} 
-          alt="Logo" 
-          width={120}
-          height={120}
-          className="w-auto h-full object-contain"
-        />
+        {config.logoImage && config.logoImage.trim() !== '' ? (
+          <Image 
+            src={config.logoImage} 
+            alt="Logo" 
+            width={120}
+            height={120}
+            className="w-auto h-full object-contain"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-white/20 rounded-lg">
+            <span className="text-white font-bold text-sm">LOGO</span>
+          </div>
+        )}
       </div>
     </div>
   );

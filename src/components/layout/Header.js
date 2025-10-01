@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { LinkButton } from "@/components/ui/Links";
 import { useConfig } from "@/context/ConfigContext";
-import { HiBars3, HiXMark } from "react-icons/hi2";
+import { HiBars3, HiXMark, HiChevronRight } from "react-icons/hi2";
 import { CgMenuGridR } from "react-icons/cg";
 
 const Header = () => {
@@ -119,9 +119,11 @@ const Header = () => {
   return (
     <header className={`fixed w-full top-0 z-50 flex items-stretch transition-all duration-500 ease-in-out ${
       scrolled 
-        ? 'bg-white/95 backdrop-blur-xl shadow-2xl border-b border-gray-200/50' 
+        ? 'smart-bg-secondary backdrop-blur-xl shadow-2xl border-b border-gray-200/50' 
         : 'bg-black/20 backdrop-blur-sm'
-    }`}>
+    }`} style={{
+      backgroundColor: scrolled ? config.menuBackground || 'rgba(255,255,255,0.95)' : undefined
+    }}>
       {/* Dynamic scroll indicator */}
       <div 
         className={`absolute bottom-0 left-0 w-full h-0.5 transition-all duration-500 ${
@@ -134,18 +136,24 @@ const Header = () => {
       <div className="flex items-center w-full px-3 xs:px-8 xl:px-16 2xl:px-24 3xl:px-32 relative z-40">
         <div className="logo-container relative z-50 h-full flex items-center">
           <Link href="/" className="relative z-50 flex items-center gap-3">
-            <Image 
-              src={config.logoImage} 
-              alt="Logo" 
-              width={300} 
-              height={100} 
-              priority 
-              className="w-auto h-16 sm:h-12 xl:h-14 2xl:h-16 object-contain transition-all duration-300" 
-            />
+            {config.logoImage && config.logoImage.trim() !== '' ? (
+              <Image 
+                src={config.logoImage} 
+                alt="Logo" 
+                width={300} 
+                height={100} 
+                priority 
+                className="w-auto h-16 sm:h-12 xl:h-14 2xl:h-16 object-contain transition-all duration-300" 
+              />
+            ) : (
+              <div className="w-auto h-16 sm:h-12 xl:h-14 2xl:h-16 flex items-center justify-center bg-gray-200 rounded-lg px-4">
+                <span className="text-gray-600 font-bold text-sm">LOGO</span>
+              </div>
+            )}
             {/* Mobile title text */}
             <div className="flex flex-col lg:hidden">
-              <h1 className="text-lg font-bold text-black leading-tight">{config.siteTitle}</h1>
-              <p className="text-xs text-gray-600 font-medium uppercase tracking-wide">{config.tagline || 'Racing Event'}</p>
+              <h1 className="text-lg font-bold smart-text-primary leading-tight" style={{ color: config.textColor || 'var(--text-primary)' }}>{config.siteTitle}</h1>
+              <p className="text-xs smart-text-secondary font-medium uppercase tracking-wide" style={{ color: config.textColor ? `${config.textColor}80` : 'var(--text-secondary)' }}>{config.tagline || 'Racing Event'}</p>
             </div>
           </Link>
         </div>
@@ -155,13 +163,27 @@ const Header = () => {
               const isActive = item.url.startsWith('#') && activeSection && (`#${activeSection}` === item.url);
               return (
                 <Link
-                  className={`z-50 px-3 py-2 xl:px-4 xl:py-3 2xl:px-5 2xl:py-4 whitespace-nowrap uppercase font-bold relative rounded-lg transition-all duration-300 text-sm xl:text-base 2xl:text-lg text-black hover:text-gray-600 hover:bg-black/5 backdrop-blur-sm ${
-                    isActive ? 'bg-black/10 text-black' : ''
+                  className={`z-50 px-3 py-2 xl:px-4 xl:py-3 2xl:px-5 2xl:py-4 whitespace-nowrap uppercase font-bold relative rounded-lg transition-all duration-300 text-sm xl:text-base 2xl:text-lg smart-text-primary hover:smart-text-secondary backdrop-blur-sm ${
+                    isActive ? 'smart-bg-primary/10 smart-text-primary' : ''
                   }`}
                   key={index}
                   href={item.url}
                   onClick={(e) => handleSmoothAnchorClick(e, item.url)}
                   aria-current={isActive ? 'page' : undefined}
+                  style={{
+                    color: config.textColor || 'var(--text-primary)',
+                    backgroundColor: isActive ? `${config.primaryColor || 'var(--primary-color)'}20` : undefined
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.target.style.backgroundColor = `${config.primaryColor || 'var(--primary-color)'}10`;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.target.style.backgroundColor = 'transparent';
+                    }
+                  }}
                 >
                   {item.label}
                 </Link>
@@ -182,8 +204,17 @@ const Header = () => {
             <div className="lg:hidden">
               <button 
                 onClick={toggleMobileMenu} 
-                className="z-50 p-3 rounded-lg cursor-pointer transition-all duration-300 backdrop-blur-sm text-black hover:bg-black/5 hover:text-gray-600" 
+                className="z-50 p-3 rounded-lg cursor-pointer transition-all duration-300 backdrop-blur-sm smart-text-primary" 
                 aria-label="Toggle mobile menu"
+                style={{
+                  color: config.textColor || 'var(--text-primary)'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = `${config.primaryColor || 'var(--primary-color)'}10`;
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'transparent';
+                }}
               >
                 <HiBars3 className="size-8" />
               </button>
@@ -273,105 +304,130 @@ const Header = () => {
         </div>
       </div>
 
-      <div ref={mobilePanelRef} className={`fixed inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-900 transform transition-transform duration-600 ease-in-out z-50 ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`} role="dialog" aria-modal="true" aria-label="Mobile Menu">
-        {/* Racing background pattern */}
+      <div ref={mobilePanelRef} className={`fixed inset-0 transform transition-transform duration-500 ease-out ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`} style={{ zIndex: 9999 }} role="dialog" aria-modal="true" aria-label="Mobile Menu">
+        {/* Clean white background */}
+        <div className="absolute inset-0 bg-white"></div>
+        
+        {/* Subtle racing pattern overlay */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-1" style={{ background: `linear-gradient(to right, transparent, ${config.primaryColor || '#3b82f6'}, transparent)` }}></div>
-          <div className="absolute bottom-0 left-0 w-full h-1" style={{ background: `linear-gradient(to right, transparent, ${config.primaryColor || '#3b82f6'}, transparent)` }}></div>
-          <div className="absolute top-0 left-0 w-1 h-full" style={{ background: `linear-gradient(to bottom, transparent, ${config.primaryColor || '#3b82f6'}, transparent)` }}></div>
-          <div className="absolute top-0 right-0 w-1 h-full" style={{ background: `linear-gradient(to bottom, transparent, ${config.primaryColor || '#3b82f6'}, transparent)` }}></div>
+          <div className="absolute top-0 left-0 w-full h-0.5" style={{ background: `linear-gradient(to right, transparent, ${config.primaryColor || '#ef4444'}, transparent)` }}></div>
+          <div className="absolute bottom-0 left-0 w-full h-0.5" style={{ background: `linear-gradient(to right, transparent, ${config.primaryColor || '#ef4444'}, transparent)` }}></div>
+          {/* Racing corner accents */}
+          <div className="absolute top-4 left-4 w-8 h-8 border-l-2 border-t-2" style={{ borderColor: config.primaryColor || '#ef4444' }}></div>
+          <div className="absolute top-4 right-4 w-8 h-8 border-r-2 border-t-2" style={{ borderColor: config.primaryColor || '#ef4444' }}></div>
+          <div className="absolute bottom-4 left-4 w-8 h-8 border-l-2 border-b-2" style={{ borderColor: config.primaryColor || '#ef4444' }}></div>
+          <div className="absolute bottom-4 right-4 w-8 h-8 border-r-2 border-b-2" style={{ borderColor: config.primaryColor || '#ef4444' }}></div>
         </div>
         
-        <div className="flex flex-col h-full relative z-10" onClick={(e) => { if (e.target === e.currentTarget) closeMobileMenu(); }}>
-          {/* Header with logo and close */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
-            <div className="flex items-center gap-3">
-              <Image 
-                src={config.logoImage} 
-                alt="Logo" 
-                width={120} 
-                height={40} 
-                className="w-auto h-10 object-contain" 
-              />
+        <div className="flex flex-col h-screen w-full relative z-20" onClick={(e) => { if (e.target === e.currentTarget) closeMobileMenu(); }}>
+          {/* Black header with logo and close */}
+          <div className="flex items-center justify-between px-6 py-6 bg-black border-b border-gray-200">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                {config.logoImage && config.logoImage.trim() !== '' ? (
+                  <Image 
+                    src={config.logoImage} 
+                    alt="Logo" 
+                    width={120} 
+                    height={40} 
+                    className="w-auto h-12 object-contain drop-shadow-lg" 
+                  />
+                ) : (
+                  <div className="w-auto h-12 flex items-center justify-center bg-gray-200 rounded-lg px-3">
+                    <span className="text-gray-600 font-bold text-xs">LOGO</span>
+                  </div>
+                )}
+                <div className="absolute -inset-1 rounded-lg opacity-20" style={{ background: `linear-gradient(45deg, ${config.primaryColor || '#ef4444'}, transparent)` }}></div>
+              </div>
               <div>
-                <h2 className="text-lg font-bold text-white">{config.siteTitle}</h2>
-                <p className="text-xs text-gray-400 uppercase tracking-wide">{config.tagline || 'Racing Event'}</p>
+                <h2 className="text-xl font-bold text-white drop-shadow-lg">{config.siteTitle}</h2>
+                <p className="text-sm text-gray-300 uppercase tracking-wider font-medium" style={{ color: config.primaryColor || '#ef4444' }}>{config.tagline || 'Racing Event'}</p>
               </div>
             </div>
-            <button onClick={closeMobileMenu} className="p-2 rounded-lg transition-all duration-300 hover:bg-white/10 text-white hover:scale-110" aria-label="Close mobile menu">
-              <HiXMark className="size-6" />
+            <button 
+              onClick={closeMobileMenu} 
+              className="relative p-3 rounded-xl transition-all duration-300 hover:bg-white/10 text-white hover:scale-110 group border border-white/20 hover:border-white/40" 
+              aria-label="Close mobile menu"
+            >
+              <HiXMark className="size-6 relative z-10" />
+              <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ background: `linear-gradient(45deg, ${config.primaryColor || '#ef4444'}20, transparent)` }}></div>
             </button>
           </div>
 
-          {/* Event countdown section */}
-          {config.hero?.eventDate && (() => {
-            const eventDate = new Date(config.hero.eventDate);
-            const now = new Date();
-            const timeDiff = eventDate.getTime() - now.getTime();
-            const days = Math.max(0, Math.floor(timeDiff / (1000 * 60 * 60 * 24)));
-            const hours = Math.max(0, Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
-            const minutes = Math.max(0, Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60)));
-            const seconds = Math.max(0, Math.floor((timeDiff % (1000 * 60)) / 1000));
-            
-            return (
-              <div className="px-6 py-4 border-b border-white/10">
-                <div className="text-center">
-                  <h3 className="text-white text-sm font-bold mb-2 uppercase tracking-wide">{config.hero.eventName || 'Next Event'}</h3>
-                  <div className="grid grid-cols-4 gap-2">
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
-                      <div className="text-white text-lg font-bold">{String(days).padStart(2, '0')}</div>
-                      <div className="text-gray-400 text-xs uppercase">Days</div>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
-                      <div className="text-white text-lg font-bold">{String(hours).padStart(2, '0')}</div>
-                      <div className="text-gray-400 text-xs uppercase">Hours</div>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
-                      <div className="text-white text-lg font-bold">{String(minutes).padStart(2, '0')}</div>
-                      <div className="text-gray-400 text-xs uppercase">Minutes</div>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-2 border border-white/20">
-                      <div className="text-white text-lg font-bold">{String(seconds).padStart(2, '0')}</div>
-                      <div className="text-gray-400 text-xs uppercase">Seconds</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
 
-          {/* Navigation menu */}
-          <nav className="flex-1 px-6 py-4 overflow-y-auto">
-            <ul className="space-y-1">
-              {config.menu.map((item, index) => (
-                <li key={index}>
+          {/* White background navigation menu */}
+          <nav className="flex-1 px-6 py-8 overflow-y-auto min-h-0 bg-white">
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-1 h-8 rounded-full" style={{ background: `linear-gradient(to bottom, ${config.primaryColor || '#ef4444'}, ${config.primaryColor ? `${config.primaryColor}80` : '#ef444480'})` }}></div>
+                <h3 className="text-gray-900 text-2xl font-bold uppercase tracking-wider">Navigation</h3>
+              </div>
+            </div>
+            <ul className="space-y-4">
+              {(() => {
+                const menuItems = config.menu && config.menu.length > 0 ? config.menu : [
+                  { label: 'Home', url: '/' },
+                  { label: 'Events', url: '/events' },
+                  { label: 'Event Info', url: '/event-info' },
+                  { label: 'News', url: '/#news' },
+                  { label: 'Documents', url: '/#documents' }
+                ];
+                console.log('Mobile menu rendering items:', menuItems);
+                return menuItems.map((item, index) => (
+                <li key={index} className="opacity-0 animate-[fadeInUp_0.6s_ease-out_forwards]" style={{ animationDelay: `${index * 100}ms` }}>
                   <Link 
                     href={item.url} 
                     onClick={(e) => { handleSmoothAnchorClick(e, item.url); closeMobileMenu(); }} 
-                    className="block py-4 px-4 rounded-xl uppercase font-bold text-sm transition-all duration-300 relative overflow-hidden group border border-white/10 hover:border-white/30"
+                    className="group relative block py-5 px-6 rounded-2xl uppercase font-bold text-lg transition-all duration-500 overflow-hidden backdrop-blur-sm border hover:scale-105 hover:-translate-y-1"
+                    style={{
+                      background: `linear-gradient(135deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.02) 100%)`,
+                      borderColor: `${config.primaryColor || '#ef4444'}40`,
+                      boxShadow: `0 4px 16px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8)`
+                    }}
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="relative z-10 text-white font-bold group-hover:text-black transition-colors duration-300">{item.label}</span>
-                      <div className="w-2 h-2 rounded-full opacity-50 group-hover:opacity-100 transition-opacity duration-300" style={{ backgroundColor: config.primaryColor || '#3b82f6' }}></div>
+                    {/* Animated background */}
+                    <div 
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-2xl"
+                      style={{ background: `linear-gradient(135deg, ${config.primaryColor || '#ef4444'}20 0%, ${config.primaryColor || '#ef4444'}10 100%)` }}
+                    ></div>
+                    
+                    {/* Racing corner indicators */}
+                    <div className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ borderColor: config.primaryColor || '#ef4444' }}></div>
+                    <div className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ borderColor: config.primaryColor || '#ef4444' }}></div>
+                    <div className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ borderColor: `${config.primaryColor || '#ef4444'}80` }}></div>
+                    <div className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ borderColor: `${config.primaryColor || '#ef4444'}80` }}></div>
+                    
+                    <div className="flex items-center justify-between relative z-10">
+                      <span className="text-gray-900 font-bold tracking-wider group-hover:text-gray-900 transition-all duration-300">{item.label}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full transition-all duration-300 group-hover:scale-125" style={{ backgroundColor: config.primaryColor || '#ef4444' }}></div>
+                        <HiChevronRight className="w-5 h-5 text-gray-600 group-hover:text-gray-900 group-hover:translate-x-1 transition-all duration-300" />
+                      </div>
                     </div>
-                    <div className="absolute inset-0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-400 origin-left bg-white rounded-xl" />
+                    
+                    {/* Shine effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-2xl"></div>
                   </Link>
                 </li>
-              ))}
+                ));
+              })()}
             </ul>
           </nav>
           
-          {/* Footer section */}
-          <div className="px-6 py-4 border-t border-white/10">
-            <div className="text-center">
-              <p className="text-gray-400 text-xs mb-2">
+          {/* Clean footer section */}
+          <div className="px-6 py-6 border-t border-gray-200 bg-white">
+            <div className="text-center space-y-4">
+              <div className="flex items-center justify-center gap-3">
+                <div className="w-8 h-0.5 rounded-full" style={{ background: `linear-gradient(to right, transparent, ${config.primaryColor || '#ef4444'})` }}></div>
+                <div className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: config.primaryColor || '#ef4444' }}></div>
+                <div className="w-8 h-0.5 rounded-full" style={{ background: `linear-gradient(to left, transparent, ${config.primaryColor || '#ef4444'})` }}></div>
+              </div>
+              <p className="text-gray-700 text-sm font-medium">
                 © {new Date().getFullYear()} {config.siteTitle}
               </p>
-              <div className="flex justify-center gap-2">
-                <div className="w-1 h-1 rounded-full" style={{ backgroundColor: config.primaryColor || '#3b82f6' }}></div>
-                <div className="w-1 h-1 rounded-full bg-gray-600"></div>
-                <div className="w-1 h-1 rounded-full" style={{ backgroundColor: config.primaryColor || '#3b82f6' }}></div>
-              </div>
+              <p className="text-gray-500 text-xs uppercase tracking-wider">
+                Motorsport Excellence
+              </p>
             </div>
           </div>
         </div>

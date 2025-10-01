@@ -5,13 +5,13 @@
   },
   "options": {},
   "attributes": {
-    "name": {
-      "type": "string"
-    },
     "url": {
       "type": "string"
     },
     "logo": {
+      "type": "string"
+    },
+    "label": {
       "type": "string"
     }
   },

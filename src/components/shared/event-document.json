@@ -1,7 +1,7 @@
 {
-  "collectionName": "components_shared_event_documents",
+  "collectionName": "components_shared_event_document_s",
   "info": {
-    "displayName": "Event Document"
+    "displayName": "EventDocument "
   },
   "options": {},
   "attributes": {

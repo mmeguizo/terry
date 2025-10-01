@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 export const dynamic = "force-dynamic";
@@ -89,12 +90,12 @@ export default async function EventPage({ params }) {
             </p>
             <h1 className="mt-2 text-3xl md:text-5xl font-extrabold text-white">{event.title || "Event"}</h1>
             <div className="mt-5 flex flex-wrap justify-center gap-3">
-              <a
+              <Link
                 href="/event-info"
                 className="inline-block bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-md"
               >
                 Event Info
-              </a>
+              </Link>
               {Array.isArray(event.buttons) &&
                 event.buttons.map((b) => (
                   <a
@@ -176,12 +177,12 @@ export default async function EventPage({ params }) {
             <div className="rounded-md border border-neutral-200 bg-white p-4">
               <h3 className="font-semibold">Event Actions</h3>
               <div className="mt-3 flex flex-col gap-2">
-                <a
+                <Link
                   href="/event-info"
                   className="text-center rounded-md bg-red-600 hover:bg-red-700 text-white px-4 py-2"
                 >
                   Event Info
-                </a>
+                </Link>
                 {(event.buttons || []).map((b) => (
                   <a
                     key={b.id}

@@ -127,19 +127,30 @@ const LatestNews = () => {
               style={{ animationDelay: `${index * 150}ms` }}
             >
               {(() => {
-                const slug = typeof newsItem.slug === 'string' && newsItem.slug.trim().length > 0
-                  ? newsItem.slug.trim()
-                  : (typeof newsItem.url === 'string' && newsItem.url.startsWith('/news/')
-                      ? newsItem.url.replace(/^\/news\//, '').replace(/\/+$/, '')
-                      : '');
-                const internalHref = slug ? `/news/${slug}` : '/news';
+                // Create a safe slug from the news item
+                let slug = '';
+                if (typeof newsItem.slug === 'string' && newsItem.slug.trim().length > 0) {
+                  slug = newsItem.slug.trim();
+                } else if (typeof newsItem.url === 'string' && newsItem.url.startsWith('/news/')) {
+                  slug = newsItem.url.replace(/^\/news\//, '').replace(/\/+$/, '');
+                } else if (typeof newsItem.title === 'string') {
+                  // Generate slug from title as fallback
+                  slug = newsItem.title.toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .trim();
+                }
+                
+                const internalHref = slug ? `/news/${slug}` : '#';
+                
                 return (
               <NewsCard
                 href={internalHref}
                 image={newsItem.image}
                 title={newsItem.title}
                 date={newsItem.date}
-                category={newsItem.category}
+                category={newsItem.category || "News"}
                 sectionBg={config.menuBackground}
               />
                 );
