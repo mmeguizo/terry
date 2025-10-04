@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_shared_hero_button_s",
+  "info": {
+    "displayName": "HeroButton "
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

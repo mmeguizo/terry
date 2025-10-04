@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_websites",
+  "info": {
+    "displayName": "Website"
+  },
+  "options": {},
+  "attributes": {
+    "url": {
+      "type": "string"
+    },
+    "logo": {
+      "type": "string"
+    },
+    "label": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

@@ -1,0 +1,40 @@
+Folder PATH listing
+Volume serial number is B8F6-FA0C
+C:.
+-   tree.txt
+-   
+----app
+-   -   favicon.ico
+-   -   globals.css
+-   -   layout.js
+-   -   page.js
+-   -   
+-   ----api
+-       ----config
+-       -       route.js
+-       -       
+-       ----news
+-               route.js
+-               
+----components
+-   ----layout
+-   -       Footer.js
+-   -       Header.js
+-   -       
+-   ----sections
+-   -       EventDocuments.js
+-   -       Hero.js
+-   -       LatestNews.js
+-   -       Sponsors.js
+-   -       
+-   ----ui
+-           Cards.js
+-           Links.js
+-           
+----config
+-       site-config.json
+-       
+----context
+        ConfigContext.js
+        ConfigProvider.js
+        

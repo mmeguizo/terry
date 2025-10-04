@@ -1,0 +1,216 @@
+{
+  "siteConfigurations": {
+    "mra": {
+      "siteName": "Motor Racing Australia",
+      "domain": "motorrace.com.au",
+      "port": 3002,
+      "slug": "mra",
+      "colors": {
+        "primary": "#CC0000",
+        "secondary": "#404040", 
+        "accent": "#C0C0C0",
+        "background": "#FFFFFF",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.motorrace.com.au"
+    },
+    "supertt": {
+      "siteName": "SuperTT",
+      "domain": "supertt.com.au", 
+      "port": 3003,
+      "slug": "supertt",
+      "colors": {
+        "primary": "#EA9216",
+        "secondary": "#3A4750",
+        "accent": "#313841",
+        "background": "#EEEEEE",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.supertt.com.au"
+    },
+    "clubman": {
+      "siteName": "Clubman Championship",
+      "domain": "clubmanchampionship.com",
+      "port": 3004, 
+      "slug": "clubman",
+      "colors": {
+        "primary": "#30232D",
+        "secondary": "#D55053",
+        "accent": "#F1C095",
+        "background": "#FAE9D7",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.clubmanchampionship.com.au"
+    },
+    "extremett": {
+      "siteName": "ExtremeTT",
+      "domain": "extremett.com.au",
+      "port": 3006,
+      "slug": "extremett", 
+      "colors": {
+        "primary": "#9DBDB8",
+        "secondary": "#F0E7D6",
+        "accent": "#EA2E00",
+        "highlight": "#E6512C",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.extremett.com.au"
+    },
+    "classicsportscars": {
+      "siteName": "Classic Sports Cars",
+      "domain": "classicsportscars.com.au",
+      "port": 3010,
+      "slug": "classicsportscars",
+      "colors": {
+        "primary": "#E66C32",
+        "secondary": "#0E3F18", 
+        "accent": "#385A42",
+        "background": "#EEEEEE",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.classicsportscars.com.au"
+    },
+    "amrc": {
+      "siteName": "Australian Motor Racing Club",
+      "domain": "amrc.com.au",
+      "port": 3011,
+      "slug": "amrc",
+      "colors": {
+        "primary": "#E63946",
+        "secondary": "#F1FAEE",
+        "accent": "#A8DADC", 
+        "highlight": "#457B9D",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.amrc.com.au"
+    },
+    "raceready": {
+      "siteName": "RaceReady",
+      "domain": "raceready.com.au",
+      "port": 3001,
+      "slug": "raceready",
+      "colors": {
+        "primary": "#3B82F6",
+        "secondary": "#1F2937",
+        "accent": "#F59E0B",
+        "background": "#FFFFFF",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.raceready.com.au"
+    },
+    "mx5cup": {
+      "siteName": "MX5 Cup",
+      "domain": "mx5cup.au", 
+      "port": 3005,
+      "slug": "mx5cup",
+      "colors": {
+        "primary": "#DC2626",
+        "secondary": "#1F2937",
+        "accent": "#F59E0B",
+        "background": "#FFFFFF", 
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.mx5cup.au"
+    },
+    "raceofficial": {
+      "siteName": "Race Official",
+      "domain": "raceofficial.com.au",
+      "port": 3007,
+      "slug": "raceofficial", 
+      "colors": {
+        "primary": "#059669",
+        "secondary": "#1F2937",
+        "accent": "#F59E0B",
+        "background": "#FFFFFF",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.raceofficial.com.au"
+    },
+    "sydney300": {
+      "siteName": "Sydney 300",
+      "domain": "sydney300.com.au",
+      "port": 3008,
+      "slug": "sydney300",
+      "colors": {
+        "primary": "#7C3AED",
+        "secondary": "#1F2937", 
+        "accent": "#F59E0B",
+        "background": "#FFFFFF",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.sydney300.com.au"
+    },
+    "wakefield300": {
+      "siteName": "Wakefield 300",
+      "domain": "wakefield300.com.au",
+      "port": 3009,
+      "slug": "wakefield300",
+      "colors": {
+        "primary": "#EF4444",
+        "secondary": "#1F2937",
+        "accent": "#F59E0B", 
+        "background": "#FFFFFF",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.wakefield300.com.au"
+    },
+    "aprabathurst": {
+      "siteName": "APRA Bathurst Challenge",
+      "domain": "aprabathurstchallenge.com",
+      "port": 3012,
+      "slug": "aprabathurst",
+      "colors": {
+        "primary": "#0891B2",
+        "secondary": "#1F2937",
+        "accent": "#F59E0B",
+        "background": "#FFFFFF",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.aprabathurstchallenge.com"
+    },
+    "iprabathurst": {
+      "siteName": "IPRA Bathurst Challenge", 
+      "domain": "iprabathurstchallenge.com",
+      "port": 3013,
+      "slug": "iprabathurst",
+      "colors": {
+        "primary": "#DB2777",
+        "secondary": "#1F2937",
+        "accent": "#F59E0B",
+        "background": "#FFFFFF",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.iprabathurstchallenge.com"
+    },
+    "tc2": {
+      "siteName": "TC2 Racing",
+      "domain": "tc2.au",
+      "port": 3014,
+      "slug": "tc2",
+      "colors": {
+        "primary": "#059669",
+        "secondary": "#1F2937",
+        "accent": "#F59E0B",
+        "background": "#FFFFFF", 
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.tc2.au"
+    },
+    "mx5nationals": {
+      "siteName": "MX5 Nationals",
+      "domain": "mx5nationals.com.au",
+      "port": 3015,
+      "slug": "mx5nationals",
+      "colors": {
+        "primary": "#DC2626",
+        "secondary": "#1F2937",
+        "accent": "#F59E0B",
+        "background": "#FFFFFF",
+        "text": "#000000"
+      },
+      "cdnDomain": "cdn.mx5nationals.com.au"
+    }
+  }
+}
+
+

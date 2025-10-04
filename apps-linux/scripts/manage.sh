@@ -35,6 +35,23 @@ pm2_id_of() {
 
 start_pm2_app() {
   local name="$1" dir="$2" port="$3"
+
+  # Install dependencies if package.json exists
+  if [ -f "$dir/package.json" ]; then
+    echo "  → Installing dependencies for $name..."
+    if [ -f "$dir/package-lock.json" ]; then
+      npm --prefix "$dir" ci
+    else
+      npm --prefix "$dir" install
+    fi
+
+    # Build if not already built or if .next doesn't exist
+    if [ ! -d "$dir/.next" ]; then
+      echo "  → Building $name..."
+      npm --prefix "$dir" run build || true
+    fi
+  fi
+
   if exists_pm2_app "$name"; then
     PORT="$port" SITE_PORT="$port" pm2 restart "$name" --update-env
   else

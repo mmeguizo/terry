@@ -1,0 +1,266 @@
+{
+  "sites": [
+    {
+      "siteTitle": "RaceReady",
+      "slug": "raceready",
+      "domain": "raceready.com.au",
+      "primaryColor": "#000000",
+      "menuBackground": "#FFFFFF",
+      "textColor": "#000000",
+      "logoImage": "https://cdn.syzmic.com.au/sites/raceready/logos/RaceReady-3.svg",
+      "eventId": null,
+      "menu": [
+        { "label": "Home", "url": "/" },
+        { "label": "Events", "url": "/events" },
+        { "label": "Event Info", "url": "/event-info" },
+        { "label": "News", "url": "/#news" },
+        { "label": "Documents", "url": "/#documents" }
+      ],
+      "hero": [{
+        "background": "https://cdn.syzmic.com.au/sites/raceready/hero/raceready-hero.jpg",
+        "eventDate": "2024-12-15",
+        "eventInfo": "Platform Launch Event",
+        "eventName": "RACEREADY SUMMIT",
+        "eventLocation": "SYDNEY MOTORSPORT PARK"
+      }],
+      "sponsors": [
+        {
+          "name": "RaceReady",
+          "logo": "https://cdn.syzmic.com.au/sites/raceready/logos/RaceReady-3.svg",
+          "url": "https://raceready.com.au"
+        },
+        {
+          "name": "Motorsport Australia",
+          "logo": "https://cdn.syzmic.com.au/common/sponsors/motorsport-australia.png",
+          "url": "https://motorsport.org.au"
+        }
+      ]
+    },
+    {
+      "siteTitle": "MRA - Motor Racing Australia",
+      "slug": "mra",
+      "domain": "motorace.com.au",
+      "primaryColor": "#CC0000",
+      "menuBackground": "#404040",
+      "textColor": "#CCCCCC",
+      "logoImage": "https://cdn.syzmic.com.au/sites/mra/logos/MRA-Logo.svg",
+      "eventId": null,
+      "menu": [
+        { "label": "Home", "url": "/" },
+        { "label": "Events", "url": "/events" },
+        { "label": "Event Info", "url": "/event-info" },
+        { "label": "News", "url": "/#news" },
+        { "label": "Documents", "url": "/#documents" }
+      ],
+      "hero": [{
+        "background": "https://cdn.syzmic.com.au/sites/mra/hero/mra-hero.jpg",
+        "eventDate": "2024-11-16",
+        "eventInfo": "Championship Round 8",
+        "eventName": "MRA FINALE",
+        "eventLocation": "BATHURST MOTOR RACING CIRCUIT"
+      }],
+      "sponsors": [
+        {
+          "name": "MRA",
+          "logo": "https://cdn.syzmic.com.au/sites/mra/logos/MRA-Logo.svg",
+          "url": "https://motorace.com.au"
+        },
+        {
+          "name": "Sydney Motorsport Park",
+          "logo": "https://cdn.syzmic.com.au/common/sponsors/smp-logo.png",
+          "url": "https://sydneymotorsportpark.com.au"
+        }
+      ]
+    },
+    {
+      "siteTitle": "SuperTT",
+      "slug": "supertt",
+      "domain": "supertt.com.au",
+      "primaryColor": "#EA9216",
+      "menuBackground": "#3A4750",
+      "textColor": "#313841",
+      "logoImage": "https://cdn.syzmic.com.au/sites/supertt/logos/SuperTT.png",
+      "eventId": "EEEEEE",
+      "menu": [
+        { "label": "Home", "url": "/" },
+        { "label": "Events", "url": "/events" },
+        { "label": "Event Info", "url": "/event-info" },
+        { "label": "News", "url": "/#news" },
+        { "label": "Documents", "url": "/#documents" }
+      ],
+      "hero": [{
+        "background": "https://cdn.syzmic.com.au/sites/supertt/hero/supertt-hero.jpg",
+        "eventDate": "2024-11-10",
+        "eventInfo": "Championship Finale",
+        "eventName": "SUPERTT SHOWDOWN",
+        "eventLocation": "MOUNT PANORAMA"
+      }],
+      "sponsors": [
+        {
+          "name": "SuperTT",
+          "logo": "https://cdn.syzmic.com.au/sites/supertt/logos/SuperTT.png",
+          "url": "https://supertt.com.au"
+        }
+      ]
+    },
+    {
+      "siteTitle": "Clubman Championship",
+      "slug": "clubman",
+      "domain": "clubmanchampionship.com.au",
+      "primaryColor": "#30232D",
+      "menuBackground": "#D55053",
+      "textColor": "#F1C095",
+      "logoImage": "https://cdn.syzmic.com.au/sites/clubman/logos/Clubman-Championship.svg",
+      "eventId": "FAE907",
+      "menu": [
+        { "label": "Home", "url": "/" },
+        { "label": "Events", "url": "/events" },
+        { "label": "Event Info", "url": "/event-info" },
+        { "label": "News", "url": "/#news" },
+        { "label": "Documents", "url": "/#documents" }
+      ],
+      "hero": [{
+        "background": "https://cdn.syzmic.com.au/sites/clubman/hero/clubman-hero.jpg",
+        "eventDate": "2024-11-03",
+        "eventInfo": "25th Anniversary Round",
+        "eventName": "CLUBMAN CELEBRATION",
+        "eventLocation": "WAKEFIELD PARK"
+      }],
+      "sponsors": [
+        {
+          "name": "Clubman Championship",
+          "logo": "https://cdn.syzmic.com.au/sites/clubman/logos/Clubman-Championship.svg",
+          "url": "https://clubmanchampionship.com.au"
+        }
+      ]
+    },
+    {
+      "siteTitle": "MX5 Cup",
+      "slug": "mx5cup",
+      "domain": "mx5cup.au",
+      "primaryColor": "#000000",
+      "menuBackground": "#FFFFFF",
+      "textColor": "#000000",
+      "logoImage": "https://cdn.syzmic.com.au/sites/mx5cup/logos/mx5cup-logo.svg",
+      "eventId": null,
+      "menu": [
+        { "label": "Home", "url": "/" },
+        { "label": "Events", "url": "/events" },
+        { "label": "Event Info", "url": "/event-info" },
+        { "label": "News", "url": "/#news" },
+        { "label": "Documents", "url": "/#documents" }
+      ],
+      "hero": [{
+        "background": "https://cdn.syzmic.com.au/sites/mx5cup/hero/mx5cup-hero.jpg",
+        "eventDate": "2024-10-27",
+        "eventInfo": "Season Finale",
+        "eventName": "MX5 CUP FINALE",
+        "eventLocation": "PHILLIP ISLAND"
+      }],
+      "sponsors": [
+        {
+          "name": "Mazda Australia",
+          "logo": "https://cdn.syzmic.com.au/common/sponsors/mazda-logo.png",
+          "url": "https://mazda.com.au"
+        }
+      ]
+    }
+  ],
+  "newsItems": [
+    {
+      "title": "RaceReady Platform Launches New Event Management Features",
+      "slug": "raceready-new-features-2024",
+      "date": "2024-09-25",
+      "image": "https://cdn.syzmic.com.au/sites/raceready/news/raceready-features.jpg",
+      "url": "/news/raceready-new-features-2024",
+      "sites": ["raceready"],
+      "content": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "RaceReady is excited to announce the launch of our enhanced event management platform, designed specifically for motorsport organizers across Australia. The new features include real-time entry management, automated timing integration, and comprehensive competitor communication tools."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "MRA Championship Round 8 Results - Thrilling Finish at Sydney Motorsport Park",
+      "slug": "mra-round-8-results-smp",
+      "date": "2024-09-28",
+      "image": "https://cdn.syzmic.com.au/sites/mra/news/round8-results.jpg",
+      "url": "/news/mra-round-8-results-smp",
+      "sites": ["mra"],
+      "content": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "The eighth round of the MRA Championship delivered spectacular racing at Sydney Motorsport Park, with close battles across all categories. The SuperTT category saw an incredible three-way battle for the lead, while the Clubman Championship provided non-stop action throughout the field."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "SuperTT Championship Heads to Bathurst for Epic Season Finale",
+      "slug": "supertt-bathurst-finale-2024",
+      "date": "2024-09-30",
+      "image": "https://cdn.syzmic.com.au/sites/supertt/news/bathurst-finale.jpg",
+      "url": "/news/supertt-bathurst-finale-2024",
+      "sites": ["supertt"],
+      "content": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "The 2024 SuperTT Championship will conclude with a spectacular finale at Mount Panorama, Bathurst, promising an unforgettable weekend of touring car racing. With only 15 points separating the top three drivers, this weekend's races will determine the 2024 champion."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Clubman Championship Celebrates 25 Years of Grassroots Racing",
+      "slug": "clubman-25-years-celebration",
+      "date": "2024-09-28",
+      "image": "https://cdn.syzmic.com.au/sites/clubman/news/25-years.jpg",
+      "url": "/news/clubman-25-years-celebration",
+      "sites": ["clubman"],
+      "content": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "The Clubman Championship marks its 25th anniversary this year, celebrating a quarter-century of providing affordable, competitive motorsport for enthusiasts across Australia. From humble beginnings with just 12 competitors, the championship now regularly attracts over 40 entries per round."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "MX5 Cup 2024 Season Wrap-Up - Incredible Racing Throughout",
+      "slug": "mx5cup-2024-season-wrap",
+      "date": "2024-09-29",
+      "image": "https://cdn.syzmic.com.au/sites/mx5cup/news/season-wrap.jpg",
+      "url": "/news/mx5cup-2024-season-wrap",
+      "sites": ["mx5cup"],
+      "content": [
+        {
+          "type": "paragraph",
+          "children": [
+            {
+              "type": "text",
+              "text": "The 2024 MX5 Cup season has concluded with some of the closest racing ever seen in the category, with multiple race winners and championship battles going down to the wire."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

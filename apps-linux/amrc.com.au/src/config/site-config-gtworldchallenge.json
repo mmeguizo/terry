@@ -1,0 +1,70 @@
+{
+  "siteTitle": "GT World Challenge",
+  "primaryColor": "#181a1beb",
+  "menuBackground": "#FFFFFF",
+  "textColor": "#000000",
+  "logoImage": "https://www.gt-world-challenge.com/assets/img/gt-world-challenge-aws-neg-logo-2025.svg",
+  "menu": [
+    { "label": "Home", "url": "#home" },
+    { "label": "Documents", "url": "#documents" },
+    { "label": "News", "url": "#news" },
+    { "label": "Sponsors", "url": "#sponsors" }
+  ],
+  "actions": [
+    { "label": "Enter Now", "url": "/entry-form/?id=5678" },
+    { "label": "Schedule", "url": "/event-schedule/?id=5678" }
+  ],
+  "currentEventId": 1389,
+  "hero": {
+    "background": "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=crop&w=1200&q=80",
+    "eventDate": "2025-09-10T10:00:00+10:00",
+    "eventInfo": "/event-info/?id=5678",
+    "eventName": "GT World Challenge",
+    "eventLocation": "GT Circuit",
+    "buttons": [
+      { "label": "Spectator Info", "url": "/spectator-info/?id=5678" },
+      { "label": "Enter now!", "url": "/entry-form/?id=5678" },
+      { "label": "Schedule", "url": "/event-schedule/?id=5678" }
+    ]
+  },
+  "eventDocuments": [
+    { "label": "Supplementary Regulations", "url": "/docs/gt-supp-regs.pdf" },
+    { "label": "Garage Allocations", "url": "/docs/gt-garageallocations.pdf" }
+  ],
+  "newsItems": [
+    {
+      "title": "GT World Challenge Returns!",
+      "date": "2025-08-01",
+      "image": "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=800&q=80",
+      "url": "/news/gt-challenge-returns"
+    },
+    {
+      "title": "New Cars Announced",
+      "date": "2025-08-05",
+      "image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+      "url": "/news/new-cars-announced"
+    }
+  ],
+  "sponsors": [
+    {
+      "name": "Pirelli",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/2/2e/Pirelli_logo.svg",
+      "url": "#"
+    },
+    {
+      "name": "AWS",
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg",
+      "url": "#"
+    }
+  ],
+  "footer": {
+    "backgroundColor": "#181a1beb",
+    "textColor": "#FFFFFF"
+  },
+  "socials": [
+    { "platform": "Facebook", "url": "https://facebook.com/gtworldchallenge" },
+    { "platform": "Instagram", "url": "https://instagram.com/gtworldchallenge" },
+    { "platform": "Twitter", "url": "https://twitter.com/gtworldchlg" },
+    { "platform": "Youtube", "url": "https://youtube.com/gtworldchallenge" }
+  ]
+}

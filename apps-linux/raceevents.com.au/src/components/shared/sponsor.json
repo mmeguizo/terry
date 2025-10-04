@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_shared_sponsors",
+  "info": {
+    "displayName": "Sponsor"
+  },
+  "options": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "logo": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

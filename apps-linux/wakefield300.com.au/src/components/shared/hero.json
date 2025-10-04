@@ -1,0 +1,25 @@
+{
+  "collectionName": "components_shared_heroes",
+  "info": {
+    "displayName": "Hero"
+  },
+  "options": {},
+  "attributes": {
+    "background": {
+      "type": "string"
+    },
+    "eventDate": {
+      "type": "date"
+    },
+    "eventInfo": {
+      "type": "string"
+    },
+    "eventName": {
+      "type": "string"
+    },
+    "eventLocation": {
+      "type": "string"
+    }
+  },
+  "config": {}
+}

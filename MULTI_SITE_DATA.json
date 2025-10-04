@@ -1,0 +1,203 @@
+{
+  "sites": [
+    {
+      "id": 3000,
+      "siteTitle": "RaceReady - Studio",
+      "slug": "studio-raceready",
+      "domain": "studio.raceready.com.au",
+      "primaryColor": "#000000",
+      "menuBackground": "#FFFFFF",
+      "textColor": "#000000",
+      "logoImage": "https://cdn.syzmic.com.au/sites/raceready/logos/RaceReady-3.svg",
+      "eventId": null,
+      "note": "I don't think this needs to be setup in Strapi"
+    },
+    {
+      "id": 3001,
+      "siteTitle": "RaceReady",
+      "slug": "raceready",
+      "domain": "raceready.com.au",
+      "primaryColor": "#000000",
+      "menuBackground": "#FFFFFF", 
+      "textColor": "#000000",
+      "logoImage": "https://cdn.syzmic.com.au/sites/raceready/logos/RaceReady-3.svg",
+      "eventId": null
+    },
+    {
+      "id": 3002,
+      "siteTitle": "MRA - Motor Racing Australia",
+      "slug": "mra",
+      "domain": "motorace.com.au",
+      "primaryColor": "#CC0000",
+      "menuBackground": "#404040",
+      "textColor": "#CCCCCC",
+      "logoImage": "https://cdn.syzmic.com.au/sites/mra/logos/MRA-Logo.svg",
+      "eventId": null,
+      "relatedSlugs": ["mra", "supertt", "clubman", "mx5cup", "extremett", "sydney300", "wakefield300", "classicsportscars"]
+    },
+    {
+      "id": 3003,
+      "siteTitle": "SuperTT",
+      "slug": "supertt",
+      "domain": "supertt.com.au",
+      "primaryColor": "#EA9216",
+      "menuBackground": "#3A4750",
+      "textColor": "#313841",
+      "logoImage": "https://cdn.syzmic.com.au/sites/supertt/logos/SuperTT.png",
+      "eventId": "EEEEEE"
+    },
+    {
+      "id": 3004,
+      "siteTitle": "Clubman Championship",
+      "slug": "clubman",
+      "domain": "clubmanchampionship.com.au",
+      "primaryColor": "#30232D",
+      "menuBackground": "#D55053",
+      "textColor": "#F1C095",
+      "logoImage": "https://cdn.syzmic.com.au/sites/clubman/logos/Clubman-Championship.svg",
+      "eventId": "FAE907"
+    },
+    {
+      "id": 3005,
+      "siteTitle": "MX5 Cup",
+      "slug": "mx5cup",
+      "domain": "mx5cup.au",
+      "primaryColor": "#000000",
+      "menuBackground": "#FFFFFF",
+      "textColor": "#000000",
+      "logoImage": "https://cdn.syzmic.com.au/sites/mx5cup/logos/mx5cup-logo.svg",
+      "eventId": null
+    },
+    {
+      "id": 3006,
+      "siteTitle": "ExtremeTT",
+      "slug": "extremett",
+      "domain": "extremett.com.au",
+      "primaryColor": "#9DBDB8",
+      "menuBackground": "#F0E7D6",
+      "textColor": "#EA2E00",
+      "logoImage": "https://cdn.syzmic.com.au/sites/extremett/logos/extremett-logo.svg",
+      "eventId": "E6512C"
+    },
+    {
+      "id": 3007,
+      "siteTitle": "Race Official",
+      "slug": "raceofficial",
+      "domain": "raceofficial.com.au",
+      "primaryColor": "#000000",
+      "menuBackground": "#FFFFFF",
+      "textColor": "#000000",
+      "logoImage": "https://cdn.syzmic.com.au/sites/raceofficial/logos/raceofficial-logo.svg",
+      "eventId": null
+    },
+    {
+      "id": 3008,
+      "siteTitle": "Sydney 300",
+      "slug": "sydney300",
+      "domain": "sydney300.com.au",
+      "primaryColor": "#000000",
+      "menuBackground": "#FFFFFF",
+      "textColor": "#000000",
+      "logoImage": "https://cdn.syzmic.com.au/sites/sydney300/logos/Sydney300-Logo.png",
+      "eventId": null
+    },
+    {
+      "id": 3009,
+      "siteTitle": "Wakefield 300",
+      "slug": "wakefield300",
+      "domain": "wakefield300.com.au",
+      "primaryColor": "#000000",
+      "menuBackground": "#FFFFFF",
+      "textColor": "#000000",
+      "logoImage": "https://cdn.syzmic.com.au/sites/wakefield300/logos/wakefield300-logo.svg",
+      "eventId": null
+    },
+    {
+      "id": 3010,
+      "siteTitle": "Classic Sports Cars",
+      "slug": "classicsportscars",
+      "domain": "classicsportscars.com.au",
+      "primaryColor": "#E66C32",
+      "menuBackground": "#0E3F18",
+      "textColor": "#385A42",
+      "logoImage": "https://cdn.syzmic.com.au/sites/classicsportscars/logos/csc-logo.svg",
+      "eventId": "EEEEEE"
+    },
+    {
+      "id": 3011,
+      "siteTitle": "Australian Motor Racing Club",
+      "slug": "amrc",
+      "domain": "amrc.com.au",
+      "primaryColor": "#E63946",
+      "menuBackground": "#F1FAEE",
+      "textColor": "#A8DADC",
+      "logoImage": "https://cdn.syzmic.com.au/sites/amrc/logos/amrc-logo.svg",
+      "eventId": "457B9D"
+    },
+    {
+      "id": 3012,
+      "siteTitle": "APRA Bathurst Challenge",
+      "slug": "aprabathurst",
+      "domain": "aprabathurstchallenge.com.au",
+      "primaryColor": "#000000",
+      "menuBackground": "#FFFFFF",
+      "textColor": "#000000",
+      "logoImage": "https://cdn.syzmic.com.au/sites/aprabathurst/logos/apra-logo.svg",
+      "eventId": null
+    },
+    {
+      "id": 3013,
+      "siteTitle": "IPRA Bathurst Challenge",
+      "slug": "iprabathurst",
+      "domain": "iprabathurstchallenge.com.au",
+      "primaryColor": "#000000",
+      "menuBackground": "#FFFFFF",
+      "textColor": "#000000",
+      "logoImage": "https://cdn.syzmic.com.au/sites/iprabathurst/logos/ipra-logo.svg",
+      "eventId": null
+    },
+    {
+      "id": 3014,
+      "siteTitle": "TC2 Racing",
+      "slug": "tc2",
+      "domain": "tc2.au",
+      "primaryColor": "#000000",
+      "menuBackground": "#FFFFFF",
+      "textColor": "#000000",
+      "logoImage": "https://cdn.syzmic.com.au/sites/tc2/logos/tc2-logo.svg",
+      "eventId": null
+    },
+    {
+      "id": 3015,
+      "siteTitle": "MX5 Nationals",
+      "slug": "mx5nationals",
+      "domain": "mx5nationals.com.au",
+      "primaryColor": "#000000",
+      "menuBackground": "#FFFFFF",
+      "textColor": "#000000",
+      "logoImage": "https://cdn.syzmic.com.au/sites/mx5nationals/logos/mx5nationals-logo.svg",
+      "eventId": null
+    }
+  ],
+  "defaultMenuItems": [
+    { "label": "Home", "url": "/" },
+    { "label": "Events", "url": "/events" },
+    { "label": "Event Info", "url": "/event-info" },
+    { "label": "News", "url": "/#news" },
+    { "label": "Documents", "url": "/#documents" }
+  ],
+  "defaultHero": {
+    "background": "https://cdn.syzmic.com.au/common/assets/racing-hero-bg.jpg",
+    "eventDate": "2025-08-30T10:00:00-05:00",
+    "eventInfo": "Round 1 Championship",
+    "eventName": "ROAD AMERICA",
+    "eventLocation": "ONE RACEWAY"
+  },
+  "defaultSponsors": [
+    {
+      "name": "RaceReady",
+      "logo": "https://cdn.syzmic.com.au/sites/raceready/logos/RaceReady-3.svg",
+      "url": "https://raceready.com.au"
+    }
+  ]
+}
