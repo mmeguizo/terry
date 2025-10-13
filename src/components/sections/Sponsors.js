@@ -1,7 +1,7 @@
 "use client";
 
 import { useConfig } from "@/context/ConfigContext";
-import Image from "next/image";
+import { SponsorImage } from "@/components/ui/ProgressiveImage";
 import Link from "next/link";
 
 const Sponsors = () => {
@@ -50,9 +50,12 @@ const Sponsors = () => {
               style={{ background: `linear-gradient(90deg, ${config.primaryColor}, ${config.primaryColor}80)` }}
             ></span>
           </h1>
-          <p className="text-gray-600 text-lg xl:text-xl 2xl:text-2xl max-w-2xl xl:max-w-4xl 2xl:max-w-6xl mx-auto">
+          <p 
+            className="text-lg xl:text-xl 2xl:text-2xl max-w-2xl xl:max-w-4xl 2xl:max-w-6xl mx-auto"
+            style={{ color: config.textColor || '#1a1a1a' }}
+          >
             Proud to be supported by industry-leading partners and sponsors
-          </p>
+</p>
         </div>
         
         {/* Marquee Container */}
@@ -83,12 +86,11 @@ const Sponsors = () => {
                   
                   <div className="relative z-10 flex flex-col items-center justify-center h-24 xl:h-28 2xl:h-32 mb-4 xl:mb-5 2xl:mb-6">
                     {sponsor.logo && sponsor.logo.trim() !== '' ? (
-                      <Image
+                      <SponsorImage
                         src={sponsor.logo}
                         alt={sponsor.name}
-                        width={200}
-                        height={100}
-                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
+                        className="w-full h-full transition-transform duration-500 group-hover:scale-110"
+                        onLoadComplete={() => console.log(`✅ Sponsor logo loaded: ${sponsor.name}`)}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-100 rounded-lg border-2 border-dashed border-gray-300">

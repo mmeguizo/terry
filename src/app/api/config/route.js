@@ -1,64 +1,124 @@
 import { NextResponse } from "next/server";
+import { cacheHelpers } from "@/utils/smartCache";
+import { RacingError, RacingErrorTypes, handleApiError } from "@/utils/apiErrorHandler";
 
 export async function GET() {
   try {
     const siteSlug = process.env.SITE_SLUG;
 
     if (!siteSlug) {
-      throw new Error("SITE_SLUG environment variable is not defined");
+      const error = new RacingError(
+        RacingErrorTypes.VALIDATION_ERROR,
+        new Error("SITE_SLUG environment variable is not defined"),
+        { endpoint: '/api/config' }
+      );
+      return NextResponse.json(
+        { error: error.message, type: error.type },
+        { status: 400 }
+      );
     }
 
-    const queryUrl =
-      `${process.env.STRAPI_URL}/api/sites?filters[slug][$eq]=${siteSlug}` +
-      `&populate[footer]=*` +
-      `&populate[socials]=*` +
-      `&populate[sponsors]=*` +
-      `&populate[eventDocuments]=*` +
-      `&populate[menu]=*` +
-      `&populate[websites]=*` +
-      `&populate[hero]=*` +
-      `&populate[heroButton]=*`;
+  // Use smart caching for site configuration
+  try {
+    const result = await cacheHelpers.getSiteConfig(siteSlug, async () => {
+      const queryUrl =
+        `${process.env.STRAPI_URL}/api/sites?filters[slug][$eq]=${siteSlug}` +
+        `&populate[footer]=*` +
+        `&populate[socials]=*` +
+        `&populate[sponsors]=*` +
+        `&populate[eventDocuments]=*` +
+        `&populate[menu]=*` +
+        `&populate[websites]=*` +
+        `&populate[hero]=*` +
+        `&populate[heroButton]=*`;
 
-    // Fetch site configuration from Strapi based on slug
-    const strapiResponse = await fetch(
-      // `${process.env.STRAPI_URL}/api/sites?filters[slug][$eq]=${siteSlug}&populate=*`,
-      queryUrl,
-      {
+      const strapiResponse = await fetch(queryUrl, {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}`,
           "Content-Type": "application/json",
         },
-        cache: "no-store", // Disable caching for dynamic content
-      }
-    );
+        // Remove no-store to allow caching
+        next: { revalidate: 1800 } // 30 minutes ISR
+      });
 
-    if (!strapiResponse.ok) {
-      console.error(`Strapi API failed with status: ${strapiResponse.status}`);
-      console.error(`Request URL: ${queryUrl}`);
-      console.error(`Response: ${await strapiResponse.text()}`);
-      throw new Error(
-        `Strapi API failed with status: ${strapiResponse.status}`
+      if (!strapiResponse.ok) {
+        console.error(`Strapi API failed with status: ${strapiResponse.status}`);
+        throw new Error(`Strapi API failed with status: ${strapiResponse.status}`);
+      }
+
+      const strapiData = await strapiResponse.json();
+
+      if (!strapiData.data || strapiData.data.length === 0) {
+        throw new Error(`No site found with slug: ${siteSlug}`);
+      }
+
+      return transformStrapiData(strapiData.data[0]);
+    });
+
+    // Add cache metadata to response headers
+    const response = NextResponse.json(result.data);
+    response.headers.set('X-Cache-Status', result.fromCache ? 'HIT' : 'MISS');
+    response.headers.set('X-Cache-Age', result.age?.toString() || '0');
+    
+    if (result.stale) {
+      response.headers.set('X-Cache-Stale', 'true');
+    }
+
+    console.log(`🏁 Config API: ${result.fromCache ? 'CACHE HIT' : 'CACHE MISS'} for ${siteSlug}`);
+    return response;
+
+  } catch (error) {
+    const racingError = handleApiError(error, { 
+      endpoint: '/api/config',
+      siteSlug,
+      operation: 'getSiteConfig'
+    });
+    
+    console.warn("🚨 Strapi failed, falling back to local JSON config:", racingError.message);
+    
+    // Fallback to local configuration
+    try {
+      const configModule = await import("@/config/site-config.json");
+      const response = NextResponse.json(configModule.default);
+      response.headers.set('X-Cache-Status', 'FALLBACK');
+      response.headers.set('X-Error-Recovered', 'true');
+      response.headers.set('X-Original-Error', racingError.type);
+      return response;
+    } catch (fallbackError) {
+      const finalError = handleApiError(fallbackError, {
+        endpoint: '/api/config',
+        siteSlug,
+        operation: 'fallbackConfig',
+        originalError: racingError
+      });
+      
+      console.error("❌ Local config fallback failed:", finalError);
+      return NextResponse.json(
+        { 
+          error: finalError.message,
+          type: finalError.type,
+          suggestion: finalError.suggestion,
+          errorId: finalError.errorId
+        }, 
+        { status: 500 }
       );
     }
-
-    const strapiData = await strapiResponse.json();
-
-    // Check if we got a site with the requested slug
-    if (!strapiData.data || strapiData.data.length === 0) {
-      console.warn(`No site found with slug: ${siteSlug}. Available sites should be checked in Strapi CMS.`);
-      console.warn(`Falling back to local configuration...`);
-      throw new Error(`No site found with slug: ${siteSlug}`);
-    }
-
-    // Transform Strapi data to match your existing structure
-    const transformedConfig = transformStrapiData(strapiData.data[0]);
-    console.log("Using Strapi config with menu items:", transformedConfig.menu.length);
-    return NextResponse.json(transformedConfig);
-  } catch (error) {
-    console.warn("Falling back to local JSON config:", error);
-    const configModule = await import("@/config/site-config.json");
-    console.log("Using local config with menu items:", configModule.default.menu.length);
-    return NextResponse.json(configModule.default);
+  }
+  } catch (globalError) {
+    const racingError = handleApiError(globalError, {
+      endpoint: '/api/config',
+      operation: 'global'
+    });
+    
+    return NextResponse.json(
+      {
+        error: racingError.message,
+        type: racingError.type,
+        suggestion: racingError.suggestion,
+        errorId: racingError.errorId
+      },
+      { status: 500 }
+    );
   }
 }
 

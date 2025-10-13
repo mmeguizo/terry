@@ -51,6 +51,9 @@ const Header = () => {
       setScrolled(scrollPosition > 100);
     };
 
+    // Check initial scroll position
+    handleScroll();
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -163,15 +166,15 @@ const Header = () => {
               const isActive = item.url.startsWith('#') && activeSection && (`#${activeSection}` === item.url);
               return (
                 <Link
-                  className={`z-50 px-3 py-2 xl:px-4 xl:py-3 2xl:px-5 2xl:py-4 whitespace-nowrap uppercase font-bold relative rounded-lg transition-all duration-300 text-sm xl:text-base 2xl:text-lg smart-text-primary hover:smart-text-secondary backdrop-blur-sm ${
-                    isActive ? 'smart-bg-primary/10 smart-text-primary' : ''
+                  className={`z-50 px-3 py-2 xl:px-4 xl:py-3 2xl:px-5 2xl:py-4 whitespace-nowrap uppercase font-bold relative rounded-lg transition-all duration-300 text-sm xl:text-base 2xl:text-lg backdrop-blur-sm ${
+                    isActive ? 'smart-bg-primary/10' : ''
                   }`}
                   key={index}
                   href={item.url}
                   onClick={(e) => handleSmoothAnchorClick(e, item.url)}
                   aria-current={isActive ? 'page' : undefined}
                   style={{
-                    color: config.textColor || 'var(--text-primary)',
+                    color: config.textColor || '#1a1a1a',
                     backgroundColor: isActive ? `${config.primaryColor || 'var(--primary-color)'}20` : undefined
                   }}
                   onMouseEnter={(e) => {
@@ -367,6 +370,7 @@ const Header = () => {
               {(() => {
                 const menuItems = config.menu && config.menu.length > 0 ? config.menu : [
                   { label: 'Home', url: '/' },
+                  { label: 'Dashboard', url: '/dashboard' },
                   { label: 'Events', url: '/events' },
                   { label: 'Event Info', url: '/event-info' },
                   { label: 'News', url: '/#news' },

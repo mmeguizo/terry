@@ -3,6 +3,7 @@
 import { useConfig } from "@/context/ConfigContext";
 import Link from "next/link";
 import Image from "next/image";
+import { NewsImage } from "./ProgressiveImage";
 import { HiArrowRight } from "react-icons/hi2";
 
 // Utility function to determine if a color is dark or light
@@ -216,22 +217,18 @@ const NewsCard = ({ href, image, title, date, category, sectionBg = null }) => {
 
       {/* Main content container */}
       <div className="relative z-10">
-        {/* Image section with modern effects */}
+        {/* Image section with progressive loading */}
         <div className="relative aspect-video overflow-hidden">
           {(() => {
             const img = normalize(image);
             const valid = isValidUrl(img);
             if (valid && img) {
               return (
-                <Image
+                <NewsImage
                   src={img}
                   alt={title || "News Image"}
-                  fill
-                  className="object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
-                  onError={(e) => {
-                    console.warn('Image failed to load:', img);
-                    e.target.style.display = 'none';
-                  }}
+                  className="transition-all duration-700 group-hover:scale-110 group-hover:brightness-110"
+                  onLoadComplete={() => console.log(`✅ News image loaded: ${title}`)}
                 />
               );
             } else {

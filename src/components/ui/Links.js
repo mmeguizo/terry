@@ -36,6 +36,10 @@ const IconLinkButton = ({ href, children, newTab, sectionBg = null }) => {
     throw new Error("IconButton must have exactly two children: icon and label");
   }
 
+  // Use textColor from config for better contrast
+  const textColor = config?.textColor || '#1a1a1a';
+  const primaryColor = config?.primaryColor || '#3b82f6';
+
   return (
     <Link 
       href={href} 
@@ -43,13 +47,19 @@ const IconLinkButton = ({ href, children, newTab, sectionBg = null }) => {
       target={newTab ? "_blank" : "_self"} 
       rel={newTab ? "noopener noreferrer" : undefined}
     >
-      <div className="flex items-center justify-center w-20 flex-shrink-0 transition-all duration-300 group-hover:scale-110 smart-accent-bg">
+      <div 
+        className="flex items-center justify-center w-20 flex-shrink-0 transition-all duration-300 group-hover:scale-110"
+        style={{ backgroundColor: primaryColor }}
+      >
         <span className="text-white text-xl group-hover:rotate-12 transition-transform duration-300">
           {childrenArray[0]}
         </span>
       </div>
-      <div className="flex-1 flex items-center px-6 py-4 bg-white/10">
-        <span className="font-semibold uppercase tracking-wide text-sm leading-tight smart-text-primary transition-colors duration-300">
+      <div className="flex-1 flex items-center px-6 py-4 bg-white/80">
+        <span 
+          className="font-semibold uppercase tracking-wide text-sm leading-tight transition-colors duration-300"
+          style={{ color: textColor }}
+        >
           {childrenArray[1]}
         </span>
       </div>

@@ -1,0 +1,38 @@
+
+    <svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+        </linearGradient>
+        <linearGradient id="flag" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+          <stop offset="50%" style="stop-color:#000000;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#ffffff;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      
+      <!-- Background circle -->
+      <circle cx="64" cy="64" r="62" fill="url(#bg)" stroke="#ffffff" stroke-width="2"/>
+      
+      
+        <!-- Racing flag pattern -->
+        <g transform="translate(25.6, 38.4)">
+          <!-- Flag pole -->
+          <rect x="0" y="0" width="3" height="51.2" fill="#ffffff"/>
+          
+          <!-- Checkered flag -->
+          <g transform="translate(3, 0)">
+            <rect x="0" y="0" width="38.4" height="25.6" fill="#ffffff"/>
+            <rect x="0" y="0" width="19.2" height="12.8" fill="#000000"/>
+            <rect x="19.2" y="12.8" width="19.2" height="12.8" fill="#000000"/>
+            <rect x="0" y="12.8" width="19.2" height="12.8" fill="#ffffff"/>
+            <rect x="19.2" y="0" width="19.2" height="12.8" fill="#ffffff"/>
+          </g>
+        </g>
+        
+        <!-- Racing text -->
+        <text x="64" y="102.4" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="10.24" font-weight="bold">RACE</text>
+      
+    </svg>
+  

@@ -4,6 +4,7 @@ import EntryCountdown from "@/components/events/EntryCountdown";
 import EventHeaderBand from "@/components/events/EventHeaderBand";
 import SectionTitle from "@/components/SectionTitle";
 import EventBrandVars from "@/components/events/EventBrandVars";
+import EventWeather from "@/components/weather/EventWeather";
 import { HiChevronRight, HiCalendarDays, HiFolder, HiMapPin, HiGlobeAlt } from "react-icons/hi2";
 
 async function fetchEvent(eventId) {
@@ -161,7 +162,15 @@ export default async function EventPage({ params }) {
               </div>
             </section>
 
-            <aside id="documents" className="scroll-mt-24">
+            <aside id="documents" className="scroll-mt-24 space-y-6">
+              {/* Weather Widget */}
+              {venue && (
+                <div>
+                  <EventWeather location={venue} showForecast={true} />
+                </div>
+              )}
+
+              {/* Event Documents */}
               <div className="event-card">
                 <SectionTitle className="mb-4">Event documents</SectionTitle>
                 {documents?.length ? (

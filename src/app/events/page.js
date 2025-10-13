@@ -47,7 +47,23 @@ export default async function EventsIndexPage() {
 
   return (
     <main className="container py-12">
-      <h1 className="text-3xl font-semibold mb-6">Events</h1>
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+        <h1 className="text-3xl font-semibold">Events</h1>
+        <div className="flex gap-2">
+          <Link
+            href="/events"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
+          >
+            📋 List View
+          </Link>
+          <Link
+            href="/events/calendar"
+            className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors duration-200"
+          >
+            📅 Calendar View
+          </Link>
+        </div>
+      </div>
 
       {items.length === 0 ? (
         <p className="text-neutral-500">No events yet.</p>

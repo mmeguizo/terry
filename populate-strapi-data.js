@@ -5,6 +5,10 @@ require('dotenv').config({ path: '.env.local' });
 const STRAPI_URL = process.env.STRAPI_URL || 'http://localhost:1337';
 const STRAPI_API_TOKEN = process.env.STRAPI_API_TOKEN;
 
+console.log('🔧 Configuration:');
+console.log('   STRAPI_URL:', STRAPI_URL);
+console.log('   STRAPI_API_TOKEN:', STRAPI_API_TOKEN ? `${STRAPI_API_TOKEN.substring(0, 20)}...` : 'NOT SET');
+
 // API client
 const strapiApi = axios.create({
   baseURL: `${STRAPI_URL}/api`,
@@ -14,7 +18,7 @@ const strapiApi = axios.create({
   }
 });
 
-// Site data from your spreadsheet
+// Complete site data from your spreadsheet
 const sites = [
   {
     siteTitle: "RaceReady",
@@ -24,17 +28,19 @@ const sites = [
     menuBackground: "#FFFFFF",
     textColor: "#000000",
     logoImage: "https://cdn.syzmic.com.au/sites/raceready/logos/RaceReady-3.svg",
-    eventId: null
+    eventId: null,
+    port: 3001
   },
   {
     siteTitle: "MRA - Motor Racing Australia",
     slug: "mra",
-    domain: "motorace.com.au",
+    domain: "motorrace.com.au",
     primaryColor: "#CC0000",
     menuBackground: "#404040",
     textColor: "#CCCCCC",
     logoImage: "https://cdn.syzmic.com.au/sites/mra/logos/MRA-Logo.svg",
-    eventId: null
+    eventId: null,
+    port: 3002
   },
   {
     siteTitle: "SuperTT",
@@ -42,19 +48,21 @@ const sites = [
     domain: "supertt.com.au",
     primaryColor: "#EA9216",
     menuBackground: "#3A4750",
-    textColor: "#313841",
+    textColor: "#ffffff",
     logoImage: "https://cdn.syzmic.com.au/sites/supertt/logos/SuperTT.png",
-    eventId: "EEEEEE"
+    eventId: "EEEEEE",
+    port: 3003
   },
   {
     siteTitle: "Clubman Championship",
     slug: "clubman",
-    domain: "clubmanchampionship.com.au",
+    domain: "clubmanchampionship.com",
     primaryColor: "#30232D",
     menuBackground: "#D55053",
     textColor: "#F1C095",
     logoImage: "https://cdn.syzmic.com.au/sites/clubman/logos/Clubman-Championship.svg",
-    eventId: "FAE907"
+    eventId: "FAE907",
+    port: 3004
   },
   {
     siteTitle: "MX5 Cup",
@@ -64,7 +72,8 @@ const sites = [
     menuBackground: "#FFFFFF",
     textColor: "#000000",
     logoImage: "https://cdn.syzmic.com.au/sites/mx5cup/logos/mx5cup-logo.svg",
-    eventId: null
+    eventId: null,
+    port: 3005
   },
   {
     siteTitle: "ExtremeTT",
@@ -74,7 +83,19 @@ const sites = [
     menuBackground: "#F0E7D6",
     textColor: "#EA2E00",
     logoImage: "https://cdn.syzmic.com.au/sites/extremett/logos/extremett-logo.svg",
-    eventId: "E6512C"
+    eventId: "E6512C",
+    port: 3006
+  },
+  {
+    siteTitle: "Race Official",
+    slug: "raceofficial",
+    domain: "raceofficial.com.au",
+    primaryColor: "#000000",
+    menuBackground: "#FFFFFF",
+    textColor: "#000000",
+    logoImage: "https://cdn.syzmic.com.au/sites/raceofficial/logos/raceofficial-logo.svg",
+    eventId: null,
+    port: 3007
   },
   {
     siteTitle: "Sydney 300",
@@ -84,7 +105,8 @@ const sites = [
     menuBackground: "#FFFFFF",
     textColor: "#000000",
     logoImage: "https://cdn.syzmic.com.au/sites/sydney300/logos/Sydney300-Logo.png",
-    eventId: null
+    eventId: null,
+    port: 3008
   },
   {
     siteTitle: "Wakefield 300",
@@ -94,7 +116,8 @@ const sites = [
     menuBackground: "#FFFFFF",
     textColor: "#000000",
     logoImage: "https://cdn.syzmic.com.au/sites/wakefield300/logos/wakefield300-logo.svg",
-    eventId: null
+    eventId: null,
+    port: 3009
   },
   {
     siteTitle: "Classic Sports Cars",
@@ -104,11 +127,67 @@ const sites = [
     menuBackground: "#0E3F18",
     textColor: "#385A42",
     logoImage: "https://cdn.syzmic.com.au/sites/classicsportscars/logos/csc-logo.svg",
-    eventId: "EEEEEE"
+    eventId: "EEEEEE",
+    port: 3010
+  },
+  {
+    siteTitle: "Australian Motor Racing Club",
+    slug: "amrc",
+    domain: "amrc.com.au",
+    primaryColor: "#E63946",
+    menuBackground: "#F1FAEE",
+    textColor: "#1a1a1a",
+    logoImage: "https://cdn.syzmic.com.au/sites/amrc/logos/amrc-logo.svg",
+    eventId: "457B9D",
+    port: 3011
+  },
+  {
+    siteTitle: "APRA Bathurst Challenge",
+    slug: "aprabathurst",
+    domain: "aprabathurstchallenge.com",
+    primaryColor: "#000000",
+    menuBackground: "#FFFFFF",
+    textColor: "#000000",
+    logoImage: "https://cdn.syzmic.com.au/sites/aprabathurst/logos/apra-logo.svg",
+    eventId: null,
+    port: 3012
+  },
+  {
+    siteTitle: "IPRA Bathurst Challenge",
+    slug: "iprabathurst",
+    domain: "iprabathurstchallenge.com",
+    primaryColor: "#000000",
+    menuBackground: "#FFFFFF",
+    textColor: "#000000",
+    logoImage: "https://cdn.syzmic.com.au/sites/iprabathurst/logos/ipra-logo.svg",
+    eventId: null,
+    port: 3013
+  },
+  {
+    siteTitle: "TC2 Racing",
+    slug: "tc2",
+    domain: "tc2.au",
+    primaryColor: "#000000",
+    menuBackground: "#FFFFFF",
+    textColor: "#000000",
+    logoImage: "https://cdn.syzmic.com.au/sites/tc2/logos/tc2-logo.svg",
+    eventId: null,
+    port: 3014
+  },
+  {
+    siteTitle: "MX5 Nationals",
+    slug: "mx5nationals",
+    domain: "mx5nationals.com.au",
+    primaryColor: "#000000",
+    menuBackground: "#FFFFFF",
+    textColor: "#000000",
+    logoImage: "https://cdn.syzmic.com.au/sites/mx5nationals/logos/mx5nationals-logo.svg",
+    eventId: null,
+    port: 3015
   }
 ];
 
-// News articles for each site (1 per site)
+// News articles for each site (expanded with all sites)
 const newsArticles = {
   raceready: [
     {
@@ -203,7 +282,7 @@ const newsArticles = {
           children: [
             {
               type: "text",
-              text: "The 2024 MX5 Cup season has concluded with some of the closest racing ever seen in the category, with multiple race winners and championship battles going down to the wire."
+              text: "The 2024 MX5 Cup season has concluded with some of the closest racing ever seen in the category, with multiple race winners and championship battles going down to the wire. The spec nature of the series continues to produce incredible on-track action."
             }
           ]
         }
@@ -223,7 +302,27 @@ const newsArticles = {
           children: [
             {
               type: "text",
-              text: "ExtremeTT is thrilled to announce an expanded 2025 calendar, featuring six rounds across Australia's most challenging circuits."
+              text: "ExtremeTT is thrilled to announce an expanded 2025 calendar, featuring six rounds across Australia's most challenging circuits. The series will visit both classic venues and exciting new locations for intense time attack competition."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  raceofficial: [
+    {
+      title: "Race Official Training Program Launches for 2025 Season",
+      slug: "raceofficial-training-2025",
+      date: "2024-09-23",
+      image: "https://cdn.syzmic.com.au/sites/raceofficial/news/training-program.jpg",
+      url: "/news/raceofficial-training-2025",
+      content: [
+        {
+          type: "paragraph",
+          children: [
+            {
+              type: "text",
+              text: "Race Official is proud to announce the launch of our comprehensive training program for aspiring motorsport officials. The program covers all aspects of race control, flag marshaling, and safety procedures."
             }
           ]
         }
@@ -243,7 +342,7 @@ const newsArticles = {
           children: [
             {
               type: "text",
-              text: "The 2024 Sydney 300 has attracted an incredible entry list featuring current and former Supercars champions, international stars, and rising local talent."
+              text: "The 2024 Sydney 300 has attracted an incredible entry list featuring current and former Supercars champions, international stars, and rising local talent for this prestigious endurance race."
             }
           ]
         }
@@ -263,7 +362,7 @@ const newsArticles = {
           children: [
             {
               type: "text",
-              text: "The Wakefield 300 returns for 2024 with significant safety enhancements, ensuring the highest standards of competitor and spectator safety."
+              text: "The Wakefield 300 returns for 2024 with significant safety enhancements, ensuring the highest standards of competitor and spectator safety at this classic endurance event."
             }
           ]
         }
@@ -283,7 +382,107 @@ const newsArticles = {
           children: [
             {
               type: "text",
-              text: "The Classic Sports Cars Championship continues to celebrate Australia's rich motorsport heritage with incredible displays of vintage racing machinery."
+              text: "The Classic Sports Cars Championship continues to celebrate Australia's rich motorsport heritage with incredible displays of vintage racing machinery from the 1950s through to the 1990s."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  amrc: [
+    {
+      title: "AMRC Announces 2025 Championship Calendar",
+      slug: "amrc-2025-calendar-announced",
+      date: "2024-09-22",
+      image: "https://cdn.syzmic.com.au/sites/amrc/news/2025-calendar.jpg",
+      url: "/news/amrc-2025-calendar-announced",
+      content: [
+        {
+          type: "paragraph",
+          children: [
+            {
+              type: "text",
+              text: "The Australian Motor Racing Club is excited to reveal its 2025 championship calendar, featuring rounds at premier venues across NSW including Sydney Motorsport Park, Wakefield Park, and Pheasant Wood Circuit."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  aprabathurst: [
+    {
+      title: "APRA Bathurst Challenge Returns to Mount Panorama",
+      slug: "apra-bathurst-2024-announcement",
+      date: "2024-09-20",
+      image: "https://cdn.syzmic.com.au/sites/aprabathurst/news/bathurst-return.jpg",
+      url: "/news/apra-bathurst-2024-announcement",
+      content: [
+        {
+          type: "paragraph",
+          children: [
+            {
+              type: "text",
+              text: "The APRA Bathurst Challenge returns to the iconic Mount Panorama circuit, bringing Production Car racing back to the mountain for an unforgettable weekend of motorsport action."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  iprabathurst: [
+    {
+      title: "IPRA Bathurst Challenge Celebrates Improved Production Cars",
+      slug: "ipra-bathurst-2024-preview",
+      date: "2024-09-19",
+      image: "https://cdn.syzmic.com.au/sites/iprabathurst/news/ipra-preview.jpg",
+      url: "/news/ipra-bathurst-2024-preview",
+      content: [
+        {
+          type: "paragraph",
+          children: [
+            {
+              type: "text",
+              text: "The IPRA Bathurst Challenge showcases Improved Production racing at Australia's most famous circuit, with modified production cars tackling the legendary mountain in spectacular fashion."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  tc2: [
+    {
+      title: "TC2 Racing Series Gains Momentum in Second Season",
+      slug: "tc2-season-2-update",
+      date: "2024-09-18",
+      image: "https://cdn.syzmic.com.au/sites/tc2/news/season-update.jpg",
+      url: "/news/tc2-season-2-update",
+      content: [
+        {
+          type: "paragraph",
+          children: [
+            {
+              type: "text",
+              text: "TC2 Racing continues to grow with an exciting second season of affordable touring car racing. The series has attracted strong grids and competitive action across all rounds."
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  mx5nationals: [
+    {
+      title: "MX5 Nationals Brings National-Level Competition to MX5 Racers",
+      slug: "mx5nationals-championship-overview",
+      date: "2024-09-17",
+      image: "https://cdn.syzmic.com.au/sites/mx5nationals/news/nationals-overview.jpg",
+      url: "/news/mx5nationals-championship-overview",
+      content: [
+        {
+          type: "paragraph",
+          children: [
+            {
+              type: "text",
+              text: "The MX5 Nationals championship provides a national platform for MX5 racers to compete at the highest level, with rounds at major circuits across Australia and excellent support from Mazda Australia."
             }
           ]
         }
@@ -351,6 +550,76 @@ const heroConfigs = {
     eventInfo: "Season Finale",
     eventName: "MX5 CUP FINALE",
     eventLocation: "PHILLIP ISLAND"
+  },
+  extremett: {
+    background: "https://cdn.syzmic.com.au/sites/extremett/hero/extremett-hero.jpg",
+    eventDate: "2024-10-20",
+    eventInfo: "Time Attack Championship",
+    eventName: "EXTREMETT CHALLENGE",
+    eventLocation: "SYDNEY MOTORSPORT PARK"
+  },
+  raceofficial: {
+    background: "https://cdn.syzmic.com.au/sites/raceofficial/hero/raceofficial-hero.jpg",
+    eventDate: "2025-02-01",
+    eventInfo: "Training Program Launch",
+    eventName: "OFFICIALS ACADEMY",
+    eventLocation: "ONLINE & TRACKSIDE"
+  },
+  sydney300: {
+    background: "https://cdn.syzmic.com.au/sites/sydney300/hero/sydney300-hero.jpg",
+    eventDate: "2024-11-30",
+    eventInfo: "Endurance Classic",
+    eventName: "SYDNEY 300",
+    eventLocation: "SYDNEY MOTORSPORT PARK"
+  },
+  wakefield300: {
+    background: "https://cdn.syzmic.com.au/sites/wakefield300/hero/wakefield300-hero.jpg",
+    eventDate: "2024-10-19",
+    eventInfo: "Endurance Classic",
+    eventName: "WAKEFIELD 300",
+    eventLocation: "WAKEFIELD PARK"
+  },
+  classicsportscars: {
+    background: "https://cdn.syzmic.com.au/sites/classicsportscars/hero/csc-hero.jpg",
+    eventDate: "2024-11-24",
+    eventInfo: "Heritage Racing",
+    eventName: "CLASSIC CHAMPIONSHIP",
+    eventLocation: "EASTERN CREEK"
+  },
+  amrc: {
+    background: "https://cdn.syzmic.com.au/sites/amrc/hero/amrc-hero.jpg",
+    eventDate: "2024-12-08",
+    eventInfo: "Club Championship",
+    eventName: "AMRC FINALS",
+    eventLocation: "SYDNEY MOTORSPORT PARK"
+  },
+  aprabathurst: {
+    background: "https://cdn.syzmic.com.au/sites/aprabathurst/hero/apra-hero.jpg",
+    eventDate: "2024-11-23",
+    eventInfo: "Production Car Challenge",
+    eventName: "APRA BATHURST",
+    eventLocation: "MOUNT PANORAMA"
+  },
+  iprabathurst: {
+    background: "https://cdn.syzmic.com.au/sites/iprabathurst/hero/ipra-hero.jpg",
+    eventDate: "2024-11-24",
+    eventInfo: "Improved Production Challenge",
+    eventName: "IPRA BATHURST",
+    eventLocation: "MOUNT PANORAMA"
+  },
+  tc2: {
+    background: "https://cdn.syzmic.com.au/sites/tc2/hero/tc2-hero.jpg",
+    eventDate: "2024-12-01",
+    eventInfo: "Touring Car Championship",
+    eventName: "TC2 SEASON FINALE",
+    eventLocation: "WAKEFIELD PARK"
+  },
+  mx5nationals: {
+    background: "https://cdn.syzmic.com.au/sites/mx5nationals/hero/mx5nationals-hero.jpg",
+    eventDate: "2024-12-15",
+    eventInfo: "National Championship",
+    eventName: "MX5 NATIONALS FINALE",
+    eventLocation: "PHILLIP ISLAND"
   }
 };
 
@@ -377,7 +646,20 @@ async function createSites() {
   
   for (const site of sites) {
     try {
-      const heroConfig = heroConfigs[site.slug] || heroConfigs.raceready;
+      // Check if site already exists
+      const existingSite = existingSites.find(s => s.attributes?.slug === site.slug);
+      if (existingSite) {
+        console.log(`⚠️  Site ${site.siteTitle} already exists, skipping...`);
+        continue;
+      }
+
+      const heroConfig = heroConfigs[site.slug] || {
+        background: "https://cdn.syzmic.com.au/sites/default/hero/default-hero.jpg",
+        eventDate: "2024-12-31",
+        eventInfo: "Coming Soon",
+        eventName: site.siteTitle.toUpperCase(),
+        eventLocation: "TBA"
+      };
       
       const siteData = {
         data: {
@@ -389,15 +671,17 @@ async function createSites() {
           textColor: site.textColor,
           logoImage: site.logoImage,
           eventId: site.eventId,
-          publishedAt: new Date().toISOString(),
           menu: defaultMenuItems,
           hero: [heroConfig],
           sponsors: defaultSponsors,
-          websites: sites.filter(s => s.slug !== site.slug).slice(0, 5).map(s => ({
-            label: s.siteTitle,
-            url: `https://${s.domain}`,
-            logo: s.logoImage
-          })),
+          websites: sites
+            .filter(s => s.slug !== site.slug)
+            .slice(0, 6)
+            .map(s => ({
+              label: s.siteTitle,
+              url: `https://${s.domain}`,
+              logo: s.logoImage
+            })),
           eventDocuments: [
             {
               label: "Event Schedule",
@@ -430,19 +714,10 @@ async function createSites() {
       console.log(`✅ Created site: ${site.siteTitle}`);
       
     } catch (error) {
-      if (error.response?.data?.error?.message?.includes('unique')) {
-        console.log(`⚠️  Site ${site.siteTitle} already exists, skipping...`);
-        // Try to find the existing site
-        const existingSite = existingSites.find(s => s.attributes?.slug === site.slug);
-        if (existingSite && !createdSites.find(cs => cs.id === existingSite.id)) {
-          createdSites.push(existingSite);
-        }
-      } else {
-        console.error(`❌ Error creating site ${site.siteTitle}:`, error.response?.data || error.message);
-        // Log detailed validation errors
-        if (error.response?.data?.error?.details?.errors) {
-          console.error('   Validation details:', error.response.data.error.details.errors);
-        }
+      console.error(`❌ Error creating site ${site.siteTitle}:`, error.response?.data?.error || error.message);
+      // Log detailed validation errors
+      if (error.response?.data?.error?.details?.errors) {
+        console.error('   Validation details:', JSON.stringify(error.response.data.error.details.errors, null, 2));
       }
     }
   }
@@ -470,8 +745,7 @@ async function createNewsItems(createdSites) {
             image: article.image,
             url: article.url,
             content: article.content,
-            sites: [site.id],
-            publishedAt: new Date().toISOString()
+            sites: [site.id]
           }
         };
         
@@ -517,13 +791,21 @@ async function populateStrapi() {
     await createNewsItems(createdSites);
     
     console.log('🎉 Strapi population completed successfully!');
-    console.log(`📊 Created ${createdSites.length} sites and ${Object.values(newsArticles).flat().length} news articles`);
+    console.log(`📊 Summary:`);
+    console.log(`   - Total sites: ${sites.length}`);
+    console.log(`   - Sites created: ${createdSites.length}`);
+    console.log(`   - News articles: ${Object.values(newsArticles).flat().length}`);
+    
+    console.log('\n🏁 All motorsport sites populated:');
+    sites.forEach(site => {
+      console.log(`   ✓ ${site.siteTitle} (${site.slug}) - ${site.domain}`);
+    });
     
   } catch (error) {
     console.error('💥 Error populating Strapi:', error.response?.data || error.message);
     
     if (error.response?.status === 401) {
-      console.log('🔑 Make sure to set your STRAPI_API_TOKEN in the script!');
+      console.log('🔑 Authentication failed! Check your STRAPI_API_TOKEN.');
     }
   }
 }

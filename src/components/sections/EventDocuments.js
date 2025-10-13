@@ -82,7 +82,7 @@ const EventDocuments = () => {
             ></span>
           </h1>
           <p 
-            className="text-lg max-w-2xl mx-auto opacity-80"
+            className="text-lg max-w-2xl mx-auto"
             style={{ color: config.textColor || '#000000' }}
           >
             Access all essential event documentation and regulations

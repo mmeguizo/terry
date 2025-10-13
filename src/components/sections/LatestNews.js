@@ -3,10 +3,27 @@
 import { useEffect, useState } from "react";
 import { Card, CardImage, CardBody, NewsCard } from "@/components/ui/Cards";
 import { useConfig } from "@/context/ConfigContext";
+import { NewsSkeleton } from "@/components/ui/Skeletons";
+import { cacheHelpers } from "@/utils/smartCache";
+import { DataError, APIError } from "@/components/error/ErrorComponents";
+import { useErrorRecovery } from "@/hooks/useErrorRecovery";
 
 const LatestNews = () => {
   const config = useConfig();
   const [newsItems, setNewsItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const { 
+    error, 
+    retryCount, 
+    canRetry, 
+    handleError, 
+    reset 
+  } = useErrorRecovery({
+    maxRetries: 3,
+    onError: (error) => console.error('🚨 News loading error:', error),
+    onMaxRetriesReached: (error) => console.error('❌ Max retries reached for news:', error)
+  });
 
   function sanitize(list) {
     const ensureValidUrl = (value) => {
@@ -31,21 +48,75 @@ const LatestNews = () => {
 
   useEffect(() => {
     const fetchNews = async () => {
+      setIsLoading(true);
       try {
-        const res = await fetch("/api/news");
-        if (!res.ok) throw new Error("News API failed");
-        const data = await res.json();
-        const cleaned = sanitize(data);
-        if (cleaned.length > 0) setNewsItems(cleaned);
-        else setNewsItems(sanitize(config.newsItems));
-      } catch (error) {
-        console.error("Failed to load news items:", error);
+        // Use smart caching for news data
+        const result = await cacheHelpers.getNews(
+          process.env.NEXT_PUBLIC_SITE_SLUG || 'default',
+          async () => {
+            const res = await fetch("/api/news");
+            if (!res.ok) throw new Error("News API failed");
+            return await res.json();
+          }
+        );
+        
+        const cleaned = sanitize(result.data);
+        if (cleaned.length > 0) {
+          setNewsItems(cleaned);
+          console.log(`🏁 News loaded: ${result.fromCache ? 'from cache' : 'fresh fetch'} (${cleaned.length} items)`);
+        } else {
+          setNewsItems(sanitize(config.newsItems));
+        }
+      } catch (fetchError) {
+        handleError(fetchError, { 
+          endpoint: '/api/news',
+          operation: 'fetchNews',
+          siteSlug: process.env.NEXT_PUBLIC_SITE_SLUG 
+        });
+        
+        // Fallback to config news items
+        console.warn("🚨 News API failed, using fallback data");
         setNewsItems(sanitize(config.newsItems));
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchNews();
   }, [config.newsItems]);
+
+  // Show skeleton while loading
+  if (isLoading) {
+    return <NewsSkeleton />;
+  }
+
+  // Show error state with retry option
+  if (error && newsItems.length === 0) {
+    return (
+      <section 
+        id="news" 
+        className="relative py-20 xl:py-24 2xl:py-28 scroll-mt-24"
+        style={{ background: config.menuBackground || '#ffffff' }}
+      >
+        <div className="container">
+          <APIError
+            error={error}
+            endpoint="/api/news"
+            onRetry={() => {
+              reset();
+              window.location.reload();
+            }}
+            retryCount={retryCount}
+            maxRetries={3}
+            className="max-w-2xl mx-auto"
+          />
+        </div>
+      </section>
+    );
+  }
+
+  // Show partial error if we have some data but there was an error
+  const showPartialError = error && newsItems.length > 0;
 
   return (
     <section 
@@ -112,12 +183,29 @@ const LatestNews = () => {
             ></span>
           </h1>
           <p 
-            className="text-lg xl:text-xl 2xl:text-2xl max-w-2xl xl:max-w-3xl 2xl:max-w-4xl mx-auto opacity-80"
+            className="text-lg xl:text-xl 2xl:text-2xl max-w-2xl xl:max-w-3xl 2xl:max-w-4xl mx-auto"
             style={{ color: config.textColor || '#000000' }}
           >
             Stay updated with the latest racing news, updates, and event information
-          </p>
+</p>
         </div>
+
+        {/* Partial error notification */}
+        {showPartialError && (
+          <div className="mb-8">
+            <APIError
+              error={error}
+              endpoint="/api/news"
+              onRetry={() => {
+                reset();
+                window.location.reload();
+              }}
+              retryCount={retryCount}
+              maxRetries={3}
+              className="max-w-2xl mx-auto"
+            />
+          </div>
+        )}
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 max-w-none gap-8 xl:gap-10 2xl:gap-12 justify-items-center">
           {newsItems.map((newsItem, index) => (
