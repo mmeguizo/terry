@@ -318,11 +318,17 @@ export default async function EventInfoPage() {
                     />
                   ) : (
                     <div>
-                      <p className="leading-relaxed mb-6 text-white">
+                      <p 
+                        className="leading-relaxed mb-6"
+                        style={{ color: config.textColor + 'E0' || '#374151' }}
+                      >
                         Join us for an exciting motorsport event featuring world-class racing action. 
                         {(eventData?.name || config.hero?.eventName) && ` ${eventData?.name || config.hero?.eventName} promises to deliver thrilling competition and unforgettable moments.`}
                       </p>
-                      <p className="leading-relaxed text-white">
+                      <p 
+                        className="leading-relaxed"
+                        style={{ color: config.textColor + 'E0' || '#374151' }}
+                      >
                         Whether you&apos;re a seasoned motorsport fan or new to racing, this event offers something for everyone. 
                         Don&apos;t miss your chance to witness high-speed action at {eventData?.venue || config.hero?.eventLocation || "this premier venue"}.
                       </p>

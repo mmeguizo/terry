@@ -9,7 +9,8 @@ export async function GET() {
     }
 
     // Try multiple approaches for Strapi v5 compatibility
-    let newsUrl = `${process.env.STRAPI_URL}/api/news-items?filters[sites][slug][$eq]=${siteSlug}&sort[0]=publishedAt:desc`;
+    // First try articles endpoint (for Strapi Cloud)
+    let newsUrl = `${process.env.STRAPI_URL}/api/articles?sort[0]=publishedAt:desc`;
     console.log('Fetching news with URL:', newsUrl);
     
     let newsRes = await fetch(newsUrl, {
@@ -23,10 +24,10 @@ export async function GET() {
     console.log('News response status:', newsRes.status);
     let newsData = await newsRes.json();
     
-    // If that fails, try without site filtering as fallback
+    // If articles fails, try news-items as fallback
     if (!newsRes.ok || newsData.error) {
-      console.log('Trying fallback approach without site filtering...');
-      newsUrl = `${process.env.STRAPI_URL}/api/news-items?sort[0]=publishedAt:desc`;
+      console.log('Trying news-items endpoint...');
+      newsUrl = `${process.env.STRAPI_URL}/api/news-items?filters[sites][slug][$eq]=${siteSlug}&sort[0]=publishedAt:desc`;
       newsRes = await fetch(newsUrl, {
         headers: {
           Authorization: `Bearer ${process.env.STRAPI_API_TOKEN}`,

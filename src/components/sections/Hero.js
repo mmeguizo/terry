@@ -134,11 +134,11 @@ const Hero = () => {
           style={{ background: `linear-gradient(to right, transparent, ${config.primaryColor || '#3b82f6'}, transparent)` }}
         ></div>
       </div>
-      <div className="container absolute z-10 inset-0 flex items-center text-center gap-4 text-white pt-20 xl:pt-24 2xl:pt-32">
+      <div className="container absolute z-10 inset-0 flex items-center text-center gap-4 text-white pt-20 xl:pt-24 2xl:pt-32 px-4 xl:px-8">
         <div className="grid xl:grid-cols-[3fr_2fr] gap-12 xl:gap-24 2xl:gap-32 3xl:gap-40 w-full lg:grid-cols-[1fr_1fr]">
-          <div className="grow font-bold flex flex-col gap-4">
-            <div className="flex justify-center lg:justify-start mb-8 xl:mb-12 2xl:mb-16">
-              <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 xs:gap-6 xl:gap-8 2xl:gap-12 3xl:gap-16">
+          <div className="grow font-bold flex flex-col gap-4 xl:gap-6">
+            <div className="flex justify-center lg:justify-start mb-4 xl:mb-8">
+              <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 xs:gap-4 xl:gap-6 2xl:gap-8">
                 {[
                   { value: timeLeft.days, label: 'Days' },
                   { value: timeLeft.hours, label: 'Hours' },
@@ -147,7 +147,7 @@ const Hero = () => {
                 ].map((item, index) => (
                   <div key={index} className="flex flex-col items-center">
                     <div 
-                      className="relative bg-white/10 backdrop-blur-lg rounded-2xl p-4 xs:p-6 xl:p-8 2xl:p-10 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 min-w-[80px] xs:min-w-[100px] xl:min-w-[120px] 2xl:min-w-[140px] group"
+                      className="relative bg-white/10 backdrop-blur-lg rounded-2xl p-3 xs:p-4 xl:p-6 2xl:p-8 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 min-w-[70px] xs:min-w-[85px] xl:min-w-[100px] 2xl:min-w-[120px] group"
                       style={{ boxShadow: `0 8px 32px ${config.primaryColor}20` }}
                     >
                       {/* Racing corner designs */}
@@ -170,11 +170,11 @@ const Hero = () => {
                         ></div>
                       </div>
                       
-                      <div className="text-3xl xs:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl font-bold text-white mb-2 text-center">
+                      <div className="text-2xl xs:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-white mb-1 text-center">
                         {formatTime(item.value)}
                       </div>
                       <div 
-                        className="text-xs xs:text-sm xl:text-base 2xl:text-lg font-semibold uppercase tracking-wider text-center"
+                        className="text-[10px] xs:text-xs xl:text-sm 2xl:text-base font-semibold uppercase tracking-wider text-center"
                         style={{ color: config.primaryColor }}
                       >
                         {item.label}
@@ -189,15 +189,15 @@ const Hero = () => {
                 ))}
               </div>
             </div>
-            <h1 className="xs:text-5xl text-4xl xl:text-6xl 2xl:text-7xl 3xl:text-8xl text-start uppercase leading-tight text-white font-bold">
+            <h1 className="xs:text-4xl text-3xl xl:text-5xl 2xl:text-6xl 3xl:text-7xl text-start uppercase leading-tight text-white font-bold">
               {typeof config.hero?.eventName === 'string' ? config.hero.eventName : 'Event Name TBA'}
             </h1>
 
-            <h1 className="xs:text-4xl text-3xl xl:text-5xl 2xl:text-6xl 3xl:text-7xl text-start uppercase leading-tight text-white font-semibold">
+            <h1 className="xs:text-3xl text-2xl xl:text-4xl 2xl:text-5xl 3xl:text-6xl text-start uppercase leading-tight text-white font-semibold">
               {typeof config.hero?.eventLocation === 'string' ? config.hero.eventLocation : 'Venue TBA'}
             </h1>
 
-            <p className="text-start uppercase text-lg xl:text-xl 2xl:text-2xl text-gray-200 font-medium">{formattedEventDate}</p>
+            <p className="text-start uppercase text-base xl:text-lg 2xl:text-xl text-gray-200 font-medium">{formattedEventDate}</p>
             {/* Dynamic button based on event state - TODO: implement when API is updated */}
             <LinkButton href="/event-info">Event Info</LinkButton>
           </div>
