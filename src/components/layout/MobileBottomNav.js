@@ -10,6 +10,21 @@ const MobileBottomNav = () => {
   const config = useConfig();
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isMobile, setIsMobile] = useState(true); // Default to true for SSR
+
+  // Check if mobile on mount
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    // Check immediately
+    checkMobile();
+    
+    // Check on resize
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Auto-hide on scroll down, show on scroll up
   useEffect(() => {
@@ -85,6 +100,11 @@ const MobileBottomNav = () => {
     if (href.startsWith('/#')) return false; // Handle hash links separately
     return pathname.startsWith(href);
   };
+
+  // Don't render on desktop
+  if (!isMobile) {
+    return null;
+  }
 
   return (
     <>

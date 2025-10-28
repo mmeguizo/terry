@@ -35,6 +35,12 @@ const NotificationManager = () => {
 
   const registerPushSubscription = async () => {
     try {
+      // Skip push subscription if no VAPID key configured
+      if (!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY) {
+        console.log('⚠️ Push notifications require VAPID keys. Using basic notifications only.');
+        return;
+      }
+
       const registration = await navigator.serviceWorker.ready;
       
       // Check if already subscribed
@@ -47,7 +53,7 @@ const NotificationManager = () => {
       // Subscribe to push notifications
       const newSubscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '')
+        applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY)
       });
 
       setSubscription(newSubscription);
