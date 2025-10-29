@@ -43,21 +43,21 @@ const IconLinkButton = ({ href, children, newTab, sectionBg = null }) => {
   return (
     <Link 
       href={href} 
-      className="group relative flex items-stretch overflow-hidden rounded-2xl backdrop-blur-sm border shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 w-full min-h-[72px] smart-card"
+      className="group relative flex items-stretch overflow-hidden rounded-2xl backdrop-blur-sm border shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 w-full min-h-[60px] smart-card"
       target={newTab ? "_blank" : "_self"} 
       rel={newTab ? "noopener noreferrer" : undefined}
     >
       <div 
-        className="flex items-center justify-center w-20 flex-shrink-0 transition-all duration-300 group-hover:scale-110"
+        className="flex items-center justify-center w-16 flex-shrink-0 transition-all duration-300 group-hover:scale-110"
         style={{ backgroundColor: primaryColor }}
       >
-        <span className="text-white text-xl group-hover:rotate-12 transition-transform duration-300">
+        <span className="text-white text-lg group-hover:rotate-12 transition-transform duration-300">
           {childrenArray[0]}
         </span>
       </div>
-      <div className="flex-1 flex items-center px-6 py-4 bg-white/80">
+      <div className="flex-1 flex items-center px-4 py-3 bg-white/80">
         <span 
-          className="font-semibold uppercase tracking-wide text-sm leading-tight transition-colors duration-300"
+          className="font-semibold uppercase tracking-wide text-xs leading-tight transition-colors duration-300"
           style={{ color: textColor }}
         >
           {childrenArray[1]}

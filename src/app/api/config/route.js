@@ -135,6 +135,7 @@ function transformStrapiData(data) {
     menuBackground: data.menuBackground,
     textColor: data.textColor,
     logoImage: data.logoImage,
+    raceReadyGUID: data.raceReadyGUID || data.racereadyGUID || null,
       menu: [
         { id: 1, label: 'Home', url: '/' },
         { id: 2, label: 'Events', url: '/events' },
@@ -148,6 +149,9 @@ function transformStrapiData(data) {
       background: data.hero?.[0]?.background?.data?.attributes?.url
         ? `${strapiUrl}${data.hero[0].background.data.attributes.url}`
         : data.hero?.[0]?.background,
+      backgroundVideo: data.hero?.[0]?.backgroundVideo?.data?.attributes?.url
+        ? `${strapiUrl}${data.hero[0].backgroundVideo.data.attributes.url}`
+        : data.hero?.[0]?.backgroundVideo || null,
       eventDate: data.hero?.[0]?.eventDate,
       eventInfo: data.hero?.[0]?.eventInfo,
       eventName: data.hero?.[0]?.eventName,

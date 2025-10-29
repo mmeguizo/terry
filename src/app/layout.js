@@ -48,6 +48,12 @@ export async function generateMetadata() {
     return {
       title: config.siteTitle,
       description: `Welcome to ${config.siteTitle}`,
+      // Disable browser caching
+      other: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      }
     };
   } catch (error) {
     const configModule = await import("@/config/site-config.json");
@@ -56,6 +62,12 @@ export async function generateMetadata() {
     return {
       title: config.siteTitle,
       description: `Welcome to ${config.siteTitle}`,
+      // Disable browser caching
+      other: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      }
     };
   }
 }
@@ -66,6 +78,11 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        {/* Disable browser caching */}
+        <meta httpEquiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0" />
+        <meta httpEquiv="Pragma" content="no-cache" />
+        <meta httpEquiv="Expires" content="0" />
+        
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content={config.primaryColor || '#3b82f6'} />
         <meta name="mobile-web-app-capable" content="yes" />

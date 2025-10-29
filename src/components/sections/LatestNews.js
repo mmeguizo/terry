@@ -129,11 +129,11 @@ const LatestNews = () => {
       {/* Subtle background pattern */}
       <div className="absolute inset-0 opacity-2">
         <div 
-          className="absolute top-0 left-1/4 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl animate-pulse"
+          className="absolute top-0 left-1/4 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl"
           style={{ backgroundColor: config.primaryColor || '#3b82f6' }}
         ></div>
         <div 
-          className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl animate-pulse delay-500"
+          className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full mix-blend-multiply filter blur-3xl"
           style={{ backgroundColor: config.primaryColor ? `${config.primaryColor}60` : '#8b5cf660' }}
         ></div>
       </div>
@@ -211,8 +211,7 @@ const LatestNews = () => {
           {newsItems.map((newsItem, index) => (
             <div
               key={index}
-              className="opacity-0 translate-y-8 animate-[fadeInUp_0.6s_ease-out_forwards] w-full max-w-sm"
-              style={{ animationDelay: `${index * 150}ms` }}
+              className="w-full max-w-sm"
             >
               {(() => {
                 // Create a safe slug from the news item

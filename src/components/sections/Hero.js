@@ -15,6 +15,8 @@ const Hero = () => {
   });
 
   const [offsetY, setOffsetY] = useState(0);
+  const [nextEvent, setNextEvent] = useState(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,9 +27,28 @@ const Hero = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Fetch next event from RaceReady API
   useEffect(() => {
-    // Check if we have a valid event date
-    const eventDate = config.hero?.eventDate;
+    const fetchNextEvent = async () => {
+      try {
+        const response = await fetch('/api/raceready-events?view=next');
+        if (response.ok) {
+          const data = await response.json();
+          setNextEvent(data);
+          console.log('✅ Next event loaded from RaceReady:', data);
+        }
+      } catch (error) {
+        console.warn('Failed to fetch next event from RaceReady:', error);
+      }
+    };
+
+    fetchNextEvent();
+  }, []);
+
+  useEffect(() => {
+    // Use next event date if available, otherwise fall back to config
+    const eventDate = nextEvent?.startDate || nextEvent?.date || config.hero?.eventDate;
+    
     if (!eventDate) {
       setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       return;
@@ -61,12 +82,12 @@ const Hero = () => {
     updateCountdown(); // Initial run
     const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval); // Cleanup
-  }, [config.hero?.eventDate]);
+  }, [nextEvent, config.hero?.eventDate]);
 
   const formatTime = (value) => value.toString().padStart(2, "0");
   
   const formattedEventDate = (() => {
-    const eventDate = config.hero?.eventDate;
+    const eventDate = nextEvent?.startDate || nextEvent?.date || config.hero?.eventDate;
     if (!eventDate) return "Event Date TBA";
     
     const date = new Date(eventDate);
@@ -79,125 +100,82 @@ const Hero = () => {
     });
   })();
 
+  // Use next event data if available, otherwise fall back to config
+  const eventName = nextEvent?.name || nextEvent?.title || config.hero?.eventName;
+  const eventLocation = nextEvent?.location || nextEvent?.venue || config.hero?.eventLocation;
+  const backgroundImage = nextEvent?.image || config.hero?.background;
+  const backgroundVideo = config.hero?.backgroundVideo;
+
   return (
     <section
       id="home"
-      className="z-0 relative w-full h-[900px] lg:h-[750px] xl:h-[800px] 2xl:h-[900px] 3xl:h-[1000px] bg-neutral-700 bg-cover bg-center bg-fixed overflow-hidden scroll-mt-24"
-      style={{
-        backgroundImage: `url(${config.hero.background})`,
-        backgroundPosition: `center ${offsetY * -0.5}px`,
-      }}
+      className="z-0 relative w-full h-[900px] lg:h-[750px] xl:h-[800px] 2xl:h-[900px] 3xl:h-[1000px] bg-neutral-700 overflow-hidden scroll-mt-24"
     >
+      {/* Video Background (if available) */}
+      {backgroundVideo && (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={backgroundImage}
+          onLoadedData={() => setVideoLoaded(true)}
+          className="absolute inset-0 w-full h-full object-cover z-0"
+        >
+          <source src={backgroundVideo} type="video/mp4" />
+        </video>
+      )}
+      
+      {/* Image Background (fallback or poster) */}
+      {!backgroundVideo && backgroundImage && (
+        <div
+          className="absolute inset-0 w-full h-full bg-cover bg-center bg-fixed z-0"
+          style={{
+            backgroundImage: `url(${backgroundImage})`,
+            backgroundPosition: `center ${offsetY * -0.5}px`,
+          }}
+        />
+      )}
+
       {/* Enhanced overlay with gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/40 z-0"></div>
-      
-      {/* Dynamic animated background elements */}
-      <div className="absolute inset-0 z-0">
-        <div 
-          className="absolute top-20 left-20 w-96 h-96 rounded-full mix-blend-overlay filter blur-3xl animate-pulse"
-          style={{ backgroundColor: `${config.primaryColor || '#3b82f6'}20` }}
-        ></div>
-        <div 
-          className="absolute bottom-20 right-20 w-96 h-96 rounded-full mix-blend-overlay filter blur-3xl animate-pulse delay-1000"
-          style={{ backgroundColor: `${config.primaryColor ? `${config.primaryColor}30` : '#8b5cf630'}` }}
-        ></div>
-      </div>
-      
-      {/* Racing corner designs */}
-      <div className="absolute inset-0 pointer-events-none z-5">
-        {/* Top corners */}
-        <div 
-          className="absolute top-8 left-8 w-20 h-20 border-l-2 border-t-2 opacity-30"
-          style={{ borderColor: config.primaryColor || '#3b82f6' }}
-        ></div>
-        <div 
-          className="absolute top-8 right-8 w-20 h-20 border-r-2 border-t-2 opacity-30"
-          style={{ borderColor: config.primaryColor || '#3b82f6' }}
-        ></div>
-        {/* Bottom corners */}
-        <div 
-          className="absolute bottom-8 left-8 w-20 h-20 border-l-2 border-b-2 opacity-30"
-          style={{ borderColor: config.primaryColor || '#3b82f6' }}
-        ></div>
-        <div 
-          className="absolute bottom-8 right-8 w-20 h-20 border-r-2 border-b-2 opacity-30"
-          style={{ borderColor: config.primaryColor || '#3b82f6' }}
-        ></div>
-        
-        {/* Racing stripes */}
-        <div 
-          className="absolute top-0 left-0 w-full h-1 opacity-20"
-          style={{ background: `linear-gradient(to right, transparent, ${config.primaryColor || '#3b82f6'}, transparent)` }}
-        ></div>
-        <div 
-          className="absolute bottom-0 left-0 w-full h-1 opacity-20"
-          style={{ background: `linear-gradient(to right, transparent, ${config.primaryColor || '#3b82f6'}, transparent)` }}
-        ></div>
-      </div>
       <div className="container absolute z-10 inset-0 flex items-center text-center gap-4 text-white pt-20 xl:pt-24 2xl:pt-32 px-4 xl:px-8">
         <div className="grid xl:grid-cols-[3fr_2fr] gap-12 xl:gap-24 2xl:gap-32 3xl:gap-40 w-full lg:grid-cols-[1fr_1fr]">
           <div className="grow font-bold flex flex-col gap-4 xl:gap-6">
-            <div className="flex justify-center lg:justify-start mb-4 xl:mb-8">
-              <div className="grid grid-cols-2 xl:grid-cols-4 gap-3 xs:gap-4 xl:gap-6 2xl:gap-8">
+            <div className="flex justify-center lg:justify-start mb-4 xl:mb-6">
+              <div className="grid grid-cols-2 xl:grid-cols-4 gap-2 xs:gap-3 xl:gap-4">
                 {[
-                  { value: timeLeft.days, label: 'Days' },
-                  { value: timeLeft.hours, label: 'Hours' },
-                  { value: timeLeft.minutes, label: 'Minutes' },
-                  { value: timeLeft.seconds, label: 'Seconds' }
+                  { value: timeLeft.days, label: 'DAYS' },
+                  { value: timeLeft.hours, label: 'HOURS' },
+                  { value: timeLeft.minutes, label: 'MINS' },
+                  { value: timeLeft.seconds, label: 'SECS' }
                 ].map((item, index) => (
                   <div key={index} className="flex flex-col items-center">
                     <div 
-                      className="relative bg-white/10 backdrop-blur-lg rounded-2xl p-3 xs:p-4 xl:p-6 2xl:p-8 border border-white/20 shadow-lg hover:shadow-xl transition-all duration-500 hover:scale-105 min-w-[70px] xs:min-w-[85px] xl:min-w-[100px] 2xl:min-w-[120px] group"
-                      style={{ boxShadow: `0 8px 32px ${config.primaryColor}20` }}
+                      className="relative bg-black/60 backdrop-blur-sm rounded-lg p-2 xs:p-3 xl:p-3 min-w-[60px] xs:min-w-[70px] xl:min-w-[85px]"
                     >
-                      {/* Racing corner designs */}
-                      <div className="absolute inset-0 pointer-events-none rounded-2xl">
-                        <div 
-                          className="absolute top-2 left-2 w-3 h-3 border-l-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                          style={{ borderColor: `${config.primaryColor || '#3b82f6'}40` }}
-                        ></div>
-                        <div 
-                          className="absolute top-2 right-2 w-3 h-3 border-r-2 border-t-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                          style={{ borderColor: `${config.primaryColor || '#3b82f6'}40` }}
-                        ></div>
-                        <div 
-                          className="absolute bottom-2 left-2 w-3 h-3 border-l-2 border-b-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                          style={{ borderColor: `${config.primaryColor || '#3b82f6'}40` }}
-                        ></div>
-                        <div 
-                          className="absolute bottom-2 right-2 w-3 h-3 border-r-2 border-b-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                          style={{ borderColor: `${config.primaryColor || '#3b82f6'}40` }}
-                        ></div>
-                      </div>
-                      
-                      <div className="text-2xl xs:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold text-white mb-1 text-center">
+                      <div className="text-2xl xs:text-3xl xl:text-4xl font-bold text-white mb-0.5 text-center tabular-nums">
                         {formatTime(item.value)}
                       </div>
                       <div 
-                        className="text-[10px] xs:text-xs xl:text-sm 2xl:text-base font-semibold uppercase tracking-wider text-center"
-                        style={{ color: config.primaryColor }}
+                        className="text-[9px] xs:text-[10px] xl:text-xs font-medium uppercase tracking-wider text-center opacity-70"
                       >
                         {item.label}
                       </div>
-                      {/* Glow effect */}
-                      <div 
-                        className="absolute inset-0 rounded-2xl opacity-20 blur-xl"
-                        style={{ background: config.primaryColor }}
-                      ></div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            <h1 className="xs:text-4xl text-3xl xl:text-5xl 2xl:text-6xl 3xl:text-7xl text-start uppercase leading-tight text-white font-bold">
-              {typeof config.hero?.eventName === 'string' ? config.hero.eventName : 'Event Name TBA'}
+            <h1 className="xs:text-3xl text-2xl xl:text-4xl 2xl:text-5xl 3xl:text-6xl text-start uppercase leading-tight text-white font-bold">
+              {typeof eventName === 'string' ? eventName : 'Event Name TBA'}
             </h1>
 
-            <h1 className="xs:text-3xl text-2xl xl:text-4xl 2xl:text-5xl 3xl:text-6xl text-start uppercase leading-tight text-white font-semibold">
-              {typeof config.hero?.eventLocation === 'string' ? config.hero.eventLocation : 'Venue TBA'}
+            <h1 className="xs:text-2xl text-xl xl:text-3xl 2xl:text-4xl 3xl:text-5xl text-start uppercase leading-tight text-white font-semibold">
+              {typeof eventLocation === 'string' ? eventLocation : 'Venue TBA'}
             </h1>
 
-            <p className="text-start uppercase text-base xl:text-lg 2xl:text-xl text-gray-200 font-medium">{formattedEventDate}</p>
+            <p className="text-start uppercase text-sm xl:text-base 2xl:text-lg text-gray-200 font-medium">{formattedEventDate}</p>
             {/* Dynamic button based on event state - TODO: implement when API is updated */}
             <LinkButton href="/event-info">Event Info</LinkButton>
           </div>

@@ -153,7 +153,7 @@ const NotificationManager = () => {
           className="bg-gradient-to-r from-gray-900 to-black text-white p-4 rounded-2xl shadow-2xl border border-white/20 backdrop-blur-xl transform transition-all duration-500 hover:scale-102 hover:shadow-3xl"
           style={{
             background: `linear-gradient(135deg, ${config.primaryColor || '#3b82f6'}15 0%, #00000095 100%)`,
-            animation: 'slideInFade 0.6s ease-out, gentlePulse 3s ease-in-out infinite'
+            // No animations
           }}
         >
           {/* Close button - subtle but accessible */}

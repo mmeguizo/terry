@@ -183,13 +183,13 @@ const MobileBottomNav = () => {
         <>
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/50 z-40 md:hidden animate-fade-in"
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
             onClick={() => setShowMoreMenu(false)}
           />
           
           {/* Menu */}
           <div 
-            className="fixed bottom-16 left-4 right-4 z-50 rounded-2xl shadow-2xl overflow-hidden md:hidden animate-slide-up-fade"
+            className="fixed bottom-16 left-4 right-4 z-50 rounded-2xl shadow-2xl overflow-hidden md:hidden"
             style={{
               background: config.menuBackground || '#ffffff',
             }}

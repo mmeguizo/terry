@@ -166,7 +166,7 @@ const Header = () => {
               const isActive = item.url.startsWith('#') && activeSection && (`#${activeSection}` === item.url);
               return (
                 <Link
-                  className={`z-50 px-3 py-2 xl:px-4 xl:py-3 2xl:px-5 2xl:py-4 whitespace-nowrap uppercase font-bold relative rounded-lg transition-all duration-300 text-sm xl:text-base 2xl:text-lg backdrop-blur-sm ${
+                  className={`z-50 px-2 py-1.5 xl:px-3 xl:py-2 2xl:px-4 2xl:py-2.5 whitespace-nowrap uppercase font-bold relative rounded-lg transition-all duration-300 text-xs xl:text-sm 2xl:text-base backdrop-blur-sm ${
                     isActive ? 'smart-bg-primary/10' : ''
                   }`}
                   key={index}
@@ -240,35 +240,6 @@ const Header = () => {
           <svg className={`relative z-30 hidden xs:block pointer-events-none transition-opacity duration-500 ease-in-out ${
             scrolled ? 'opacity-20' : 'opacity-100'
           }`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2500 97">
-            <defs>
-              <linearGradient id="headerShineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="white" stopOpacity="0" />
-                <stop offset="42%" stopColor="white" stopOpacity="0" />
-                <stop offset="50%" stopColor="white" stopOpacity="0.95" />
-                <stop offset="58%" stopColor="white" stopOpacity="0" />
-                <stop offset="100%" stopColor="white" stopOpacity="0" />
-              </linearGradient>
-              <linearGradient id="headerShineGradientCore" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="white" stopOpacity="0" />
-                <stop offset="48%" stopColor="white" stopOpacity="0" />
-                <stop offset="49%" stopColor="white" stopOpacity="1" />
-                <stop offset="51%" stopColor="white" stopOpacity="1" />
-                <stop offset="52%" stopColor="white" stopOpacity="0" />
-                <stop offset="100%" stopColor="white" stopOpacity="0" />
-              </linearGradient>
-              <filter id="headerShineBlur" x="-20%" y="-200%" width="140%" height="500%" filterUnits="userSpaceOnUse">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="4" />
-              </filter>
-              <filter id="headerShineBlurLight" x="-20%" y="-200%" width="140%" height="500%" filterUnits="userSpaceOnUse">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="2" />
-              </filter>
-              <clipPath id="headerBandClip" clipPathUnits="userSpaceOnUse">
-                <path
-                  d="M 0.315 91 L -0.014 97 L 2391.63 97 C 2411.38 96.996 2430.32 89.143 2444.28 75.169 C 2444.28 75.169 2478.74 40.715 2495.96 23.49 C 2519.86 -0.404 2549.44 0 2549.44 0 C 2549.44 -0.293 2536.457 0 2531.59 0 C 2521.156 0 2501.577 8.305 2492.2 17.682 C 2472.473 37.409 2457.583 52.913 2440.37 70.126 C 2426.067 84.429 2406.699 91 2389.44 91 C 2379.532 91 2371.637 91 2371.637 91 L 0.315 91 Z"
-                  transform="matrix(-1, 0, 0, -1, 2549.43994141, 96.999985)"
-                />
-              </clipPath>
-            </defs>
             <path
               fill={config.menuBackground}
               d="M -379.355 -0.012 L -379.355 74.988 L 1949.14 74.988 C 1964.82 74.988 1995.639 70.748 2006.719 59.658 C 2006.719 59.658 2035.045 35.513 2048.725 21.843 C 2067.695 2.873 2069.382 -0.012 2069.382 -0.012 L -379.355 -0.012 Z"
@@ -281,28 +252,6 @@ const Header = () => {
               d="M 0.315 91 L -0.014 97 L 2391.63 97 C 2411.38 96.996 2430.32 89.143 2444.28 75.169 C 2444.28 75.169 2478.74 40.715 2495.96 23.49 C 2519.86 -0.404 2549.44 0 2549.44 0 C 2549.44 -0.293 2536.457 0 2531.59 0 C 2521.156 0 2501.577 8.305 2492.2 17.682 C 2472.473 37.409 2457.583 52.913 2440.37 70.126 C 2426.067 84.429 2406.699 91 2389.44 91 C 2379.532 91 2371.637 91 2371.637 91 L 0.315 91 Z"
               transform="matrix(-1, 0, 0, -1, 2549.43994141, 96.999985)"
             />
-            <g style={{ mixBlendMode: 'screen', opacity: 0.95 }} clipPath="url(#headerBandClip)">
-              <g transform="rotate(-8 1250 48)">
-                <rect
-                  x="-1200"
-                  y="-220"
-                  width="1600"
-                  height="440"
-                  fill="url(#headerShineGradient)"
-                  filter="url(#headerShineBlur)"
-                  className="header-shine"
-                />
-                <rect
-                  x="-1200"
-                  y="-220"
-                  width="700"
-                  height="440"
-                  fill="url(#headerShineGradientCore)"
-                  filter="url(#headerShineBlurLight)"
-                  className="header-shine-core"
-                />
-              </g>
-            </g>
           </svg>
         </div>
       </div>
@@ -378,11 +327,11 @@ const Header = () => {
                 ];
                 console.log('Mobile menu rendering items:', menuItems);
                 return menuItems.map((item, index) => (
-                <li key={index} className="opacity-0 animate-[fadeInUp_0.6s_ease-out_forwards]" style={{ animationDelay: `${index * 100}ms` }}>
+                <li key={index}>
                   <Link 
                     href={item.url} 
                     onClick={(e) => { handleSmoothAnchorClick(e, item.url); closeMobileMenu(); }} 
-                    className="group relative block py-5 px-6 rounded-2xl uppercase font-bold text-lg transition-all duration-500 overflow-hidden backdrop-blur-sm border hover:scale-105 hover:-translate-y-1"
+                    className="group relative block py-4 px-5 rounded-2xl uppercase font-bold text-base transition-all duration-500 overflow-hidden backdrop-blur-sm border hover:scale-105 hover:-translate-y-1"
                     style={{
                       background: `linear-gradient(135deg, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.02) 100%)`,
                       borderColor: `${config.primaryColor || '#ef4444'}40`,

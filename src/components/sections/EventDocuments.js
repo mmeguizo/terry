@@ -10,7 +10,7 @@ const EventDocuments = () => {
   return (
     <section 
       id="documents" 
-      className="relative py-20 scroll-mt-24 overflow-hidden"
+      className="relative py-12 scroll-mt-24 overflow-hidden"
       style={{
         background: config.menuBackground || '#ffffff'
       }}
@@ -70,19 +70,19 @@ const EventDocuments = () => {
       </div>
       
       <div className="container relative z-10">
-        <div className="text-center mb-16">
+        <div className="text-center mb-10">
           <h1 
-            className="xs:text-5xl text-4xl font-bold mb-4 uppercase tracking-wider"
+            className="xs:text-4xl text-3xl font-bold mb-3 uppercase tracking-wider"
             style={{ color: config.textColor || '#000000' }}
           >
             Event Documents
             <span 
-              className="block w-24 h-1 mx-auto mt-4 rounded-full"
+              className="block w-20 h-1 mx-auto mt-3 rounded-full"
               style={{ background: `linear-gradient(to right, ${config.primaryColor || '#3b82f6'}, ${config.primaryColor ? `${config.primaryColor}80` : '#3b82f680'})` }}
             ></span>
           </h1>
           <p 
-            className="text-lg max-w-2xl mx-auto"
+            className="text-base max-w-2xl mx-auto"
             style={{ color: config.textColor || '#000000' }}
           >
             Access all essential event documentation and regulations
@@ -93,8 +93,7 @@ const EventDocuments = () => {
           {config.eventDocuments.map((eventDocument, index) => (
             <div
               key={index}
-              className="opacity-0 translate-y-8 animate-[fadeInUp_0.6s_ease-out_forwards] flex"
-              style={{ animationDelay: `${index * 100}ms` }}
+              className="flex"
             >
               <IconLinkButton 
                 href={eventDocument.url}
