@@ -199,9 +199,6 @@ export async function GET(req, ctx) {
     };
 
     console.log("[event-api] root keys →", Object.keys(merged || {}));
-    
-    // Debug: Log raw API response to see what RaceReady sends
-    console.log("[event-api] RAW RACEREADY RESPONSE →", JSON.stringify(json, null, 2));
 
     const evt = normalizeEvent(merged);
 

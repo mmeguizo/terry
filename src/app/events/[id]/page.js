@@ -34,8 +34,11 @@ function fmtDateTime(d) {
 }
 
 async function fetchEventFromApi(id) {
-  const url = `${process.env.NEXT_PUBLIC_BASE_URL || ""}/api/events/${encodeURIComponent(id)}`;
-  const finalUrl = url.startsWith("/") ? `http://localhost:3000${url}` : url || `http://localhost:3000/api/events/${id}`;
+  // Build URL - handle both absolute and relative base URLs
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.SITE_DOMAIN || "";
+  const apiPath = `/api/events/${encodeURIComponent(id)}`;
+  const finalUrl = baseUrl ? `${baseUrl}${apiPath}` : apiPath;
+  
   console.log("[event-page] fetch →", finalUrl);
 
   const res = await fetch(finalUrl, { cache: "no-store" });
@@ -53,9 +56,6 @@ async function fetchEventFromApi(id) {
     entries: json.event.entries?.length || 0,
     categories: json.event.categories?.length || 0,
   });
-  
-  // Debug: Log all event fields to see what data we're getting
-  console.log("[event-page] FULL EVENT DATA →", json.event);
   
   return json.event;
 }
