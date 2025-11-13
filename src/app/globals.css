@@ -417,24 +417,27 @@ html {
 }
 
 header {
-  height: 77px !important;
+  min-height: 80px;
+  height: auto;
   background-color: transparent;
+  border-bottom: none;
 }
 
-.menu-container {
-  & > svg {
-    top: 0;
-    left: 0;
-    opacity: 1;
-    position: absolute;
-    width: 2500px;
-    height: 97px;
-    z-index: 40;
-  }
+.logo-container img {
+  transition: opacity 0.2s ease;
 }
 
-.logo-container {
-  /* Removed background - always transparent */
+.logo-container img:hover {
+  opacity: 0.9;
+}
+
+/* Navigation hover states */
+header nav a.group:hover {
+  color: var(--primary-color, #ef4444) !important;
+}
+
+header nav a.group:hover span[style*="backgroundColor"] {
+  box-shadow: 0 0 8px var(--primary-color, #ef4444)60 !important;
 }
 
 .button {
