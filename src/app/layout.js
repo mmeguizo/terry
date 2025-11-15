@@ -5,6 +5,7 @@ import PageOpener from "@/components/layout/PageOpener";
 import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import ConfigProvider from "@/context/ConfigProvider";
+import PerformanceMonitor from "@/components/debug/PerformanceMonitor";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
 import NotificationManager from "@/components/pwa/NotificationManager";
 import NetworkStatus from "@/components/pwa/NetworkStatus";
@@ -107,6 +108,7 @@ export default async function RootLayout({ children }) {
               <ErrorBoundary context="footer" level="component">
                 <Footer />
               </ErrorBoundary>
+              <PerformanceMonitor />
               <InstallPrompt />
               <NotificationManager />
               <NetworkStatus />
