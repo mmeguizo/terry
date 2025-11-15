@@ -137,26 +137,36 @@ const Header = () => {
         }}
       ></div>
       <div className="flex items-center w-full px-3 xs:px-8 xl:px-16 2xl:px-24 3xl:px-32 relative z-40">
-        <div className="logo-container relative z-50 h-full flex items-center">
-          <Link href="/" className="relative z-50 flex items-center gap-3">
+        <div className="logo-container relative z-50 h-full flex items-center pt-2 -mt-1" style={{
+          background: 'transparent'
+        }}>
+          <Link href="/" className="relative z-50 flex items-center gap-3 transition-transform duration-300 hover:scale-105">
             {config.logoImage && config.logoImage.trim() !== '' ? (
-              <Image 
-                src={config.logoImage} 
-                alt="Logo" 
-                width={300} 
-                height={100} 
-                priority 
-                className="w-auto h-16 sm:h-12 xl:h-14 2xl:h-16 object-contain transition-all duration-300" 
-              />
+              <div className="relative">
+                <Image
+                  src={config.logoImage}
+                  alt="Logo"
+                  width={300}
+                  height={100}
+                  priority
+                  className="w-auto h-16 sm:h-12 xl:h-14 2xl:h-16 object-contain transition-all duration-300 drop-shadow-lg"
+                  style={{
+                    filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4))',
+                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+                  }}
+                />
+              </div>
             ) : (
-              <div className="w-auto h-16 sm:h-12 xl:h-14 2xl:h-16 flex items-center justify-center bg-gray-200 rounded-lg px-4">
+              <div className="w-auto h-16 sm:h-12 xl:h-14 2xl:h-16 flex items-center justify-center bg-gray-200 rounded-lg px-4 shadow-lg" style={{
+                boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)'
+              }}>
                 <span className="text-gray-600 font-bold text-sm">LOGO</span>
               </div>
             )}
             {/* Mobile title text */}
             <div className="flex flex-col lg:hidden">
-              <h1 className="text-lg font-bold smart-text-primary leading-tight" style={{ color: config.textColor || 'var(--text-primary)' }}>{config.siteTitle}</h1>
-              <p className="text-xs smart-text-secondary font-medium uppercase tracking-wide" style={{ color: config.textColor ? `${config.textColor}80` : 'var(--text-secondary)' }}>{config.tagline || 'Racing Event'}</p>
+              <h1 className="text-lg font-bold smart-text-primary leading-tight drop-shadow-md" style={{ color: config.textColor || 'var(--text-primary)', textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)' }}>{config.siteTitle}</h1>
+              <p className="text-xs smart-text-secondary font-medium uppercase tracking-wide drop-shadow-sm" style={{ color: config.textColor ? `${config.textColor}80` : 'var(--text-secondary)', textShadow: '0 1px 2px rgba(0, 0, 0, 0.2)' }}>{config.tagline || 'Racing Event'}</p>
             </div>
           </Link>
         </div>

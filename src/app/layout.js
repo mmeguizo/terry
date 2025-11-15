@@ -1,14 +1,9 @@
 import { Exo_2 } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
-import PageOpener from "@/components/layout/PageOpener";
 import Footer from "@/components/layout/Footer";
 import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import ConfigProvider from "@/context/ConfigProvider";
-import PerformanceMonitor from "@/components/debug/PerformanceMonitor";
-import InstallPrompt from "@/components/pwa/InstallPrompt";
-import NotificationManager from "@/components/pwa/NotificationManager";
-import NetworkStatus from "@/components/pwa/NetworkStatus";
 import ErrorBoundary from "@/components/error/ErrorBoundary";
 
 const exo2 = Exo_2({
@@ -98,7 +93,6 @@ export default async function RootLayout({ children }) {
         <ConfigProvider config={config}>
           <ErrorBoundary context="app" level="page">
             <div className="flex flex-col justify-between min-h-screen">
-              <PageOpener />
               <ErrorBoundary context="navigation" level="component">
                 <Header />
               </ErrorBoundary>
@@ -108,10 +102,6 @@ export default async function RootLayout({ children }) {
               <ErrorBoundary context="footer" level="component">
                 <Footer />
               </ErrorBoundary>
-              <PerformanceMonitor />
-              <InstallPrompt />
-              <NotificationManager />
-              <NetworkStatus />
               <MobileBottomNav />
             </div>
           </ErrorBoundary>
