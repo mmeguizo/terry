@@ -3,6 +3,7 @@ import Image from 'next/image';
 import configData from '@/config/site-config.json';
 import fs from 'fs';
 import path from 'path';
+import BackButton from '@/components/ui/BackButton';
 
 // This will be used for static generation of known news items
 export async function generateStaticParams() {
@@ -176,9 +177,7 @@ export default async function NewsPage({ params }) {
                                 )}
                             </div>
                             <div className="mb-8">
-                              <a href="#news" className="button" style={{ "--primary-color": '#3b82f6' }}>
-                                ← Back to News
-                              </a>
+                              <BackButton />
                             </div>
                         </div>
 
