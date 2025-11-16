@@ -1,42 +1,58 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function BackButton() {
   const router = useRouter();
-  const [canGoBack, setCanGoBack] = useState(false);
-  const [referrer, setReferrer] = useState(null);
+  const [label, setLabel] = useState("Go Back");
+  const [backPath, setBackPath] = useState("/events");
 
   useEffect(() => {
-    // Check if browser history is available
-    setCanGoBack(window.history.length > 1);
+    // Check localStorage for previous page
+    const previousPage = localStorage.getItem("previousPage");
+    const currentPage = window.location.pathname;
 
-    // Try to determine where user came from
-    const ref = document.referrer;
-    if (ref) {
-      setReferrer(ref);
+    // Store current page for next navigation
+    localStorage.setItem("previousPage", currentPage);
+
+    // Check document.referrer
+    const referrer = document.referrer;
+    let detectedLabel = "Back to Events";
+    let detectedPath = "/events";
+
+    if (referrer) {
+      if (referrer.includes("/news")) {
+        detectedLabel = "Back to News";
+        detectedPath = "/news";
+      } else if (referrer.includes("/events")) {
+        detectedLabel = "Back to Events";
+        detectedPath = "/events";
+      }
+    } else if (previousPage && previousPage !== currentPage) {
+      // Use stored previous page if referrer not available
+      if (previousPage.includes("/news")) {
+        detectedLabel = "Back to News";
+        detectedPath = "/news";
+      } else if (previousPage.includes("/events")) {
+        detectedLabel = "Back to Events";
+        detectedPath = "/events";
+      }
     }
+
+    setLabel(detectedLabel);
+    setBackPath(detectedPath);
   }, []);
 
   const handleBack = () => {
-    if (canGoBack) {
+    // Try to go back in history first
+    if (window.history.length > 1) {
       router.back();
     } else {
-      router.push("/events");
+      // Fallback to detected path
+      router.push(backPath);
     }
   };
-
-  // Determine label based on referrer
-  const getLabel = () => {
-    if (!referrer) return "Back to Events";
-    if (referrer.includes("/news")) return "Back to News";
-    if (referrer.includes("/events")) return "Back to Events";
-    return "Go Back";
-  };
-
-  const label = getLabel();
 
   return (
     <button
