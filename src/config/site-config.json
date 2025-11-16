@@ -194,18 +194,18 @@
   "sponsors": [
     {
       "name": "Honda Motor Co., Ltd.",
-      "logo": "https://logos-world.net/wp-content/uploads/2021/03/Honda-Logo-2000-present.png",
-      "url": "#"
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/3/38/Honda.svg",
+      "url": "https://www.honda.com"
     },
     {
       "name": "Toyota Motor Corporation",
-      "logo": "https://wp.logos-download.com/wp-content/uploads/2016/02/Toyota_Europe_Logo_2020-700x453.png",
-      "url": "#"
+      "logo": "https://media.topgear.com.ph/wp-content/uploads/2025/07/toyota-logo-car.png",
+      "url": "https://www.toyota.com"
     },
     {
       "name": "Ford Motor Company",
-      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ford_logo_flat.svg/2560px-Ford_logo_flat.svg.png",
-      "url": "#"
+      "logo": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Ford_logo_flat.svg/1200px-Ford_logo_flat.svg.png",
+      "url": "https://www.ford.com"
     }
   ],
   "footer": {

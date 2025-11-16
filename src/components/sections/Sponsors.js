@@ -7,8 +7,18 @@ import Link from "next/link";
 const Sponsors = () => {
   const config = useConfig();
 
+  // Prioritize local config sponsors, fallback to API sponsors
+  const sponsors = (config.sponsors && config.sponsors.length > 0)
+    ? config.sponsors
+    : [];
+
+  // Don't render if no sponsors available
+  if (!sponsors || sponsors.length === 0) {
+    return null;
+  }
+
   // Create enough duplicates for seamless scrolling
-  const sponsorItems = [...config.sponsors, ...config.sponsors, ...config.sponsors];
+  const sponsorItems = [...sponsors, ...sponsors, ...sponsors];
 
   return (
     <section 

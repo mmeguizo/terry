@@ -6,6 +6,15 @@ export async function GET() {
   try {
     const siteSlug = process.env.SITE_SLUG;
 
+    // Load local site config to get sponsors
+    let localConfig = {};
+    try {
+      const configModule = await import("@/config/site-config.json");
+      localConfig = configModule.default;
+    } catch (e) {
+      console.warn("Could not load local config for sponsors:", e);
+    }
+
     if (!siteSlug) {
       const error = new RacingError(
         RacingErrorTypes.VALIDATION_ERROR,
@@ -52,14 +61,20 @@ export async function GET() {
         throw new Error(`No site found with slug: ${siteSlug}`);
       }
 
-      return transformStrapiData(strapiData.data[0]);
+      // Get transformed data from Strapi (which will have empty sponsors array)
+      const transformedData = transformStrapiData(strapiData.data[0]);
+
+      // Merge in sponsors from local config
+      transformedData.sponsors = localConfig.sponsors || [];
+
+      return transformedData;
     });
 
     // Add cache metadata to response headers
     const response = NextResponse.json(result.data);
     response.headers.set('X-Cache-Status', result.fromCache ? 'HIT' : 'MISS');
     response.headers.set('X-Cache-Age', result.age?.toString() || '0');
-    
+
     if (result.stale) {
       response.headers.set('X-Cache-Stale', 'true');
     }
@@ -183,16 +198,8 @@ function transformStrapiData(data) {
         : raw;
       return { ...item, image: normalizedImage };
     }),
-    sponsors: (data.sponsors || []).map((sponsor) => {
-      const mediaFromObject = sponsor.logo?.data?.attributes?.url
-        ? `${strapiUrl}${sponsor.logo.data.attributes.url}`
-        : null;
-      const raw = mediaFromObject || sponsor.logo || null;
-      const normalizedLogo = typeof raw === "string"
-        ? (raw.startsWith("http") ? raw : `${strapiUrl}${raw}`)
-        : raw;
-      return { ...sponsor, logo: normalizedLogo };
-    }),
+    // Always use empty array for sponsors - will use local site config in Sponsors component
+    sponsors: [],
     // footer: data.footer ||[],
     footer: {
       backgroundColor: data.footer?.[0]?.backgroundColor || "#000000",

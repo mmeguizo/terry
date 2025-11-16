@@ -1,8 +1,8 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
-import EventCalendar from '@/components/calendar/EventCalendar';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import CalendarView from '@/components/calendar/CalendarView';
 
 async function getEvents() {
   try {
@@ -125,18 +125,9 @@ export default async function EventCalendarPage() {
           {/* Calendar */}
           <Suspense fallback={<CalendarSkeleton />}>
             <div className="mb-8">
-              <EventCalendar events={events} />
+              <CalendarView events={events} config={config} />
             </div>
           </Suspense>
-
-          {/* Event count */}
-          {events.length > 0 && (
-            <div className="text-center mt-8">
-              <p style={{ color: config.textColor || '#1a1a1a', opacity: 0.7 }}>
-                Showing {events.length} upcoming event{events.length !== 1 ? 's' : ''}
-              </p>
-            </div>
-          )}
 
           {/* Empty state */}
           {events.length === 0 && (

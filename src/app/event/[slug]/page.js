@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import BackButton from "@/components/ui/BackButton";
 
 // Disable ALL caching completely
 export const dynamic = "force-dynamic";
@@ -505,15 +506,7 @@ export default async function EventDetailPage({ params }) {
 
           {/* Back Button */}
           <div className="pt-8">
-            <Link
-              href="/events"
-              className="inline-flex items-center gap-3 text-red-600 hover:text-red-700 font-bold uppercase text-sm tracking-wide group"
-            >
-              <svg className="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
-              Back to Events
-            </Link>
+            <BackButton />
           </div>
         </div>
       </section>
