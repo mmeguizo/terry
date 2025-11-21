@@ -5,6 +5,32 @@ import { useConfig } from "@/context/ConfigContext";
 import { HiChevronRight } from "react-icons/hi2";
 import { LinkButton, IconLinkButton } from "@/components/ui/Links";
 
+// Helper function to extract YouTube video ID and create embed URL
+const getYouTubeEmbedUrl = (url) => {
+  if (!url) return null;
+
+  // Extract video ID from various YouTube URL formats
+  let videoId = null;
+
+  // youtu.be format
+  if (url.includes('youtu.be/')) {
+    videoId = url.split('youtu.be/')[1]?.split(/[?&]/)[0];
+  }
+  // youtube.com/watch?v= format
+  else if (url.includes('youtube.com/watch?v=')) {
+    videoId = url.split('v=')[1]?.split('&')[0];
+  }
+  // youtube.com/embed/ format (already embedded)
+  else if (url.includes('youtube.com/embed/')) {
+    videoId = url.split('embed/')[1]?.split(/[?&]/)[0];
+  }
+
+  if (!videoId) return null;
+
+  // Create embed URL with autoplay, loop, mute, and no controls
+  return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
+};
+
 const Hero = () => {
   const config = useConfig();
   const [timeLeft, setTimeLeft] = useState({
@@ -106,28 +132,28 @@ const Hero = () => {
   const backgroundImage = nextEvent?.image || config.hero?.background;
   const backgroundVideo = config.hero?.backgroundVideo;
 
+  // Check if backgroundVideo is a YouTube URL
+  const isYouTube = backgroundVideo && (
+    backgroundVideo.includes('youtube.com') ||
+    backgroundVideo.includes('youtu.be')
+  );
+  const youtubeEmbedUrl = isYouTube ? getYouTubeEmbedUrl(backgroundVideo) : null;
+
+  // Debug logging
+  console.log('🎥 Video config:', {
+    backgroundVideo,
+    isYouTube,
+    youtubeEmbedUrl,
+    backgroundImage
+  });
+
   return (
     <section
       id="home"
       className="z-0 relative w-full h-[900px] lg:h-[750px] xl:h-[800px] 2xl:h-[900px] 3xl:h-[1000px] bg-neutral-700 overflow-hidden scroll-mt-24"
     >
-      {/* Video Background (if available) */}
-      {backgroundVideo && (
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          poster={backgroundImage}
-          onLoadedData={() => setVideoLoaded(true)}
-          className="absolute inset-0 w-full h-full object-cover z-0"
-        >
-          <source src={backgroundVideo} type="video/mp4" />
-        </video>
-      )}
-      
-      {/* Image Background (fallback or poster) */}
-      {!backgroundVideo && backgroundImage && (
+      {/* Image Background (poster/fallback) - Always show as base layer */}
+      {backgroundImage && (
         <div
           className="absolute inset-0 w-full h-full bg-cover bg-center bg-fixed z-0"
           style={{
@@ -137,11 +163,40 @@ const Hero = () => {
         />
       )}
 
+      {/* YouTube Video Background - Layer on top of image */}
+      {youtubeEmbedUrl && (
+        <div className="absolute inset-0 w-full h-full z-[1]">
+          <iframe
+            src={youtubeEmbedUrl}
+            className="absolute top-1/2 left-1/2 w-[300%] h-[300%] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+            frameBorder="0"
+            allow="autoplay; encrypted-media"
+            allowFullScreen
+            title="Hero Background Video"
+          />
+        </div>
+      )}
+
+      {/* MP4 Video Background (if not YouTube) */}
+      {backgroundVideo && !isYouTube && (
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={backgroundImage}
+          onLoadedData={() => setVideoLoaded(true)}
+          className="absolute inset-0 w-full h-full object-cover z-[1]"
+        >
+          <source src={backgroundVideo} type="video/mp4" />
+        </video>
+      )}
+
       {/* Enhanced overlay with gradient */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/40 z-0"></div>
-      <div className="container absolute z-10 inset-0 flex items-center text-center gap-4 text-white pt-20 xl:pt-24 2xl:pt-32 px-4 xl:px-8">
-        <div className="grid xl:grid-cols-[3fr_2fr] gap-12 xl:gap-24 2xl:gap-32 3xl:gap-40 w-full lg:grid-cols-[1fr_1fr]">
-          <div className="grow font-bold flex flex-col gap-4 xl:gap-6">
+      <div className="container absolute z-10 inset-0 flex items-center text-center gap-4 text-white pt-16 xl:pt-20 2xl:pt-24 px-4 xl:px-8">
+        <div className="grid xl:grid-cols-[3fr_2fr] gap-8 xl:gap-16 2xl:gap-20 w-full lg:grid-cols-[1fr_1fr]">
+          <div className="grow flex flex-col gap-3 xl:gap-4">
             <div className="flex justify-center lg:justify-start mb-4 xl:mb-6">
               <div className="grid grid-cols-2 xl:grid-cols-4 gap-2 xs:gap-3 xl:gap-4">
                 {[
@@ -167,44 +222,72 @@ const Hero = () => {
                 ))}
               </div>
             </div>
-            <h1 className="xs:text-3xl text-2xl xl:text-4xl 2xl:text-5xl 3xl:text-6xl text-start uppercase leading-tight text-white font-bold">
+            <h1 className="xs:text-2xl text-xl xl:text-3xl 2xl:text-4xl 3xl:text-5xl text-start uppercase leading-tight text-white font-normal">
               {typeof eventName === 'string' ? eventName : 'Event Name TBA'}
             </h1>
 
-            <h1 className="xs:text-2xl text-xl xl:text-3xl 2xl:text-4xl 3xl:text-5xl text-start uppercase leading-tight text-white font-semibold">
+            <h2 className="xs:text-xl text-lg xl:text-2xl 2xl:text-3xl 3xl:text-4xl text-start uppercase leading-tight text-white font-light">
               {typeof eventLocation === 'string' ? eventLocation : 'Venue TBA'}
-            </h1>
+            </h2>
 
-            <p className="text-start uppercase text-sm xl:text-base 2xl:text-lg text-gray-200 font-medium">{formattedEventDate}</p>
-            {/* Dynamic button based on event state - TODO: implement when API is updated */}
-            <LinkButton href="/event-info">Event Info</LinkButton>
+            <p className="text-start uppercase text-xs xl:text-sm 2xl:text-base text-gray-200 font-light">{formattedEventDate}</p>
+
+            {/* Dynamic buttons based on event_status */}
+            <div className="flex gap-3 justify-start flex-wrap">
+              {nextEvent?.event_status === 'entries-open' && (
+                <LinkButton href={nextEvent?.entry_url || '/event-info'}>
+                  Enter Now
+                </LinkButton>
+              )}
+              {nextEvent?.event_status === 'entries-closed' && (
+                <button
+                  disabled
+                  className="px-6 py-3 bg-gray-500 text-white font-semibold rounded-lg opacity-60 cursor-not-allowed"
+                >
+                  Entries Closed
+                </button>
+              )}
+              {nextEvent?.event_status === 'live' && (
+                <div className="px-6 py-3 bg-red-600 text-white font-bold rounded-lg animate-pulse">
+                  🔴 Happening Now!
+                </div>
+              )}
+              {(!nextEvent?.event_status || nextEvent?.event_status === 'upcoming') && (
+                <div className="px-6 py-3 bg-neutral-700 text-white font-semibold rounded-lg border border-neutral-600">
+                  Entries Opening Soon
+                </div>
+              )}
+              <LinkButton href="/event-info">
+                Event Info
+              </LinkButton>
+            </div>
           </div>
-          <div className="shrink-0 flex flex-col justify-end grow gap-3 xl:gap-4 2xl:gap-5">
-            {Array.isArray(config.hero?.buttons) && config.hero.buttons.map((button, index) => {
-              // Convert external URLs to internal event/document links
-              let internalHref = button.url;
-              if (typeof button.url === 'string' && button.url.length > 0) {
-                if (button.url.startsWith('http') || button.url.startsWith('//')) {
-                  // For external URLs, link to our event page or documents
-                  if (button.label?.toLowerCase().includes('event') || button.label?.toLowerCase().includes('info')) {
-                    internalHref = config.currentEventId ? `/event/${config.currentEventId}` : '/events';
-                  } else if (button.label?.toLowerCase().includes('document') || button.label?.toLowerCase().includes('download')) {
-                    internalHref = '#documents';
-                  } else {
-                    internalHref = '/events';
-                  }
-                }
-              } else {
-                internalHref = '/events';
-              }
-              
-              return (
-                <IconLinkButton key={index} href={internalHref}>
+          <div className="shrink-0 flex flex-col justify-end grow gap-2 xl:gap-2.5">
+            {/* Populate from next event documents if available */}
+            {Array.isArray(nextEvent?.documents) && nextEvent.documents.length > 0 ? (
+              nextEvent.documents.map((doc, index) => (
+                <IconLinkButton key={index} href={doc.url || doc.link || '#'} newTab={true}>
                   <HiChevronRight />
-                  {typeof button.label === 'string' ? button.label : 'Action'}
+                  {doc.name || doc.title || doc.label || 'Document'}
                 </IconLinkButton>
-              );
-            })}
+              ))
+            ) : (
+              // GT4-inspired default buttons
+              <>
+                <IconLinkButton href="/event-timetable">
+                  <HiChevronRight />
+                  Event Timetable
+                </IconLinkButton>
+                <IconLinkButton href="/race-tickets">
+                  <HiChevronRight />
+                  Race Tickets
+                </IconLinkButton>
+                <IconLinkButton href="/noticeboard">
+                  <HiChevronRight />
+                  Noticeboard
+                </IconLinkButton>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -54,58 +54,18 @@ const Footer = () => {
             </p>
           </div>
 
-          {/* Mobile-optimized grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
-            
-            {/* Quick Links Section */}
-            <div className="text-center sm:text-left">
-              <h2 className="text-white text-lg font-bold mb-4 relative inline-block">
-                Quick Links
-                <div className="absolute -bottom-1 left-1/2 sm:left-0 transform -translate-x-1/2 sm:translate-x-0 w-12 h-0.5" style={{ backgroundColor: config.primaryColor || '#3b82f6' }}></div>
-              </h2>
-              <nav className="flex flex-col gap-2">
-                {config.menu.map((item, index) => (
-                  <Link 
-                    key={index} 
-                    href={item.url} 
-                    className="text-white/80 hover:text-white transition-all duration-200 py-2 px-3 rounded-lg hover:bg-white/5 inline-block text-center sm:text-left"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
-            </div>
-
-            {/* Event Information Section */}
-            <div className="text-center sm:text-left">
-              <h2 className="text-white text-lg font-bold mb-4 relative inline-block">
-                Event Info
-                <div className="absolute -bottom-1 left-1/2 sm:left-0 transform -translate-x-1/2 sm:translate-x-0 w-12 h-0.5" style={{ backgroundColor: config.primaryColor || '#3b82f6' }}></div>
-              </h2>
-              <div className="flex flex-col gap-2">
-                {config.eventDocuments?.slice(0, 4).map((doc, index) => (
-                  <Link 
-                    key={index} 
-                    href={doc.url} 
-                    className="text-white/80 hover:text-white transition-all duration-200 py-2 px-3 rounded-lg hover:bg-white/5 text-sm inline-block text-center sm:text-left"
-                  >
-                    {doc.label}
-                  </Link>
-                )) || (
-                  <p className="text-white/60 text-sm">Event documents coming soon</p>
-                )}
-              </div>
-            </div>
+          {/* Two-column grid: Connect With Us and Acknowledgment */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
 
             {/* Social Media and Contact Section */}
-            <div className="text-center sm:text-left sm:col-span-2 lg:col-span-1">
+            <div className="text-center lg:text-left">
               <h2 className="text-white text-lg font-bold mb-4 relative inline-block">
                 Connect With Us
-                <div className="absolute -bottom-1 left-1/2 sm:left-0 transform -translate-x-1/2 sm:translate-x-0 w-12 h-0.5" style={{ backgroundColor: config.primaryColor || '#3b82f6' }}></div>
+                <div className="absolute -bottom-1 left-1/2 lg:left-0 transform -translate-x-1/2 lg:translate-x-0 w-12 h-0.5" style={{ backgroundColor: config.primaryColor || '#3b82f6' }}></div>
               </h2>
-              
+
               {/* Social Media Icons */}
-              <div className="flex justify-center sm:justify-start gap-3 mb-6">
+              <div className="flex justify-center lg:justify-start gap-3 mb-6">
                 {config.socials?.map((social, index) => {
                   const IconComponent = FaIcons[`Fa${social.platform.charAt(0) + social.platform.slice(1)}`];
                   return (
@@ -140,20 +100,32 @@ const Footer = () => {
 
               {/* Contact Information */}
               <div className="space-y-2">
-                <p className="flex items-center justify-center sm:justify-start gap-2 text-white/70 text-sm">
+                <p className="flex items-center justify-center lg:justify-start gap-2 text-white/70 text-sm">
                   <FaIcons.FaEnvelope style={{ color: config.primaryColor || '#3b82f6' }} />
                   info@{config.siteTitle?.toLowerCase().replace(/\s+/g, '') || 'racing'}.com.au
                 </p>
-                <p className="flex items-center justify-center sm:justify-start gap-2 text-white/70 text-sm">
+                <p className="flex items-center justify-center lg:justify-start gap-2 text-white/70 text-sm">
                   <FaIcons.FaPhone style={{ color: config.primaryColor || '#3b82f6' }} />
                   +61 (0) 123 456 789
                 </p>
-                <p className="flex items-center justify-center sm:justify-start gap-2 text-white/70 text-sm">
+                <p className="flex items-center justify-center lg:justify-start gap-2 text-white/70 text-sm">
                   <FaIcons.FaMapMarkerAlt style={{ color: config.primaryColor || '#3b82f6' }} />
                   {config.hero?.eventLocation || 'Racing Venue'}
                 </p>
               </div>
             </div>
+
+            {/* Acknowledgment of Country Section */}
+            <div className="text-center lg:text-left">
+              <h2 className="text-white text-lg font-bold mb-4 relative inline-block">
+                Acknowledgment of Country
+                <div className="absolute -bottom-1 left-1/2 lg:left-0 transform -translate-x-1/2 lg:translate-x-0 w-12 h-0.5" style={{ backgroundColor: config.primaryColor || '#3b82f6' }}></div>
+              </h2>
+              <p className="text-white/70 text-sm leading-relaxed">
+                MRA acknowledges the Traditional Custodians of the lands on which we live and work and pays respect to Elders past and present. We extend that respect to all Aboriginal and Torres Strait Islander peoples and recognise their continuing connection to Country.
+              </p>
+            </div>
+
           </div>
         </div>
       </div>

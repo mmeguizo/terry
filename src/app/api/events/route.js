@@ -19,24 +19,33 @@ function getOrigin() {
 }
 
 export async function GET(request) {
-  const siteHost = getSiteFromRequest(request);
-
-  // If you support query params (e.g., ?siteHost=...), prefer header then query
-  const url = new URL(request.url);
-  const qsSite = url.searchParams.get("siteHost");
-  const effectiveSite = siteHost || qsSite || null;
-
   try {
-    // When listing events from Strapi or internal API, forward the site identifier
+    // Try RaceReady Events API first
+    const origin = getOrigin();
+    const raceReadyRes = await fetch(`${origin}/api/raceready-events?view=events`, {
+      cache: "no-store",
+    });
+
+    if (raceReadyRes.ok) {
+      const events = await raceReadyRes.json();
+      if (Array.isArray(events) && events.length > 0) {
+        console.log('✅ Returning events from RaceReady:', events.length);
+        return NextResponse.json(events);
+      }
+    }
+
+    // Fallback to Strapi (legacy)
+    const siteHost = getSiteFromRequest(request);
+    const url = new URL(request.url);
+    const qsSite = url.searchParams.get("siteHost");
+    const effectiveSite = siteHost || qsSite || null;
+
     const fetchInit = {
       headers: effectiveSite ? { "x-site-host": effectiveSite } : undefined,
       cache: "no-store",
     };
 
-    // Try Strapi-backed events first (example)
     const strapiUrl = process.env.STRAPI_URL;
-    // adjust your Strapi query to filter by site host if you have such a field:
-    // e.g. /api/events?filters[site][host][$eq]=<hostname>&populate=deep
     const eventsRes = await fetch(
       `${strapiUrl}/api/events?populate=deep${effectiveSite ? `&filters[site][host][$eq]=${encodeURIComponent(effectiveSite)}` : ""}`,
       fetchInit
@@ -44,20 +53,31 @@ export async function GET(request) {
 
     if (eventsRes.ok) {
       const json = await eventsRes.json();
-      // normalize to array expected by callers
-      const items = Array.isArray(json?.data) ? json.data.map(d => /* map attributes */ d.attributes) : [];
+      const items = Array.isArray(json?.data) ? json.data.map(d => d.attributes) : [];
       return NextResponse.json(items);
     }
 
-    // fallback: synthesize from Site.hero if no events collection
+    // Final fallback: synthesize from Site.hero
     const siteRes = await fetch(`${strapiUrl}/api/site?populate=deep`, fetchInit);
     const siteJson = siteRes.ok ? await siteRes.json() : null;
     const siteAttrs = siteJson?.data?.attributes;
-    const synthesized = siteAttrs ? [ /* create event object from siteAttrs.hero */ transformSiteHeroToEvent(siteAttrs) ] : [];
+    const synthesized = siteAttrs ? [transformSiteHeroToEvent(siteAttrs)] : [];
     return NextResponse.json(synthesized);
   } catch (e) {
+    console.error('Events API error:', e);
     return NextResponse.json({ error: e?.message || "Failed to fetch events" }, { status: 500 });
   }
+}
+
+// Helper to slugify strings
+function slugify(str) {
+  if (!str) return '';
+  return str.toString().toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '');
 }
 
 // helper used above - implement according to your transform
@@ -66,10 +86,13 @@ function transformSiteHeroToEvent(siteAttrs) {
   return {
     id: siteAttrs?.id ?? "site-hero",
     title: heroObj?.eventName || heroObj?.title || siteAttrs?.siteTitle,
+    name: heroObj?.eventName || heroObj?.title || siteAttrs?.siteTitle,
     slug: heroObj?.slug || slugify(heroObj?.eventName || siteAttrs?.siteTitle),
     startDate: heroObj?.eventDate,
+    date: heroObj?.eventDate,
     image: heroObj?.background,
+    venue: heroObj?.eventLocation || heroObj?.venue || 'TBD',
+    location: heroObj?.eventLocation || heroObj?.venue || 'TBD',
     path: `/events/${heroObj?.slug || (heroObj?.eventName ? slugify(heroObj.eventName) : siteAttrs.id)}`,
-    // ...other fields as required
   };
 }

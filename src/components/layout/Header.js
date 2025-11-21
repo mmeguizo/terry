@@ -13,7 +13,6 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isWebsitesMenuOpen, setIsWebsitesMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
-  const [scrolled, setScrolled] = useState(false);
   const websitesPanelRef = useRef(null);
   const mobilePanelRef = useRef(null);
 
@@ -43,20 +42,6 @@ const Header = () => {
   const closeWebsitesMenu = () => {
     setIsWebsitesMenuOpen(false);
   };
-
-  // Scroll detection for header animation
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY;
-      setScrolled(scrollPosition > 100);
-    };
-
-    // Check initial scroll position
-    handleScroll();
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Active section highlighting
   useEffect(() => {
@@ -120,25 +105,19 @@ const Header = () => {
   }, [isWebsitesMenuOpen, isMobileMenuOpen]);
 
   return (
-    <header className={`fixed w-full top-0 z-50 flex items-stretch transition-all duration-500 ease-in-out ${
-      scrolled 
-        ? 'smart-bg-secondary backdrop-blur-xl shadow-2xl border-b border-gray-200/50' 
-        : 'bg-black/20 backdrop-blur-sm'
-    }`} style={{
-      backgroundColor: scrolled ? config.menuBackground || 'rgba(255,255,255,0.95)' : undefined
+    <header className="fixed w-full top-0 z-50 flex items-stretch shadow-lg border-b border-gray-200/30" style={{
+      backgroundColor: config.menuBackground || '#ffffff'
     }}>
-      {/* Dynamic scroll indicator */}
-      <div 
-        className={`absolute bottom-0 left-0 w-full h-0.5 transition-all duration-500 ${
-          scrolled ? 'opacity-100' : 'opacity-60'
-        }`}
+      {/* Bottom accent line */}
+      <div
+        className="absolute bottom-0 left-0 w-full h-0.5"
         style={{
           background: `linear-gradient(to right, transparent, ${config.primaryColor || '#3b82f6'}, transparent)`
         }}
       ></div>
       <div className="flex items-center w-full px-3 xs:px-8 xl:px-16 2xl:px-24 3xl:px-32 relative z-40">
         <div className="logo-container relative z-50 h-full flex items-center pt-2 -mt-1" style={{
-          background: 'transparent'
+          backgroundColor: config.menuBackground || '#ffffff'
         }}>
           <Link href="/" className="relative z-50 flex items-center gap-3 transition-transform duration-300 hover:scale-105">
             {config.logoImage && config.logoImage.trim() !== '' ? (
@@ -170,13 +149,13 @@ const Header = () => {
             </div>
           </Link>
         </div>
-        <div className="relative h-full menu-container flex gap-4 xl:gap-6 2xl:gap-8 flex-grow justify-end items-center pt-[5px] xs:ps-30 z-50">
-          <div className="hidden lg:flex gap-4 xl:gap-6 2xl:gap-8 items-center" role="navigation" aria-label="Primary">
+        <div className="relative h-full menu-container flex gap-2 xl:gap-3 2xl:gap-4 flex-grow justify-end items-center pt-[5px] xs:ps-30 z-50">
+          <div className="hidden lg:flex gap-1.5 xl:gap-2 2xl:gap-2.5 items-center" role="navigation" aria-label="Primary">
             {config.menu.map((item, index) => {
               const isActive = item.url.startsWith('#') && activeSection && (`#${activeSection}` === item.url);
               return (
                 <Link
-                  className={`z-50 px-2 py-1.5 xl:px-3 xl:py-2 2xl:px-4 2xl:py-2.5 whitespace-nowrap uppercase font-bold relative rounded-lg transition-all duration-300 text-xs xl:text-sm 2xl:text-base backdrop-blur-sm ${
+                  className={`z-50 px-2 py-1.5 xl:px-2.5 xl:py-1.5 2xl:px-3 2xl:py-2 whitespace-nowrap uppercase font-medium relative rounded-lg transition-all duration-300 text-xs xl:text-sm 2xl:text-sm backdrop-blur-sm ${
                     isActive ? 'smart-bg-primary/10' : ''
                   }`}
                   key={index}
@@ -235,21 +214,18 @@ const Header = () => {
 
             <button
               onClick={toggleWebsitesMenu}
-              className="z-50 px-3 py-2.5 xl:px-4 xl:py-3 2xl:px-5 2xl:py-3.5 flex items-center justify-center gap-2 xl:gap-2.5 2xl:gap-3 overflow-hidden relative rounded-lg cursor-pointer duration-300 text-white transition-all hover:scale-105 shadow-lg ml-2 xl:ml-3 2xl:ml-4"
-              style={{ 
-                backgroundColor: config.primaryColor || '#3b82f6',
-                boxShadow: `0 4px 15px ${config.primaryColor || '#3b82f6'}40`
+              className="z-50 px-2 py-1.5 xl:px-2.5 xl:py-1.5 flex items-center justify-center gap-1 xl:gap-1.5 overflow-hidden relative rounded cursor-pointer duration-300 text-white transition-all hover:opacity-90 ml-2 xl:ml-3"
+              style={{
+                backgroundColor: config.primaryColor || '#3b82f6'
               }}
               aria-label="Open websites panel"
             >
-              <span className="md:block hidden text-sm xl:text-base 2xl:text-lg font-semibold uppercase relative z-50">Websites</span>
-              <CgMenuGridR className="size-6 xl:size-7 2xl:size-8 relative z-50" />
+              <span className="md:block hidden text-[10px] xl:text-xs font-normal uppercase relative z-50">Websites</span>
+              <CgMenuGridR className="size-3 xl:size-3.5 relative z-50" />
             </button>
           </div>
 
-          <svg className={`relative z-30 hidden xs:block pointer-events-none transition-opacity duration-500 ease-in-out ${
-            scrolled ? 'opacity-20' : 'opacity-100'
-          }`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2500 97">
+          <svg className="relative z-30 hidden xs:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2500 97">
             <path
               fill={config.menuBackground}
               d="M -379.355 -0.012 L -379.355 74.988 L 1949.14 74.988 C 1964.82 74.988 1995.639 70.748 2006.719 59.658 C 2006.719 59.658 2035.045 35.513 2048.725 21.843 C 2067.695 2.873 2069.382 -0.012 2069.382 -0.012 L -379.355 -0.012 Z"

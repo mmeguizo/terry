@@ -173,8 +173,10 @@ function normalizeRaceReadyData(data, view) {
 function normalizeEvent(event) {
   if (!event) return null;
 
-  // Extract venue name if it's an object
-  let venueName = event.venue || event.location || event.track;
+  // Extract venue name - check all possible field names
+  let venueName = event.venue_name || event.venue || event.location || event.track;
+
+  // If venue is an object, extract the name from it
   if (typeof venueName === 'object' && venueName !== null) {
     venueName = venueName.name || venueName.display || venueName.track || 'Venue TBA';
   }
@@ -213,7 +215,7 @@ function normalizeEvent(event) {
     }
   }
 
-  return {
+  const normalized = {
     id: event.id || event.eventid || event.event_id,
     slug: event.slug || event.event_slug || event.eventSlug,
     name: event.name || event.event_name || event.eventName || event.title,
@@ -252,5 +254,7 @@ function normalizeEvent(event) {
     // Keep original data for reference
     _raw: event
   };
+
+  return normalized;
 }
 

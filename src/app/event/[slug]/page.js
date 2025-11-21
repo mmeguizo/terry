@@ -253,63 +253,6 @@ function EntryStatusSection({ event, dateRange }) {
   );
 }
 
-// Event Documents Section
-function EventDocumentsSection({ documents }) {
-  if (!Array.isArray(documents) || documents.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-neutral-200 p-8 lg:p-10">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-1.5 h-8 bg-red-600 rounded-full"></div>
-        <h2 className="text-2xl font-black uppercase tracking-wide text-neutral-900">Event Documents</h2>
-      </div>
-
-      <div className="overflow-hidden rounded-lg border border-neutral-200">
-        <table className="w-full">
-          <tbody>
-            {documents.map((doc, idx) => (
-              <tr
-                key={idx}
-                className={`border-b border-neutral-200 hover:bg-red-50 transition-colors ${
-                  idx % 2 === 0 ? 'bg-neutral-50' : 'bg-white'
-                }`}
-              >
-                <td className="px-6 py-4">
-                  <a
-                    href={doc.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 text-red-600 hover:text-red-700 font-semibold group"
-                  >
-                    <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    <span className="group-hover:underline">{doc.name || doc.label || doc.title}</span>
-                  </a>
-                </td>
-                <td className="px-6 py-4 text-right">
-                  <a
-                    href={doc.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-neutral-500 hover:text-red-600 transition-colors"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                    </svg>
-                  </a>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
 // Entry List Section by Category
 function EntryListSection({ entries, categories }) {
   if (!entries || entries.length === 0) {
@@ -497,9 +440,6 @@ export default async function EventDetailPage({ params }) {
 
           {/* Entry Status */}
           <EntryStatusSection event={event} dateRange={dateRange} />
-
-          {/* Event Documents */}
-          <EventDocumentsSection documents={event.documents} />
 
           {/* Entry List by Category */}
           <EntryListSection entries={event.entries} categories={event.categories} />

@@ -171,19 +171,19 @@ const LatestNews = () => {
       </div>
       
       <div className="container relative z-10 max-w-7xl xl:max-w-6xl 2xl:max-w-7xl">
-        <div className="text-center mb-16 xl:mb-20 2xl:mb-24">
-          <h1 
-            className="xs:text-5xl text-4xl xl:text-6xl 2xl:text-7xl font-bold mb-4 xl:mb-6 2xl:mb-8 uppercase tracking-wider"
+        <div className="text-center mb-10 xl:mb-12 2xl:mb-14">
+          <h1
+            className="xs:text-3xl text-2xl xl:text-4xl 2xl:text-5xl font-normal mb-3 xl:mb-4 2xl:mb-6 uppercase tracking-wider"
             style={{ color: config.textColor || '#000000' }}
           >
             Latest News
-            <span 
-              className="block w-24 xl:w-28 2xl:w-32 h-1 xl:h-1.5 2xl:h-2 mx-auto mt-4 xl:mt-6 2xl:mt-8 rounded-full"
+            <span
+              className="block w-20 xl:w-24 2xl:w-28 h-1 xl:h-1 2xl:h-1.5 mx-auto mt-3 xl:mt-4 2xl:mt-6 rounded-full"
               style={{ background: `linear-gradient(to right, ${config.primaryColor || '#3b82f6'}, ${config.primaryColor ? `${config.primaryColor}80` : '#3b82f680'})` }}
             ></span>
           </h1>
-          <p 
-            className="text-lg xl:text-xl 2xl:text-2xl max-w-2xl xl:max-w-3xl 2xl:max-w-4xl mx-auto"
+          <p
+            className="text-base xl:text-lg 2xl:text-xl max-w-2xl xl:max-w-3xl 2xl:max-w-4xl mx-auto"
             style={{ color: config.textColor || '#000000' }}
           >
             Stay updated with the latest racing news, updates, and event information
@@ -207,7 +207,7 @@ const LatestNews = () => {
           </div>
         )}
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 max-w-none gap-8 xl:gap-10 2xl:gap-12 justify-items-center">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-none gap-3 xl:gap-4 2xl:gap-5 justify-items-center">
           {newsItems.map((newsItem, index) => (
             <div
               key={index}

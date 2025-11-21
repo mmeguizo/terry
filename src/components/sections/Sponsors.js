@@ -49,14 +49,14 @@ const Sponsors = () => {
       </div>
       
       <div className="w-full relative z-10 xl:px-8 2xl:px-12 3xl:px-16">
-        <div className="text-center mb-16 xl:mb-20 2xl:mb-24">
+        <div className="text-center mb-10 xl:mb-12 2xl:mb-14">
           <h1
-            className="xs:text-5xl text-4xl xl:text-6xl 2xl:text-7xl font-bold text-[var(--color-primary)] mb-4 xl:mb-6 2xl:mb-8 uppercase tracking-wider"
+            className="xs:text-3xl text-2xl xl:text-4xl 2xl:text-5xl font-normal text-[var(--color-primary)] mb-3 xl:mb-4 2xl:mb-6 uppercase tracking-wider"
             style={{ "--color-primary": config.primaryColor }}
           >
             Sponsors & Partners
-            <span 
-              className="block w-24 xl:w-28 2xl:w-32 h-1 xl:h-1.5 2xl:h-2 mx-auto mt-4 xl:mt-6 2xl:mt-8 rounded-full"
+            <span
+              className="block w-20 xl:w-24 2xl:w-28 h-1 xl:h-1 2xl:h-1.5 mx-auto mt-3 xl:mt-4 2xl:mt-6 rounded-full"
               style={{ background: `linear-gradient(90deg, ${config.primaryColor}, ${config.primaryColor}80)` }}
             ></span>
           </h1>

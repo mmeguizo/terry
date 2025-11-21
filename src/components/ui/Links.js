@@ -8,10 +8,10 @@ const LinkButton = ({ href, children, newTab }) => {
   const config = useConfig();
 
   return (
-    <Link 
-      href={href} 
-      className="group relative inline-flex items-center justify-center px-8 py-4 text-sm uppercase tracking-wider transition-all duration-300 transform rounded-xl overflow-hidden shadow-lg hover:shadow-2xl hover:-translate-y-1 hover:scale-105 smart-button-primary"
-      target={newTab ? "_blank" : "_self"} 
+    <Link
+      href={href}
+      className="group relative inline-flex items-center justify-center px-6 py-2.5 text-xs uppercase tracking-wide transition-all duration-300 transform rounded-lg overflow-hidden shadow-md hover:shadow-lg hover:-translate-y-0.5 hover:scale-105 smart-button-primary font-medium"
+      target={newTab ? "_blank" : "_self"}
       rel={newTab ? "noopener noreferrer" : undefined}
     >
       <span className="absolute inset-0 w-full h-full bg-gradient-to-br from-white/20 via-transparent to-black/20"></span>
@@ -41,23 +41,23 @@ const IconLinkButton = ({ href, children, newTab, sectionBg = null }) => {
   const primaryColor = config?.primaryColor || '#3b82f6';
 
   return (
-    <Link 
-      href={href} 
-      className="group relative flex items-stretch overflow-hidden rounded-2xl backdrop-blur-sm border shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 hover:scale-105 w-full min-h-[60px] smart-card"
-      target={newTab ? "_blank" : "_self"} 
+    <Link
+      href={href}
+      className="group relative flex items-stretch overflow-hidden rounded-lg backdrop-blur-sm border shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:scale-105 w-full min-h-[50px] smart-card"
+      target={newTab ? "_blank" : "_self"}
       rel={newTab ? "noopener noreferrer" : undefined}
     >
-      <div 
-        className="flex items-center justify-center w-16 flex-shrink-0 transition-all duration-300 group-hover:scale-110"
+      <div
+        className="flex items-center justify-center w-12 flex-shrink-0 transition-all duration-300 group-hover:scale-110"
         style={{ backgroundColor: primaryColor }}
       >
-        <span className="text-white text-lg group-hover:rotate-12 transition-transform duration-300">
+        <span className="text-white text-base group-hover:rotate-12 transition-transform duration-300">
           {childrenArray[0]}
         </span>
       </div>
-      <div className="flex-1 flex items-center px-4 py-3 bg-white/80">
-        <span 
-          className="font-semibold uppercase tracking-wide text-xs leading-tight transition-colors duration-300"
+      <div className="flex-1 flex items-center px-3 py-2 bg-white/80">
+        <span
+          className="font-normal uppercase tracking-wide text-xs leading-tight transition-colors duration-300"
           style={{ color: textColor }}
         >
           {childrenArray[1]}

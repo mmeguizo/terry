@@ -61,16 +61,16 @@ export default async function EventsIndexPage() {
   }));
 
   return (
-    <main className="min-h-screen bg-white pt-32">
+    <main className="min-h-screen bg-neutral-900 pt-32">
       {/* Hero Section */}
-      <div className="border-b border-neutral-200 bg-gradient-to-b from-neutral-50 to-white">
+      <div className="border-b border-neutral-800 bg-gradient-to-b from-neutral-900 to-neutral-950">
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-4xl">
             <div className="flex items-center gap-4 mb-6">
               <div className="w-2 h-12 bg-red-600 rounded-full"></div>
-              <h1 className="text-5xl md:text-6xl font-black uppercase tracking-tight text-neutral-900">Events</h1>
+              <h1 className="text-5xl md:text-6xl font-bold uppercase tracking-tight text-white">Events</h1>
             </div>
-            <p className="text-lg text-neutral-600 font-medium">Upcoming racing championships and events</p>
+            <p className="text-lg text-neutral-400 font-normal">Upcoming racing championships and events</p>
           </div>
         </div>
       </div>
@@ -80,13 +80,13 @@ export default async function EventsIndexPage() {
         <div className="flex justify-end gap-3 mb-12">
           <Link
             href="/events"
-            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold uppercase text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-300"
+            className="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold uppercase text-sm tracking-wide shadow-lg hover:shadow-xl transition-all duration-300"
           >
             List View
           </Link>
           <Link
             href="/events/calendar"
-            className="px-6 py-3 border-2 border-neutral-300 text-neutral-700 hover:border-neutral-400 hover:bg-neutral-50 rounded-lg font-bold uppercase text-sm tracking-wide transition-all duration-300"
+            className="px-6 py-3 border-2 border-neutral-700 text-neutral-300 hover:border-neutral-600 hover:bg-neutral-800 rounded-lg font-semibold uppercase text-sm tracking-wide transition-all duration-300"
           >
             Calendar View
           </Link>
@@ -98,12 +98,12 @@ export default async function EventsIndexPage() {
             <p className="text-neutral-500 text-lg">No events available at this time.</p>
           </div>
         ) : (
-          <div className="grid gap-6">
+          <div className="grid gap-8">
             {items.map((e, i) => {
-              // Extract venue name if it's an object
-              const venueName = typeof e.venue === 'string'
-                ? e.venue
-                : e.venue?.name || e.venue?.display || e.location || 'TBD';
+              // Extract venue name - prioritize location field from normalization
+              const venueName = e.location ||
+                (typeof e.venue === 'string' ? e.venue : e.venue?.name || e.venue?.display) ||
+                'TBD';
 
               // Determine event status
               const eventDate = e.startDate || e.date;
@@ -111,50 +111,65 @@ export default async function EventsIndexPage() {
                 new Date(eventDate) > new Date() ? 'Upcoming' : 'Past'
               ) : 'TBD';
 
+              // Extract date parts for red date block
+              const dateObj = eventDate ? new Date(eventDate) : null;
+              const dateDay = dateObj ? dateObj.getDate() : '?';
+              const dateMonth = dateObj ? dateObj.toLocaleDateString("en-US", { month: 'short' }).toUpperCase() : '?';
+
               return (
                 <div
                   key={e.id ?? i}
-                  className="group relative overflow-hidden border border-neutral-200 rounded-xl transition-all duration-300 hover:shadow-xl hover:border-red-300"
+                  className="group relative overflow-hidden bg-neutral-800 border border-neutral-700 rounded-xl transition-all duration-300 hover:shadow-2xl hover:border-red-600"
                 >
-                  {/* Background gradient accent */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-red-50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  {/* Red Date Block - Top Right Corner */}
+                  <div className="absolute top-6 right-6 z-10">
+                    <div className="bg-red-600 text-white rounded-lg overflow-hidden shadow-xl min-w-[80px]">
+                      <div className="bg-red-700 text-center py-1 px-3">
+                        <p className="text-xs font-bold uppercase tracking-wider">{dateMonth}</p>
+                      </div>
+                      <div className="text-center py-2 px-3">
+                        <p className="text-3xl font-bold leading-none">{dateDay}</p>
+                      </div>
+                    </div>
+                  </div>
 
-                  {/* Left accent bar */}
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-red-600 to-red-500"></div>
+                  {/* Status Badge - Top Right Below Date */}
+                  <div className="absolute top-32 right-6 z-10">
+                    <div className={`px-4 py-2 rounded-lg font-semibold uppercase text-xs whitespace-nowrap shadow-lg ${
+                      eventStatus === 'Upcoming'
+                        ? 'bg-green-600 text-white'
+                        : 'bg-neutral-600 text-neutral-200'
+                    }`}>
+                      {eventStatus}
+                    </div>
+                  </div>
 
                   {/* Content */}
-                  <div className="relative p-8">
-                    {/* Header row with status badge */}
-                    <div className="flex items-start justify-between gap-4 mb-6">
-                      <div className="flex-1">
-                        <h2 className="text-3xl font-black uppercase text-neutral-900 mb-2 group-hover:text-red-600 transition-colors">
-                          {e.name || e.title || "Event"}
-                        </h2>
-                        <p className="text-sm text-neutral-600 font-medium uppercase tracking-wide">{e.shortName || e.series || ""}</p>
-                      </div>
-                      <div className={`px-4 py-2 rounded-lg font-bold uppercase text-xs whitespace-nowrap ${
-                        eventStatus === 'Upcoming'
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {eventStatus}
-                      </div>
+                  <div className="relative p-10 pr-32">
+                    {/* Event Title */}
+                    <div className="mb-6">
+                      <h2 className="text-4xl font-bold uppercase text-white mb-3 group-hover:text-red-500 transition-colors leading-tight">
+                        {e.name || e.title || "Event"}
+                      </h2>
+                      {(e.shortName || e.series) && (
+                        <p className="text-sm text-red-500 font-medium uppercase tracking-wide">{e.shortName || e.series}</p>
+                      )}
                     </div>
 
                     {/* Info grid */}
-                    <div className="grid md:grid-cols-2 gap-6 mb-6">
+                    <div className="grid md:grid-cols-2 gap-8 mb-8">
                       {/* Date Info */}
                       <div className="flex gap-4">
                         <div className="flex-shrink-0">
-                          <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-red-100">
-                            <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-neutral-700 border border-neutral-600">
+                            <svg className="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                           </div>
                         </div>
                         <div>
-                          <p className="text-xs font-bold uppercase text-neutral-500 tracking-wider mb-1">Date</p>
-                          <p className="text-base font-bold text-neutral-900">
+                          <p className="text-xs font-semibold uppercase text-neutral-500 tracking-wider mb-2">Date</p>
+                          <p className="text-base font-medium text-neutral-200">
                             {e.date || fmtDateRange(e.startDate || e.date, e.endDate) || "TBD"}
                           </p>
                         </div>
@@ -163,16 +178,16 @@ export default async function EventsIndexPage() {
                       {/* Track Info */}
                       <div className="flex gap-4">
                         <div className="flex-shrink-0">
-                          <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-neutral-100">
-                            <svg className="w-6 h-6 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <div className="flex items-center justify-center w-14 h-14 rounded-lg bg-neutral-700 border border-neutral-600">
+                            <svg className="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                           </div>
                         </div>
                         <div>
-                          <p className="text-xs font-bold uppercase text-neutral-500 tracking-wider mb-1">Track</p>
-                          <p className="text-base font-bold text-neutral-900">{venueName}</p>
+                          <p className="text-xs font-semibold uppercase text-neutral-500 tracking-wider mb-2">Track</p>
+                          <p className="text-base font-medium text-neutral-200">{venueName}</p>
                         </div>
                       </div>
                     </div>
@@ -180,7 +195,7 @@ export default async function EventsIndexPage() {
                     {/* CTA Button */}
                     <a
                       href={e.path || `/event/${e.slug || e.id}`}
-                      className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-bold uppercase text-sm px-8 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105"
+                      className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-semibold uppercase text-sm px-10 py-4 rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:scale-105"
                     >
                       <span>View Details</span>
                       <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
