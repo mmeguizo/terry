@@ -267,9 +267,9 @@ const Hero = () => {
           </div>
           <div className="shrink-0 flex flex-col justify-end grow gap-2 xl:gap-2.5">
             {/* Clean GT4-inspired buttons */}
-            <IconLinkButton href="/noticeboard">
+            <IconLinkButton href="/events">
               <HiChevronRight />
-              Supplementary Regulations
+              Event Timetable
             </IconLinkButton>
             <IconLinkButton href="/noticeboard">
               <HiChevronRight />
