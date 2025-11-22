@@ -418,17 +418,17 @@ const Header = () => {
                     className="group relative"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <div 
+                    <div
                       className="block relative overflow-hidden rounded-2xl backdrop-blur-sm border transition-all duration-500 group-hover:scale-105 group-hover:-translate-y-2 aspect-video shadow-lg hover:shadow-2xl cursor-pointer"
                       style={{
-                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                        borderColor: 'rgba(255, 255, 255, 0.5)',
-                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                        backgroundColor: 'rgba(30, 30, 40, 0.95)',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2)'
                       }}
                       onClick={() => console.log('Clicked website:', item)}
                     >
-                      {/* Clean background glow effect */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/30 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      {/* Dark background glow effect */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-transparent to-purple-900/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       
                       {/* Logo container */}
                       <div className="relative z-10 p-4 h-full flex items-center justify-center">

@@ -59,10 +59,35 @@ export async function GET() {
 
     // Normalize Strapi absolute URL if needed
     const base = process.env.STRAPI_URL?.replace(/\/$/, '') || '';
-    const normalized = transformedNews.map(n => ({
-      ...n,
-      image: n.image && n.image.startsWith('http') ? n.image : (n.image ? `${base}${n.image}` : null),
-    }));
+
+    // Motorsport placeholder images for articles without images
+    const placeholderImages = [
+      'https://images.pexels.com/photos/190574/pexels-photo-190574.jpeg',
+      'https://images.pexels.com/photos/210182/pexels-photo-210182.jpeg',
+      'https://images.pexels.com/photos/544290/pexels-photo-544290.jpeg',
+      'https://images.pexels.com/photos/192334/pexels-photo-192334.jpeg',
+      'https://images.pexels.com/photos/274399/pexels-photo-274399.jpeg',
+      'https://images.pexels.com/photos/1545743/pexels-photo-1545743.jpeg',
+      'https://images.pexels.com/photos/1035108/pexels-photo-1035108.jpeg',
+      'https://images.pexels.com/photos/137577/pexels-photo-137577.jpeg',
+    ];
+
+    const normalized = transformedNews.map((n, index) => {
+      let normalizedImage = null;
+
+      if (n.image) {
+        // If article has an image, normalize the URL
+        normalizedImage = n.image.startsWith('http') ? n.image : `${base}${n.image}`;
+      } else {
+        // If no image, use placeholder
+        normalizedImage = placeholderImages[index % placeholderImages.length];
+      }
+
+      return {
+        ...n,
+        image: normalizedImage,
+      };
+    });
 
     return NextResponse.json(normalized);
   } catch (err) {

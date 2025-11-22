@@ -61,11 +61,21 @@ export async function GET() {
         throw new Error(`No site found with slug: ${siteSlug}`);
       }
 
-      // Get transformed data from Strapi (which will have empty sponsors array)
+      // Get transformed data from Strapi
       const transformedData = transformStrapiData(strapiData.data[0]);
 
-      // Merge in sponsors from local config
+      // Merge in data from local config when Strapi returns empty arrays
       transformedData.sponsors = localConfig.sponsors || [];
+
+      // Use local config for websites if Strapi has none
+      if (!transformedData.websites || transformedData.websites.length === 0) {
+        transformedData.websites = localConfig.websites || [];
+      }
+
+      // Use local config for news if Strapi has none
+      if (!transformedData.newsItems || transformedData.newsItems.length === 0) {
+        transformedData.newsItems = localConfig.newsItems || [];
+      }
 
       return transformedData;
     });

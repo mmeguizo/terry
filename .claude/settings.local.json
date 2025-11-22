@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(cat:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(node scripts/update-hero-video.js:*)",
+      "Bash(npm run dev:*)",
+      "Bash(node scripts/populate-racing-networks.js:*)",
+      "Bash(node scripts/add-news-placeholder-images.js:*)"
     ],
     "deny": [],
     "ask": []

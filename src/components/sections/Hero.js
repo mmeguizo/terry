@@ -27,8 +27,9 @@ const getYouTubeEmbedUrl = (url) => {
 
   if (!videoId) return null;
 
-  // Create embed URL with autoplay, loop, mute, and no controls
-  return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1`;
+  // Create embed URL with autoplay, loop, mute, no controls, and highest quality
+  // vq=hd1080 requests 1080p, hd720 is fallback
+  return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&playlist=${videoId}&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&vq=hd1080&hd=1`;
 };
 
 const Hero = () => {
@@ -173,6 +174,8 @@ const Hero = () => {
             allow="autoplay; encrypted-media"
             allowFullScreen
             title="Hero Background Video"
+            loading="eager"
+            style={{ border: 0 }}
           />
         </div>
       )}
@@ -263,31 +266,15 @@ const Hero = () => {
             </div>
           </div>
           <div className="shrink-0 flex flex-col justify-end grow gap-2 xl:gap-2.5">
-            {/* Populate from next event documents if available */}
-            {Array.isArray(nextEvent?.documents) && nextEvent.documents.length > 0 ? (
-              nextEvent.documents.map((doc, index) => (
-                <IconLinkButton key={index} href={doc.url || doc.link || '#'} newTab={true}>
-                  <HiChevronRight />
-                  {doc.name || doc.title || doc.label || 'Document'}
-                </IconLinkButton>
-              ))
-            ) : (
-              // GT4-inspired default buttons
-              <>
-                <IconLinkButton href="/event-timetable">
-                  <HiChevronRight />
-                  Event Timetable
-                </IconLinkButton>
-                <IconLinkButton href="/race-tickets">
-                  <HiChevronRight />
-                  Race Tickets
-                </IconLinkButton>
-                <IconLinkButton href="/noticeboard">
-                  <HiChevronRight />
-                  Noticeboard
-                </IconLinkButton>
-              </>
-            )}
+            {/* Clean GT4-inspired buttons */}
+            <IconLinkButton href="/noticeboard">
+              <HiChevronRight />
+              Supplementary Regulations
+            </IconLinkButton>
+            <IconLinkButton href="/noticeboard">
+              <HiChevronRight />
+              Noticeboard
+            </IconLinkButton>
           </div>
         </div>
       </div>

@@ -166,28 +166,28 @@
     {
       "title": "News Item #1",
       "date": "2025-07-15",
-      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMZGwELE70XYdU6i4rl3vywZuj8jl2_7AZHA&s",
+      "image": "https://images.pexels.com/photos/190574/pexels-photo-190574.jpeg",
       "url": "/news/item-1",
       "slug": "item-1"
     },
     {
       "title": "News Item #2",
       "date": "2025-07-15",
-      "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRIIJdew4sk2nA4uE0PEl69DczjP5nPtRJWhA&s",
+      "image": "https://images.pexels.com/photos/210182/pexels-photo-210182.jpeg",
       "url": "/news/item-2",
       "slug": "item-2"
     },
     {
       "title": "News Item #3",
       "date": "2025-07-15",
-      "image": "https://corp.formula1.com/wp-content/uploads/2024/09/Ferrari-Challenge-2_Credit-Ferrari-North-America-1-2048x1365-1-1.webp",
+      "image": "https://images.pexels.com/photos/544290/pexels-photo-544290.jpeg",
       "url": "/news/item-3",
       "slug": "item-3"
     },
     {
       "title": "News Item #4",
       "date": "2025-07-15",
-      "image": "https://assets.maz.tv/y9q69x4vw6qn1gxez9c44z0jvokj-300.jpeg",
+      "image": "https://images.pexels.com/photos/192334/pexels-photo-192334.jpeg",
       "url": "/news/item-4",
       "slug": "item-4"
     }
