@@ -105,20 +105,12 @@ const Header = () => {
   }, [isWebsitesMenuOpen, isMobileMenuOpen]);
 
   return (
-    <header className="fixed w-full top-0 z-50 flex items-stretch shadow-lg border-b border-gray-200/30" style={{
-      backgroundColor: config.menuBackground || '#ffffff'
+    <header className="fixed w-full top-0 z-50 flex items-stretch" style={{
+      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+      backdropFilter: 'blur(8px)'
     }}>
-      {/* Bottom accent line */}
-      <div
-        className="absolute bottom-0 left-0 w-full h-0.5"
-        style={{
-          background: `linear-gradient(to right, transparent, ${config.primaryColor || '#3b82f6'}, transparent)`
-        }}
-      ></div>
       <div className="flex items-center w-full px-3 xs:px-8 xl:px-16 2xl:px-24 3xl:px-32 relative z-40">
-        <div className="logo-container relative z-50 h-full flex items-center pt-2 -mt-1" style={{
-          backgroundColor: config.menuBackground || '#ffffff'
-        }}>
+        <div className="logo-container relative z-50 h-full flex items-center pt-2 -mt-1">
           <Link href="/" className="relative z-50 flex items-center gap-3 transition-transform duration-300 hover:scale-105">
             {config.logoImage && config.logoImage.trim() !== '' ? (
               <div className="relative">
@@ -128,11 +120,7 @@ const Header = () => {
                   width={300}
                   height={100}
                   priority
-                  className="w-auto h-16 sm:h-12 xl:h-14 2xl:h-16 object-contain transition-all duration-300 drop-shadow-lg"
-                  style={{
-                    filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4))',
-                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
-                  }}
+                  className="w-auto h-16 sm:h-18 xl:h-20 2xl:h-24 object-contain transition-all duration-300"
                 />
               </div>
             ) : (
@@ -155,20 +143,20 @@ const Header = () => {
               const isActive = item.url.startsWith('#') && activeSection && (`#${activeSection}` === item.url);
               return (
                 <Link
-                  className={`z-50 px-2 py-1.5 xl:px-2.5 xl:py-1.5 2xl:px-3 2xl:py-2 whitespace-nowrap uppercase font-medium relative rounded-lg transition-all duration-300 text-xs xl:text-sm 2xl:text-sm backdrop-blur-sm ${
-                    isActive ? 'smart-bg-primary/10' : ''
+                  className={`z-50 px-2 py-1.5 xl:px-2.5 xl:py-1.5 2xl:px-3 2xl:py-2 whitespace-nowrap uppercase font-medium relative rounded-lg transition-all duration-300 text-xs xl:text-sm 2xl:text-sm ${
+                    isActive ? '' : ''
                   }`}
                   key={index}
                   href={item.url}
                   onClick={(e) => handleSmoothAnchorClick(e, item.url)}
                   aria-current={isActive ? 'page' : undefined}
                   style={{
-                    color: config.textColor || '#1a1a1a',
-                    backgroundColor: isActive ? `${config.primaryColor || 'var(--primary-color)'}20` : undefined
+                    color: '#ffffff',
+                    backgroundColor: isActive ? `${config.primaryColor || '#dc2626'}30` : undefined
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.target.style.backgroundColor = `${config.primaryColor || 'var(--primary-color)'}10`;
+                      e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -194,15 +182,12 @@ const Header = () => {
 
           <div className="flex items-center gap-2 xl:gap-3 2xl:gap-4 mr-4 xl:mr-6 2xl:mr-8">
             <div className="lg:hidden">
-              <button 
-                onClick={toggleMobileMenu} 
-                className="z-50 p-3 rounded-lg cursor-pointer transition-all duration-300 backdrop-blur-sm smart-text-primary" 
+              <button
+                onClick={toggleMobileMenu}
+                className="z-50 p-3 rounded-lg cursor-pointer transition-all duration-300 text-white"
                 aria-label="Toggle mobile menu"
-                style={{
-                  color: config.textColor || 'var(--text-primary)'
-                }}
                 onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = `${config.primaryColor || 'var(--primary-color)'}10`;
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
                 }}
                 onMouseLeave={(e) => {
                   e.target.style.backgroundColor = 'transparent';
@@ -227,13 +212,13 @@ const Header = () => {
 
           <svg className="relative z-30 hidden xs:block pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2500 97">
             <path
-              fill={config.menuBackground}
+              fill="rgba(0, 0, 0, 0.85)"
               d="M -379.355 -0.012 L -379.355 74.988 L 1949.14 74.988 C 1964.82 74.988 1995.639 70.748 2006.719 59.658 C 2006.719 59.658 2035.045 35.513 2048.725 21.843 C 2067.695 2.873 2069.382 -0.012 2069.382 -0.012 L -379.355 -0.012 Z"
               style={{ transformOrigin: "1062.52px 38.494px" }}
               transform="matrix(-1, 0, 0, -1, 0, 0)"
             />
             <path
-              fill={config.primaryColor}
+              fill={config.primaryColor || '#dc2626'}
               fillOpacity="1"
               d="M 0.315 91 L -0.014 97 L 2391.63 97 C 2411.38 96.996 2430.32 89.143 2444.28 75.169 C 2444.28 75.169 2478.74 40.715 2495.96 23.49 C 2519.86 -0.404 2549.44 0 2549.44 0 C 2549.44 -0.293 2536.457 0 2531.59 0 C 2521.156 0 2501.577 8.305 2492.2 17.682 C 2472.473 37.409 2457.583 52.913 2440.37 70.126 C 2426.067 84.429 2406.699 91 2389.44 91 C 2379.532 91 2371.637 91 2371.637 91 L 0.315 91 Z"
               transform="matrix(-1, 0, 0, -1, 2549.43994141, 96.999985)"

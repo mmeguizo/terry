@@ -84,9 +84,9 @@ export default async function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content={config.siteTitle || 'RaceReady'} />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png" />
+        <link rel="apple-touch-icon" href="/Logo/MRA/MRA-Favicon-1.png" />
+        <link rel="icon" type="image/svg+xml" href="/Logo/MRA/MRA-Favicon-1.svg" />
+        <link rel="icon" type="image/png" href="/Logo/MRA/MRA-Favicon-1.png" />
       </head>
       <body className={`${exo2.variable} antialiased`}>
         <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:bg-black focus:text-white focus:px-4 focus:py-2 rounded">Skip to content</a>

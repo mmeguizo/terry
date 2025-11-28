@@ -44,6 +44,7 @@ const Hero = () => {
   const [offsetY, setOffsetY] = useState(0);
   const [nextEvent, setNextEvent] = useState(null);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,6 +59,7 @@ const Hero = () => {
   useEffect(() => {
     const fetchNextEvent = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch('/api/raceready-events?view=next');
         if (response.ok) {
           const data = await response.json();
@@ -66,6 +68,8 @@ const Hero = () => {
         }
       } catch (error) {
         console.warn('Failed to fetch next event from RaceReady:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -151,7 +155,7 @@ const Hero = () => {
   return (
     <section
       id="home"
-      className="z-0 relative w-full h-[900px] lg:h-[750px] xl:h-[800px] 2xl:h-[900px] 3xl:h-[1000px] bg-neutral-700 overflow-hidden scroll-mt-24"
+      className="z-0 relative w-full h-[650px] lg:h-[550px] xl:h-[600px] 2xl:h-[650px] 3xl:h-[700px] bg-neutral-700 overflow-hidden scroll-mt-24"
     >
       {/* Image Background (poster/fallback) - Always show as base layer */}
       {backgroundImage && (
@@ -195,8 +199,8 @@ const Hero = () => {
         </video>
       )}
 
-      {/* Enhanced overlay with gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/40 z-0"></div>
+      {/* Enhanced overlay with gradient - darkened for subtle video */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/80 to-black/70 z-[2]"></div>
       <div className="container absolute z-10 inset-0 flex items-center text-center gap-4 text-white pt-16 xl:pt-20 2xl:pt-24 px-4 xl:px-8">
         <div className="grid xl:grid-cols-[3fr_2fr] gap-8 xl:gap-16 2xl:gap-20 w-full lg:grid-cols-[1fr_1fr]">
           <div className="grow flex flex-col gap-3 xl:gap-4">
@@ -225,15 +229,25 @@ const Hero = () => {
                 ))}
               </div>
             </div>
-            <h1 className="xs:text-2xl text-xl xl:text-3xl 2xl:text-4xl 3xl:text-5xl text-start uppercase leading-tight text-white font-normal">
-              {typeof eventName === 'string' ? eventName : 'Event Name TBA'}
-            </h1>
+            {isLoading ? (
+              <>
+                <div className="h-8 xl:h-10 2xl:h-12 bg-white/20 rounded animate-pulse w-64 xl:w-80"></div>
+                <div className="h-6 xl:h-8 2xl:h-10 bg-white/15 rounded animate-pulse w-48 xl:w-60"></div>
+                <div className="h-4 xl:h-5 bg-white/10 rounded animate-pulse w-32"></div>
+              </>
+            ) : (
+              <>
+                <h1 className="xs:text-2xl text-xl xl:text-3xl 2xl:text-4xl 3xl:text-5xl text-start uppercase leading-tight text-white font-normal">
+                  {typeof eventName === 'string' ? eventName : 'Event Name TBA'}
+                </h1>
 
-            <h2 className="xs:text-xl text-lg xl:text-2xl 2xl:text-3xl 3xl:text-4xl text-start uppercase leading-tight text-white font-light">
-              {typeof eventLocation === 'string' ? eventLocation : 'Venue TBA'}
-            </h2>
+                <h2 className="xs:text-xl text-lg xl:text-2xl 2xl:text-3xl 3xl:text-4xl text-start uppercase leading-tight text-white font-light">
+                  {typeof eventLocation === 'string' ? eventLocation : 'Venue TBA'}
+                </h2>
 
-            <p className="text-start uppercase text-xs xl:text-sm 2xl:text-base text-gray-200 font-light">{formattedEventDate}</p>
+                <p className="text-start uppercase text-xs xl:text-sm 2xl:text-base text-gray-200 font-light">{formattedEventDate}</p>
+              </>
+            )}
 
             {/* Dynamic buttons based on event_status */}
             <div className="flex gap-3 justify-start flex-wrap">
@@ -260,21 +274,36 @@ const Hero = () => {
                   Entries Opening Soon
                 </div>
               )}
-              <LinkButton href="/event-info">
+              <LinkButton href={nextEvent?.slug ? `/event/${nextEvent.slug}` : '/events'}>
                 Event Info
               </LinkButton>
             </div>
           </div>
-          <div className="shrink-0 flex flex-col justify-end grow gap-2 xl:gap-2.5">
-            {/* Clean GT4-inspired buttons */}
-            <IconLinkButton href="/events">
-              <HiChevronRight />
-              Event Timetable
-            </IconLinkButton>
-            <IconLinkButton href="/noticeboard">
-              <HiChevronRight />
-              Noticeboard
-            </IconLinkButton>
+          <div className="shrink-0 flex flex-col justify-end items-end grow gap-2 xl:gap-2.5 max-w-[280px] xl:max-w-[320px] ml-auto">
+            {/* Quick links from RaceReady API documents */}
+            {nextEvent?.documents && nextEvent.documents.length > 0 ? (
+              nextEvent.documents.map((doc, index) => (
+                <IconLinkButton
+                  key={index}
+                  href={doc.URL_Long || doc.url || '#'}
+                  className="w-full"
+                >
+                  <HiChevronRight />
+                  {doc.name || doc.title || `Document ${index + 1}`}
+                </IconLinkButton>
+              ))
+            ) : (
+              <>
+                <IconLinkButton href="/events" className="w-full">
+                  <HiChevronRight />
+                  Event Calendar
+                </IconLinkButton>
+                <IconLinkButton href="/noticeboard" className="w-full">
+                  <HiChevronRight />
+                  Noticeboard
+                </IconLinkButton>
+              </>
+            )}
           </div>
         </div>
       </div>
